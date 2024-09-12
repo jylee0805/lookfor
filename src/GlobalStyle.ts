@@ -146,6 +146,7 @@ html{
 }
 body {
   line-height: 1.5;
+  display: block;
 }
 a {
   text-decoration: none;
