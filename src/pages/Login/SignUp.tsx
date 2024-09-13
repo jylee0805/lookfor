@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { auth, createUserWithEmailAndPassword, db, addDoc, collection } from "../../utils/firebase";
+import api from "../../utils/api";
 
 const SignUpBox = styled.div<{ isLogin: boolean }>`
   width: 100%;
@@ -51,35 +51,38 @@ function SignUp({ isLogin }: Props) {
     formState: { errors },
   } = useForm<FormInputs>();
 
-  const onSubmit: SubmitHandler<FormInputs> = (data) => {
-    createUserWithEmailAndPassword(auth, data.email, data.password)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-        await addDoc(collection(db, "users"), {
-          userName: data.name,
-          UID: user.uid,
-        });
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode);
-        console.log(errorMessage);
-      });
+  const onSubmit: SubmitHandler<FormInputs> = async (data) => {
+    const userName = await api.findUser(data.name);
+    if (userName.length >= 1) {
+      alert("用戶名已存在");
+      return;
+    }
+    if (data.password !== data.checkPassword) {
+      alert("請再次確認密碼");
+      return;
+    }
+    const response = await api.userSignUp(data.email, data.password);
+    console.log(response);
+    if (response === "Firebase: Error (auth/email-already-in-use).") {
+      alert("電子郵件已被使用");
+      return;
+    }
+    if (response instanceof Object) {
+      await api.setUser(data.name, response.user.uid);
+    }
   };
 
   return (
     <SignUpBox isLogin={isLogin}>
       <Label>
-        名稱<Require>*</Require>
-        <Input type="text" placeholder="請輸入名稱" {...register("name", { required: "請輸入名稱" })} />
-        {errors.name && <span>{errors.name.message}</span>}
-      </Label>
-      <Label>
         電子信箱<Require>*</Require>
         <Input type="email" placeholder="請輸入電子信箱" {...register("email", { required: "請輸入電子信箱" })} />
         {errors.email && <span>{errors.email.message}</span>}
+      </Label>
+      <Label>
+        名稱<Require>*</Require>
+        <Input type="text" placeholder="請輸入名稱" {...register("name", { required: "請輸入名稱" })} />
+        {errors.name && <span>{errors.name.message}</span>}
       </Label>
       <Label>
         設定密碼<Require>*</Require>
