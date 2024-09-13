@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useForm, SubmitHandler } from "react-hook-form";
 import api from "../../utils/api";
+import { useNavigate } from "react-router-dom";
 
 const LoginBox = styled.div<{ isLogin: boolean }>`
   width: 100%;
@@ -35,6 +36,7 @@ interface FormInputs {
 }
 
 function LogIn({ isLogin }: Props) {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -49,7 +51,9 @@ function LogIn({ isLogin }: Props) {
       return;
     } else if (response === "Firebase: Error (auth/invalid-email).") {
       alert("無效的 mail");
+      return;
     }
+    navigate("/");
   };
 
   return (

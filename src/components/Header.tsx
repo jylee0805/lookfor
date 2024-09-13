@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import logo from "../images/logo.png";
+import api from "../utils/api";
+import { useEffect, useState } from "react";
+import { auth, onAuthStateChanged } from "../utils/firebase";
 
 const Container = styled.header`
   display: flex;
@@ -16,14 +19,35 @@ const LogoBox = styled.div`
 const Logo = styled.img``;
 const Nav = styled.ul`
   display: flex;
+  align-items: center;
 `;
-
 const StyleLink = styled(Link)`
   font-size: 20px;
   padding: 20px 24px;
   color: #000000;
 `;
+const LogOutBtn = styled.button`
+  font-size: 20px;
+  padding: 20px 24px;
+  color: #000000;
+  background: none;
+`;
 function Header() {
+  const [isLogin, setIsLogin] = useState(false);
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLogin(true);
+      } else {
+        setIsLogin(false);
+      }
+    });
+  }, []);
+
+  const handlerLogout = () => {
+    api.userLogOut();
+  };
+
   return (
     <Container>
       <LogoBox>
@@ -34,11 +58,9 @@ function Header() {
           <StyleLink to="/view">場地</StyleLink>
         </li>
         <li>
-          <StyleLink to="/view">演唱會資訊</StyleLink>
+          <StyleLink to="/concertlist">演唱會資訊</StyleLink>
         </li>
-        <li>
-          <StyleLink to="/view">登入</StyleLink>
-        </li>
+        <li>{isLogin ? <LogOutBtn onClick={handlerLogout}>登出</LogOutBtn> : <StyleLink to="/login">登入</StyleLink>}</li>
       </Nav>
     </Container>
   );
