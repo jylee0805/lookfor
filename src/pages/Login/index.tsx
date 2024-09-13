@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import SignUp from "./SignUp";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "../../utils/firebase";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { auth, signInWithEmailAndPassword } from "../../utils/firebase";
 
 const Container = styled.div`
   padding: 40px 80px;
@@ -80,37 +80,19 @@ function Login() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<FormInputs>();
   const onSubmit: SubmitHandler<FormInputs> = (data) => {
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
-        // 登入成功
         const user = userCredential.user;
         console.log(user);
       })
       .catch((error) => {
-        // 登入失敗
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorCode);
         console.log(errorMessage);
       });
-  };
-
-  const handlerSignUp = () => {
-    /*createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // 註冊成功
-        const user = userCredential.user;
-        console.log(user);
-      })
-      .catch((error) => {
-        // 註冊失敗
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode);
-        console.log(errorMessage);
-      });*/
   };
 
   return (
