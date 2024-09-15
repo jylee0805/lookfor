@@ -121,9 +121,14 @@ const api = {
   },
 
   async getSections() {
-    const q = query(collection(db, "sections"));
+    const q = query(collection(db, "sections"), orderBy("sectionName"));
     const querySnapshot = await getDocs(q);
-    console.log(querySnapshot);
+    const section: object[] = [];
+    querySnapshot.forEach((doc) => {
+      section.push(doc.data());
+    });
+
+    return section;
   },
 
   async getRows(section: string) {
@@ -136,18 +141,19 @@ const api = {
     return row;
   },
 
-  async getViewPosts(section: string, row: number, seat: number) {
+  async getViewPosts(section: string, row: number, seat: number, onUpdate: (comments: object[]) => void) {
     const q = query(collection(db, "viewPosts"), where("section", "==", section), where("row", "==", row), where("seat", "==", seat));
-    const querySnapshot = await getDocs(q);
-    const posts: object[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      data.id = doc.id;
-      posts.push(data);
-    });
-    console.log(posts);
 
-    return posts;
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const updatedComments: object[] = [];
+      querySnapshot.forEach((doc) => {
+        updatedComments.push({ id: doc.id, ...doc.data() });
+      });
+      console.log(updatedComments);
+
+      onUpdate(updatedComments);
+    });
+    return unsubscribe;
   },
 
   async getViewComments(id: string, onUpdate: (comments: object[]) => void) {
@@ -160,17 +166,13 @@ const api = {
       querySnapshot.forEach((doc) => {
         updatedComments.push({ id: doc.id, ...doc.data() });
       });
+      console.log(updatedComments);
+
       onUpdate(updatedComments);
     });
     return unsubscribe;
   },
-  /*const querySnapshot = await getDocs(q);
-    const comments: object[] = [];
-    querySnapshot.forEach((doc) => {
-      console.log(doc.data());
 
-      comments.push(doc.data());
-    });*/
   async getConcerts() {
     const q = query(collection(db, "concerts"));
     const querySnapshot = await getDocs(q);

@@ -50,23 +50,26 @@ const PostVieBtn = styled.button`
   font-weight: 600;
   padding: 12px 24px;
 `;
-
-interface Post {
+export interface Comment {
+  content: string;
+  userUID: string;
+}
+export interface Post {
   image: string;
   note: string;
   content: string;
   id: string;
+  comment: Comment[];
 }
-interface Comment {
-  content: string;
-  userUID: string;
-}
+
 interface State {
-  allSeats: number[];
+  allSeats: object[];
+  rowSeats: number[];
   section: string;
   row: number;
   seat: number;
   isSelectRow: boolean;
+  isSelectSection: boolean;
   isPostClick: boolean;
   viewPosts: Post[];
   viewComments: Comment[];
@@ -76,24 +79,27 @@ interface State {
 }
 
 export type Action =
-  | { type: "getAllSeats"; payload: { allSeats: number[] } }
-  | { type: "selectSection"; payload: { section: string } }
-  | { type: "selectRow"; payload: { row: number } }
+  | { type: "getAllSeats"; payload: { allSeats: object[] } }
+  | { type: "selectSection"; payload: { section: string; rowSeats: number[]; isSelectRow: boolean } }
+  | { type: "selectRow"; payload: { row: number; isSelectRow: boolean } }
   | { type: "selectSeat"; payload: { seat: number } }
-  | { type: "setViewPosts"; payload: { viewPosts: object[] } }
-  | { type: "setViewComments"; payload: { viewComments: object[] } }
+  | { type: "setViewPosts"; payload: { viewPosts: Post[] } }
+  | { type: "setViewComments"; payload: { viewComments: object[]; id: string } }
   | { type: "isSelectRow"; payload: { isSelectRow: boolean } }
   | { type: "togglePostClick" }
-  | { type: "setSelectPhoto"; payload: { selectPhoto: object } }
+  | { type: "setSelectPhoto"; payload: { selectPhoto: object; localPhotoUrl: string } }
   | { type: "setLocalPhotoUrl"; payload: { localPhotoUrl: string } }
-  | { type: "setUploadPhotoUrl"; payload: { uploadPhotoUrl: string } };
+  | { type: "setUploadPhotoUrl"; payload: { uploadPhotoUrl: string } }
+  | { type: "isSelectSection" };
 
 const initial: State = {
   allSeats: [],
+  rowSeats: [],
   section: "0",
   row: 0,
   seat: 0,
   isSelectRow: false,
+  isSelectSection: false,
   viewPosts: [],
   viewComments: [],
   isPostClick: false,
@@ -107,23 +113,32 @@ const reducer = (state: State, action: Action): State => {
     case "getAllSeats":
       return { ...state, allSeats: action.payload.allSeats };
     case "selectSection":
-      return { ...state, section: action.payload.section };
+      return { ...state, section: action.payload.section, rowSeats: action.payload.rowSeats, isSelectRow: action.payload.isSelectRow, isSelectSection: true };
     case "selectRow":
-      return { ...state, row: action.payload.row };
+      return { ...state, row: action.payload.row, isSelectRow: action.payload.isSelectRow };
     case "selectSeat":
       return { ...state, seat: action.payload.seat };
     case "setViewPosts":
       return { ...state, viewPosts: action.payload.viewPosts };
-    case "setViewComments":
-      return { ...state, viewComments: action.payload.viewComments };
-    case "isSelectRow":
-      return { ...state, isSelectRow: true };
+    case "setViewComments": {
+      const posts = JSON.parse(JSON.stringify(state.viewPosts));
+
+      posts.forEach((post: Post) => {
+        if (post.id === action.payload.id) {
+          post.comment = action.payload.viewComments;
+        }
+        return post;
+      });
+      console.log(posts);
+
+      return { ...state, viewPosts: posts };
+    }
+    case "isSelectSection":
+      return { ...state, isSelectSection: true };
     case "togglePostClick":
       return { ...state, isPostClick: !state.isPostClick };
     case "setSelectPhoto":
-      return { ...state, selectPhoto: action.payload.selectPhoto };
-    case "setLocalPhotoUrl":
-      return { ...state, localPhotoUrl: action.payload.localPhotoUrl };
+      return { ...state, selectPhoto: action.payload.selectPhoto, localPhotoUrl: action.payload.localPhotoUrl };
     case "setUploadPhotoUrl":
       return { ...state, uploadPhotoUrl: action.payload.uploadPhotoUrl };
   }
@@ -131,63 +146,69 @@ const reducer = (state: State, action: Action): State => {
 function View() {
   const [state, dispatch] = useReducer(reducer, initial);
 
-  /*useEffect(() => {
-    api.getViewComments();
-    dispatch({ type: "setViewComments", payload: { viewComments: queryViewComments } });
-  }, []);*/
-
   useEffect(() => {
     const loadViewPosts = async () => {
-      // 获取帖子列表
-      const queryViewPosts = await api.getViewPosts(state.section, state.row + 1, state.seat + 1);
-
-      // 保存所有取消订阅的函数
+      const unsubscribesPost: (() => void)[] = [];
       const unsubscribes: (() => void)[] = [];
+      const posts: object[] = [];
 
-      queryViewPosts.forEach((post: Post) => {
-        // 为每个帖子创建一个监听器
-        const unsubscribe = api.getViewComments(post.id, (updatedComments) => {
-          console.log("Comments for post", post.id, ":", updatedComments);
-          dispatch({ type: "setViewComments", payload: { viewComments: updatedComments } });
+      // 監聽貼文變更
+
+      const unsubscribePost = api.getViewPosts(state.section, state.row + 1, state.seat + 1, (updatedPosts) => {
+        // 獲取並更新貼文
+        console.log(updatedPosts);
+        posts.push(...updatedPosts);
+
+        // 更新貼文狀態
+        dispatch({ type: "setViewPosts", payload: { viewPosts: posts } });
+
+        // 針對每篇貼文監聽留言
+        updatedPosts.forEach((post: any) => {
+          const unsubscribe = api.getViewComments(post.id, (updatedComments) => {
+            console.log(updatedComments);
+
+            // 更新對應貼文的留言
+            dispatch({ type: "setViewComments", payload: { viewComments: updatedComments, id: post.id } });
+          });
+
+          unsubscribes.push(unsubscribe);
         });
-
-        unsubscribes.push(unsubscribe);
       });
 
-      // 在组件卸载时，取消所有的监听器
+      unsubscribesPost.push(unsubscribePost);
+
+      // 清除訂閱
       return () => {
+        unsubscribesPost.forEach((unsubscribe) => unsubscribe());
         unsubscribes.forEach((unsubscribe) => unsubscribe());
       };
     };
 
     loadViewPosts();
   }, [state.section, state.row, state.seat]);
-  const handlerSection = async (section: string) => {
-    console.log(section);
 
+  useEffect(() => {
+    const getAllSeats = async () => {
+      const allSection = await api.getSections();
+
+      dispatch({ type: "getAllSeats", payload: { allSeats: allSection } });
+    };
+    getAllSeats();
+
+    return () => {
+      getAllSeats();
+    };
+  }, []);
+
+  const handlerSection = async (section: string) => {
     const rows = await api.getRows(section);
     const sectionAry: number[] = Array.isArray(rows) ? rows : [];
-    dispatch({ type: "getAllSeats", payload: { allSeats: sectionAry } });
-    dispatch({ type: "selectSection", payload: { section: section } });
+
+    dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, section: section, isSelectRow: false } });
   };
 
   const handlerSeat = async (seat: number) => {
-    console.log(seat);
-
-    const queryViewPosts = await api.getViewPosts(state.section, state.row + 1, seat + 1);
-
-    /*const queryViewComments = (
-      await Promise.all(
-        queryViewPosts.map(async (post) => {
-          const comments = await api.getViewComments(post.id);
-          console.log(comments);
-          return comments;
-        })
-      )
-    ).reduce((acc, val) => acc.concat(val), []);*/
-
-    dispatch({ type: "setViewPosts", payload: { viewPosts: queryViewPosts } });
-    //dispatch({ type: "setViewComments", payload: { viewComments: queryViewComments } });
+    dispatch({ type: "selectSeat", payload: { seat: seat } });
   };
 
   const handlerComment = async (id: string, content: string) => {
@@ -197,12 +218,10 @@ function View() {
     const target = event.target as HTMLInputElement;
 
     if (target.files && target.files.length > 0) {
-      console.log(URL.createObjectURL(target.files[0]));
-      console.log(typeof target.files[0], target.files[0]);
-      dispatch({ type: "setSelectPhoto", payload: { selectPhoto: target.files[0] } });
-      dispatch({ type: "setLocalPhotoUrl", payload: { localPhotoUrl: URL.createObjectURL(target.files[0]) } });
+      dispatch({ type: "setSelectPhoto", payload: { selectPhoto: target.files[0], localPhotoUrl: URL.createObjectURL(target.files[0]) } });
     }
   };
+
   return (
     <Container>
       <Banner>
@@ -214,7 +233,7 @@ function View() {
           <StyleLink to="/">視角分享</StyleLink>
         </NavItem>
         <NavItem>
-          <StyleLink to="/">交通資訊</StyleLink>
+          <StyleLink to="/transportation-driving">交通資訊</StyleLink>
         </NavItem>
       </Nav>
       <Main>

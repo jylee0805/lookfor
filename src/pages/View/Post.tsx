@@ -1,6 +1,8 @@
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
 import api from "../../utils/api";
+import useGoogleVisionAPI from "../../utils/useGoogleVisionAPI";
+import { Action } from ".";
 
 const PostContainer = styled.div<{ show: boolean }>`
   position: absolute;
@@ -19,6 +21,9 @@ const FormRow = styled.div`
 const PostTitle = styled.h3``;
 const Label = styled.p``;
 const Input = styled.input``;
+const Select = styled.select`
+  flex-grow: 1;
+`;
 const Content = styled.textarea`
   grid-column: span 2;
 `;
@@ -32,35 +37,87 @@ const FileBtn = styled.input`
 const ImagePreview = styled.img`
   width: 250px;
 `;
+
+interface Seats {
+  sectionName: string;
+  row: number[];
+}
+
 interface Props {
   state: {
-    allSeats: number[];
+    allSeats: Seats[];
     section: string;
     row: number;
     seat: number;
     isPostClick: boolean;
     selectPhoto: object;
+    localPhotoUrl: string;
   };
   dispatch: React.Dispatch<Action>;
   sendImage: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+interface FormInputs {
+  section: string;
+  row: string;
+  seat: string;
+  concert: string;
+  note: string;
+  content: string;
+}
+
 function Post({ state, dispatch, sendImage }: Props) {
+  const { labels, handleAnalyzeImage } = useGoogleVisionAPI();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    watch,
+    //formState: { errors },
   } = useForm<FormInputs>();
+  const sectionValue = watch("section");
+  const rowValue = parseInt(watch("row"));
 
-  const onSubmit: SubmitHandler<FormInputs> = async (data) => {
-    console.log(typeof data);
+  const filteredSeats = state.allSeats.filter((item) => item.sectionName === sectionValue);
+  const uniqueRows = filteredSeats.length > 0 && Array.isArray(filteredSeats[0].row) ? filteredSeats[0].row : [];
+  const seats = uniqueRows[rowValue - 1];
+  console.log(seats);
 
+  const onSubmit: SubmitHandler<FormInputs> = async (data: object) => {
     let url;
     if (state.selectPhoto) {
       url = await api.uploadImage(state.selectPhoto);
+
+      await handleAnalyzeImage(url);
+      console.log(labels);
+
       dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: url } });
+      if (labels.includes("Person")) {
+        alert("請確認圖片不包含人物");
+        return;
+      } else {
+        await api.setViewPost(data, url);
+        reset({
+          section: "",
+          row: "",
+          seat: "",
+          concert: "",
+          note: "",
+          content: "",
+        });
+      }
     }
-    await api.setViewPost(data, url);
+  };
+  const handlerCancel = () => {
+    reset({
+      section: "",
+      row: "",
+      seat: "",
+      concert: "",
+      note: "",
+      content: "",
+    });
+    dispatch({ type: "togglePostClick" });
   };
 
   return (
@@ -69,11 +126,37 @@ function Post({ state, dispatch, sendImage }: Props) {
       <FormContainer>
         <Label>位置</Label>
         <FormRow>
-          <Input type="text" defaultValue="" {...register("section")} />
+          <Select {...register("section")}>
+            <option value="">Select section</option>
+            <option value="2A">2A</option>
+            <option value="2B">2B</option>
+            <option value="2C">2C</option>
+            <option value="2D">2D</option>
+            <option value="2E">2E</option>
+            <option value="2F">2F</option>
+            <option value="2G">2G</option>
+            <option value="3A">3A</option>
+            <option value="3B">3B</option>
+            <option value="3C">3C</option>
+            <option value="3D">3D</option>
+            <option value="3E">3E</option>
+            <option value="3F">3F</option>
+            <option value="3G">3G</option>
+          </Select>
           <Label>區</Label>
-          <Input type="number" defaultValue="" {...register("row")} />
+          <Select {...register("row")}>
+            <option value="">Select section</option>
+            {uniqueRows.map((_, index) => (
+              <option value={index + 1}>{index + 1}</option>
+            ))}
+          </Select>
           <Label>排</Label>
-          <Input type="number" defaultValue="" {...register("seat")} />
+          <Select {...register("seat")}>
+            <option value="">Select section</option>
+            {Array.from({ length: seats }).map((_, index) => (
+              <option value={index + 1}>{index + 1}</option>
+            ))}
+          </Select>
           <Label>號</Label>
         </FormRow>
 
@@ -83,13 +166,13 @@ function Post({ state, dispatch, sendImage }: Props) {
         <Input type="text" defaultValue="" {...register("note")} />
         <Content defaultValue="" {...register("content")}></Content>
       </FormContainer>
-      {state.selectPhoto && <ImagePreview src={state.selectPhoto} />}
+      {state.selectPhoto && <ImagePreview src={state.localPhotoUrl} />}
 
       <SelectPhotoBtn>
         選擇照片
         <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" onChange={sendImage} />
       </SelectPhotoBtn>
-      <Cancel onClick={() => {}}>取消</Cancel>
+      <Cancel onClick={() => handlerCancel()}>取消</Cancel>
       <Submit onClick={handleSubmit(onSubmit)}>送出</Submit>
     </PostContainer>
   );

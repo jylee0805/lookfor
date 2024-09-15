@@ -1,13 +1,14 @@
 import styled from "styled-components";
 import avatar from "../../images/avatar.jpg";
-import view from "../../images/view.jpg";
 import { useState } from "react";
+import { Post, Comment } from "./index";
 
-const SeatSection = styled.div`
+const SeatSection = styled.div<{ rowSelect: boolean }>`
   grid-column: span 2;
   margin-top: 80px;
   padding: 0 100px;
   margin-bottom: 80px;
+  display: ${(props) => (props.rowSelect ? "block" : "none")};
 `;
 const Seats = styled.div`
   display: flex;
@@ -18,12 +19,13 @@ const Title = styled.h4`
   font-size: 32px;
   font-weight: 600;
 `;
-const SeatBtn = styled.button`
+const SeatBtn = styled.button<{ selected: boolean }>`
   width: 40px;
   height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
+  border: 2px solid ${(props) => (props.selected ? "#328c48" : "transparent")};
 `;
 const Card = styled.div`
   border-radius: 10px;
@@ -69,7 +71,7 @@ const CommentAvatar = styled.img`
   border-radius: 20px;
 `;
 const CommentUserName = styled.p``;
-const Comment = styled.p``;
+const CommentText = styled.p``;
 
 const TypeIn = styled.div`
   margin-top: auto;
@@ -83,18 +85,10 @@ const Type = styled.input`
   flex-grow: 1;
 `;
 const Send = styled.button``;
-interface Post {
-  image: string;
-  note: string;
-  content: string;
-}
-interface Comment {
-  content: string;
-  userUID: string;
-}
+
 interface Props {
   state: {
-    allSeats: number[];
+    rowSeats: number[];
     section: string;
     row: number;
     seat: number;
@@ -108,26 +102,25 @@ interface Props {
 
 function Seat({ state, handlerSeat, handlerComment }: Props) {
   const [comment, setComment] = useState("");
-  console.log(comment);
 
   return (
-    <SeatSection>
+    <SeatSection rowSelect={state.isSelectRow}>
       <Seats>
-        {state.isSelectRow &&
-          Array.from({ length: state.allSeats[state.row] }).map((_, index) => (
-            <SeatBtn
-              key={index}
-              onClick={() => {
-                handlerSeat(index);
-              }}
-            >
-              {index + 1}
-            </SeatBtn>
-          ))}
+        {Array.from({ length: state.rowSeats[state.row] }).map((_, index) => (
+          <SeatBtn
+            key={index}
+            selected={state.seat === index}
+            onClick={() => {
+              handlerSeat(index);
+            }}
+          >
+            {index + 1}
+          </SeatBtn>
+        ))}
       </Seats>
       <Title> 視角分享</Title>
       {state.viewPosts && state.viewPosts.length !== 0 ? (
-        state.viewPosts.map((post, index) => (
+        state.viewPosts.map((post: Post, index) => (
           <Card key={index}>
             <Img src={post.image} />
             <ContentBox>
@@ -138,14 +131,14 @@ function Seat({ state, handlerSeat, handlerComment }: Props) {
               <Note>{post.note}</Note>
               <Content>{post.content}</Content>
               <CommentSection>
-                {state.viewComments &&
-                  state.viewComments.map((comment, index) => (
+                {post.comment &&
+                  post.comment.map((comment, index) => (
                     <CommentBox key={index}>
                       <UserBox>
                         <CommentAvatar src={avatar} />
                         <CommentUserName>User Name</CommentUserName>
                       </UserBox>
-                      <Comment>{comment.content}</Comment>
+                      <CommentText>{comment.content}</CommentText>
                     </CommentBox>
                   ))}
               </CommentSection>

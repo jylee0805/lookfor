@@ -32,7 +32,7 @@ const VipFirst = styled.div`
 const VipSecond = styled(VipFirst)`
   transform: scaleX(-1);
 `;
-const SecondA = styled.div`
+/*const SecondA = styled.div`
   width: 90px;
   height: 110px;
   background: rgb(105, 240, 174);
@@ -40,10 +40,10 @@ const SecondA = styled.div`
   text-align: center;
   color: #000;
   line-height: 90px;
-`;
-const SecondG = styled(SecondA)`
-  transform: scaleX(-1);
-`;
+`;*/
+/*const SecondG = styled(SecondA)`
+  //transform: scaleX(-1);
+`;*/
 const SecondB = styled.div`
   width: 90px;
   height: 110px;
@@ -69,22 +69,22 @@ function Sections({ handlerSection }: Props) {
         <VipSecond></VipSecond>
       </Vip>
       <Second>
-        <SecondA data-section="2A">2A</SecondA>
-        <SecondB data-section="2B"></SecondB>
-        <SecondB data-section="2C"></SecondB>
-        <SecondB data-section="2D"></SecondB>
-        <SecondB data-section="2E"></SecondB>
-        <SecondB data-section="2F"></SecondB>
-        <SecondG data-section="2G"></SecondG>
+        <SecondB data-section="2A">2A</SecondB>
+        <SecondB data-section="2B">2B</SecondB>
+        <SecondB data-section="2C">2C</SecondB>
+        <SecondB data-section="2D">2D</SecondB>
+        <SecondB data-section="2E">2E</SecondB>
+        <SecondB data-section="2F">2F</SecondB>
+        <SecondB data-section="2G">2G</SecondB>
       </Second>
       <Third>
-        <SecondB data-section="3A"></SecondB>
-        <SecondB data-section="3B"></SecondB>
-        <SecondB data-section="3C"></SecondB>
-        <SecondB data-section="3D"></SecondB>
-        <SecondB data-section="3E"></SecondB>
-        <SecondB data-section="3F"></SecondB>
-        <SecondB data-section="3G"></SecondB>
+        <SecondB data-section="3A">3A</SecondB>
+        <SecondB data-section="3B">3B</SecondB>
+        <SecondB data-section="3C">3C</SecondB>
+        <SecondB data-section="3D">3D</SecondB>
+        <SecondB data-section="3E">3E</SecondB>
+        <SecondB data-section="3F">3F</SecondB>
+        <SecondB data-section="3G">3G</SecondB>
       </Third>
     </SelectSection>
   );
