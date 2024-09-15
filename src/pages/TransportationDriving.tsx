@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { useLoadScript, GoogleMap } from "@react-google-maps/api";
 
 const Container = styled.div``;
 const Banner = styled.div`
@@ -32,7 +33,11 @@ const StyleLink = styled(Link)`
   color: #000;
   padding: 10px;
 `;
-const Main = styled.main``;
+const Main = styled.main`
+  width: 70%;
+  margin: 0 auto;
+  margin-bottom: 80px;
+`;
 const BtnBox = styled.div`
   display: flex;
   justify-content: center;
@@ -45,8 +50,53 @@ const TransportationBtn = styled.button`
   font-weight: 600;
   padding: 12px 24px;
 `;
+const Content = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 30px;
+`;
+const SubTitle = styled.h4`
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 10px;
+  padding: 0 50px;
+  display: flex;
+  align-items: center;
+`;
+const Station = styled.p``;
+const Away = styled.p``;
+const Detail = styled.div`
+  padding: 50px 0;
+`;
+const Line = styled.div`
+  grid-column: span 2;
+  width: 100%;
+  height: 1px;
+  background: #000;
+`;
+
+const containerStyle = {
+  width: "100%",
+  height: "600px",
+};
+const MapContainer = styled.div`
+  width: 100%;
+  height: 500px;
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加陰影 */
+  overflow: hidden; /* 防止地圖超出容器 */
+`;
 
 function TransportationDriving() {
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: "AIzaSyA3EzkV4hLZiO3UWwyXgtWQxZHRc85JmHs",
+    libraries: ["places"],
+  });
+
+  if (!isLoaded) return <div>Loading...</div>;
+
   return (
     <Container>
       <Banner>
@@ -66,6 +116,20 @@ function TransportationDriving() {
           <TransportationBtn>大眾運輸</TransportationBtn>
           <TransportationBtn>自行開車</TransportationBtn>
         </BtnBox>
+        <Content>
+          <SubTitle>自行開車</SubTitle>
+          <Detail>
+            <Station>昆陽站</Station>
+            <Away>距離本中心約 600 公尺距離。請從 4 號出口出站，向東步行約 8 分鐘抵達。</Away>
+            <Station>南港站</Station>
+            <Away>距離本中心約 900 公尺。請由 1A 連通道出站，沿指標前行至 CITYLINK B 棟，由一樓走出大門後，沿市民大道向西步行約 11 分鐘抵達。</Away>
+          </Detail>
+          <Line />
+          <SubTitle>停車資訊</SubTitle>
+          <MapContainer>
+            <GoogleMap zoom={16} center={{ lat: 25.05212208941782, lng: 121.59858876881236 }} mapContainerStyle={containerStyle}></GoogleMap>
+          </MapContainer>
+        </Content>
       </Main>
     </Container>
   );
