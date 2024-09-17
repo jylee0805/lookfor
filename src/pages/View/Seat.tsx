@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import avatar from "../../images/avatar.jpg";
 import { useState } from "react";
-import { Post, Comment } from "./index";
+import { Post, Comment, Action } from "./index";
 
 const SeatSection = styled.div<{ rowSelect: boolean }>`
   grid-column: span 2;
@@ -41,9 +41,12 @@ const UserBox = styled.div`
   margin-bottom: 20px;
   column-gap: 10px;
 `;
+const ImgBox = styled.div`
+  width: 50%;
+  text-align: center;
+`;
 const Img = styled.img`
   border-radius: 10px;
-  width: 50%;
 `;
 const ContentBox = styled.div`
   flex-grow: 1;
@@ -85,7 +88,11 @@ const Type = styled.input`
   flex-grow: 1;
 `;
 const Send = styled.button``;
-
+const NoView = styled.p`
+  font-size: 24px;
+  text-align: center;
+  margin: 40px 0;
+`;
 interface Props {
   state: {
     rowSeats: number[];
@@ -95,14 +102,14 @@ interface Props {
     isSelectRow: boolean;
     viewPosts: Post[];
     viewComments: Comment[];
+    comment: { [key: string]: string };
   };
+  dispatch: React.Dispatch<Action>;
   handlerSeat: (seat: number) => void;
-  handlerComment: (id: string, content: string) => void;
+  handlerComment: (id: string) => void;
 }
 
-function Seat({ state, handlerSeat, handlerComment }: Props) {
-  const [comment, setComment] = useState("");
-
+function Seat({ state, handlerSeat, handlerComment, dispatch }: Props) {
   return (
     <SeatSection rowSelect={state.isSelectRow}>
       <Seats>
@@ -122,7 +129,10 @@ function Seat({ state, handlerSeat, handlerComment }: Props) {
       {state.viewPosts && state.viewPosts.length !== 0 ? (
         state.viewPosts.map((post: Post, index) => (
           <Card key={index}>
-            <Img src={post.image} />
+            <ImgBox>
+              <Img src={post.image} />
+            </ImgBox>
+
             <ContentBox>
               <UserBox>
                 <Avatar src={avatar} />
@@ -143,14 +153,14 @@ function Seat({ state, handlerSeat, handlerComment }: Props) {
                   ))}
               </CommentSection>
               <TypeIn>
-                <Type type="text" placeholder="留言..." value={comment} onChange={(e) => setComment(e.target.value)} />
-                <Send onClick={() => handlerComment(post.id, comment)}>送出</Send>
+                <Type type="text" placeholder="留言..." value={state.comment[post.id]} onChange={(e) => dispatch({ type: "setComment", payload: { id: post.id, commentText: e.target.value } })} />
+                <Send onClick={() => handlerComment(post.id)}>送出</Send>
               </TypeIn>
             </ContentBox>
           </Card>
         ))
       ) : (
-        <p>暫時沒有視角</p>
+        <NoView>暫時沒有視角</NoView>
       )}
     </SeatSection>
   );

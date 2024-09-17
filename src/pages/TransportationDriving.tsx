@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-
-import { useLoadScript, GoogleMap, MarkerF, InfoWindowF } from "@react-google-maps/api";
-import { useEffect, useState } from "react";
+import { useLoadScript, GoogleMap, MarkerF } from "@react-google-maps/api";
+import { useState } from "react";
+import parkingData from "../utils/parking.json";
 
 const Container = styled.div``;
 const Banner = styled.div`
@@ -44,14 +44,7 @@ const BtnBox = styled.div`
   display: flex;
   justify-content: center;
 `;
-const TransportationBtn = styled.button`
-  grid-column: span 2;
-  display: block;
-  margin: 0 auto 32px;
-  font-size: 24px;
-  font-weight: 600;
-  padding: 12px 24px;
-`;
+
 const Content = styled.div`
   display: grid;
   grid-template-columns: auto 1fr;
@@ -64,6 +57,9 @@ const SubTitle = styled.h4`
   padding: 0 50px;
   display: flex;
   align-items: center;
+`;
+const ParkSubTitle = styled(SubTitle)`
+  grid-column: span 2;
 `;
 const Station = styled.p``;
 const Away = styled.p``;
@@ -82,7 +78,13 @@ const containerStyle = {
   height: "600px",
 };
 const MapContainer = styled.div`
-  width: 100%;
+  padding: 0 50px;
+  grid-column: span 2;
+  display: flex;
+  column-gap: 20px;
+`;
+const Map = styled.div`
+  flex-grow: 1;
   height: 500px;
   position: relative;
   border: 1px solid #ccc;
@@ -90,7 +92,10 @@ const MapContainer = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加陰影 */
   overflow: hidden; /* 防止地圖超出容器 */
 `;
-
+const Place = styled.div`
+  width: 30%;
+  padding-top: 10px;
+`;
 const PlaceContent = styled.div`
   width: 100%;
   padding-top: 10px;
@@ -101,61 +106,41 @@ const PlaceTitle = styled.p`
   font-weight: 700;
   margin-bottom: 10px;
 `;
-const PlaceAddress = styled.p`
+const PlaceText = styled.p`
   font-size: 15px;
   color: #000;
+  line-height: 1.8;
 `;
 
 interface Place {
-  placeLat: number;
-  placeLng: number;
+  lat: number;
+  lng: number;
+  name: string;
+  parkNum: string;
+  fee: string;
+  openTime: string;
+  address?: string;
+  placeId?: string;
 }
 function TransportationDriving() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyA3EzkV4hLZiO3UWwyXgtWQxZHRc85JmHs",
     libraries: ["places"],
   });
-  const center = { lat: 25.05212208941782, lng: 121.59858876881236 };
+  const center = { lat: 25.05312208941785, lng: 121.60058876881236 };
   const [places, setPlaces] = useState<Place[]>([]);
-  const [selectedMarker, setSelectedMarker] = useState(null);
-  const [map, setMap] = useState(null);
+  const [selectedMarker, setSelectedMarker] = useState<Place | null>(null);
+
   console.log(selectedMarker);
 
-  const onLoad = (map: google.maps.Map) => {
-    setMap(map);
-    const service = new window.google.maps.places.PlacesService(map);
-    const request: google.maps.places.PlaceSearchRequest = {
-      location: center,
-      radius: 450, // 搜索範圍，單位為米
-      type: "parking", // 搜索類型為「停車場」
-    };
-    service.nearbySearch(request, (results, status) => {
-      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-        console.log("找到的停車場:", results);
-        if (results) {
-          const placeLats: Place[] = [];
-          results.forEach((place) => {
-            const { geometry, name, place_id } = place;
-
-            if (geometry && geometry.location) {
-              const { lat, lng } = geometry.location;
-              const placeLat = lat();
-              const placeLng = lng();
-              placeLats.push({ placeLat, placeLng, name, placeId: place_id });
-            }
-          });
-          console.log(placeLats);
-
-          if (placeLats) setPlaces(placeLats);
-        }
-      } else {
-        console.error("未能找到停車場:", status);
-      }
-    });
+  const onLoad = () => {
+    console.log(typeof parkingData);
+    setPlaces(parkingData);
   };
 
-  const handleMarkerClick = (place) => {
-    if (map) {
+  const handleMarkerClick = (place: Place) => {
+    setSelectedMarker(place);
+    /*if (map) {
       const service = new window.google.maps.places.PlacesService(map);
       const request = {
         placeId: place.placeId,
@@ -163,7 +148,7 @@ function TransportationDriving() {
       };
 
       service.getDetails(request, (result, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+        if (result && result.formatted_address && status === window.google.maps.places.PlacesServiceStatus.OK) {
           setSelectedMarker({
             ...place,
             address: result.formatted_address, // 更新地址
@@ -173,7 +158,7 @@ function TransportationDriving() {
           console.error("未能獲取地標詳細信息:", status);
         }
       });
-    }
+    }*/
   };
   if (!isLoaded) return <div>Loading...</div>;
   /*useEffect(() => {
@@ -259,7 +244,7 @@ function TransportationDriving() {
       </Banner>
       <Nav>
         <NavItem>
-          <StyleLink to="/">視角分享</StyleLink>
+          <StyleLink to="/view">視角分享</StyleLink>
         </NavItem>
         <NavItem>
           <StyleLink to="/transportation-driving">交通資訊</StyleLink>
@@ -267,8 +252,8 @@ function TransportationDriving() {
       </Nav>
       <Main>
         <BtnBox>
-          <TransportationBtn>大眾運輸</TransportationBtn>
-          <TransportationBtn>自行開車</TransportationBtn>
+          <StyleLink to="/transportation-public">大眾運輸</StyleLink>
+          <StyleLink to="/transportation-driving">自行開車</StyleLink>
         </BtnBox>
         <Content>
           <SubTitle>自行開車</SubTitle>
@@ -279,19 +264,26 @@ function TransportationDriving() {
             <Away>距離本中心約 900 公尺。請由 1A 連通道出站，沿指標前行至 CITYLINK B 棟，由一樓走出大門後，沿市民大道向西步行約 11 分鐘抵達。</Away>
           </Detail>
           <Line />
-          <SubTitle>停車資訊</SubTitle>
+          <ParkSubTitle>停車資訊</ParkSubTitle>
           <MapContainer>
-            <GoogleMap zoom={16} center={center} mapContainerStyle={containerStyle} onLoad={onLoad}>
-              {places && places.map((place, index) => <MarkerF key={index} position={{ lat: place.placeLat, lng: place.placeLng }} onClick={() => handleMarkerClick(place)} />)}
+            <Map>
+              <GoogleMap zoom={16} center={center} mapContainerStyle={containerStyle} onLoad={onLoad}>
+                {places && places.map((place, index) => <MarkerF key={index} position={{ lat: place.lat, lng: place.lng }} onClick={() => handleMarkerClick(place)} />)}
+              </GoogleMap>
+            </Map>
+            <Place>
               {selectedMarker && (
-                <InfoWindowF position={{ lat: selectedMarker.placeLat, lng: selectedMarker.placeLng }} onCloseClick={() => setSelectedMarker(null)}>
-                  <PlaceContent>
-                    <PlaceTitle>{selectedMarker.name}</PlaceTitle>
-                    <PlaceAddress>{selectedMarker.address}</PlaceAddress>
-                  </PlaceContent>
-                </InfoWindowF>
+                <PlaceContent>
+                  <PlaceTitle>{selectedMarker.name}</PlaceTitle>
+                  <PlaceText>開放時間：{selectedMarker.openTime}</PlaceText>
+                  <PlaceText>停車位：{selectedMarker.parkNum}</PlaceText>
+                  <PlaceText>費用：{selectedMarker.fee}</PlaceText>
+                  <a href={`https://www.google.com/maps/dir/?api=1&origin=臺北流行音樂中心&destination=${selectedMarker.lat},${selectedMarker.lng}`} target="blank">
+                    在 Google 上查看
+                  </a>
+                </PlaceContent>
               )}
-            </GoogleMap>
+            </Place>
           </MapContainer>
         </Content>
       </Main>

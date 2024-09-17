@@ -8,6 +8,18 @@ import { useEffect, useReducer } from "react";
 import Post from "./Post";
 
 const Container = styled.div``;
+const Mask = styled.div<{ postClick: boolean }>`
+  display: ${(props) => (props.postClick ? "block" : "none")};
+  background: #3e3e3e99;
+  width: 100%;
+  height: auto;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+`;
 const Banner = styled.div`
   text-align: center;
   padding: 200px 0;
@@ -51,19 +63,32 @@ const PostVieBtn = styled.button`
   padding: 12px 24px;
 `;
 export interface Comment {
-  content: string;
-  userUID: string;
+  content?: string;
+  userUID?: string;
+  createdTime?: string;
+  id: string;
 }
 export interface Post {
-  image: string;
-  note: string;
-  content: string;
+  image?: string;
+  note?: string;
+  content?: string;
   id: string;
-  comment: Comment[];
+  comment?: Comment[];
+  concert?: string;
+  createdTime?: string;
+  row?: number;
+  seat?: number;
+  section?: string;
+  userUID?: string;
+}
+
+interface Seats {
+  sectionName: string;
+  row: number[];
 }
 
 interface State {
-  allSeats: object[];
+  allSeats: Seats[];
   rowSeats: number[];
   section: string;
   row: number;
@@ -73,24 +98,26 @@ interface State {
   isPostClick: boolean;
   viewPosts: Post[];
   viewComments: Comment[];
-  selectPhoto: object;
+  selectPhoto: File | null;
   localPhotoUrl: string;
   uploadPhotoUrl: string;
+  comment: { [key: string]: string };
 }
 
 export type Action =
-  | { type: "getAllSeats"; payload: { allSeats: object[] } }
+  | { type: "getAllSeats"; payload: { allSeats: Seats[] } }
   | { type: "selectSection"; payload: { section: string; rowSeats: number[]; isSelectRow: boolean } }
   | { type: "selectRow"; payload: { row: number; isSelectRow: boolean } }
   | { type: "selectSeat"; payload: { seat: number } }
   | { type: "setViewPosts"; payload: { viewPosts: Post[] } }
-  | { type: "setViewComments"; payload: { viewComments: object[]; id: string } }
+  | { type: "setViewComments"; payload: { viewComments: Comment[]; id: string } }
   | { type: "isSelectRow"; payload: { isSelectRow: boolean } }
   | { type: "togglePostClick" }
-  | { type: "setSelectPhoto"; payload: { selectPhoto: object; localPhotoUrl: string } }
+  | { type: "setSelectPhoto"; payload: { selectPhoto: File | null; localPhotoUrl: string } }
   | { type: "setLocalPhotoUrl"; payload: { localPhotoUrl: string } }
   | { type: "setUploadPhotoUrl"; payload: { uploadPhotoUrl: string } }
-  | { type: "isSelectSection" };
+  | { type: "isSelectSection" }
+  | { type: "setComment"; payload: { commentText: string; id: string } };
 
 const initial: State = {
   allSeats: [],
@@ -103,9 +130,10 @@ const initial: State = {
   viewPosts: [],
   viewComments: [],
   isPostClick: false,
-  selectPhoto: {},
+  selectPhoto: null,
   localPhotoUrl: "",
   uploadPhotoUrl: "",
+  comment: {},
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -122,7 +150,6 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, viewPosts: action.payload.viewPosts };
     case "setViewComments": {
       const posts = JSON.parse(JSON.stringify(state.viewPosts));
-
       posts.forEach((post: Post) => {
         if (post.id === action.payload.id) {
           post.comment = action.payload.viewComments;
@@ -141,10 +168,16 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, selectPhoto: action.payload.selectPhoto, localPhotoUrl: action.payload.localPhotoUrl };
     case "setUploadPhotoUrl":
       return { ...state, uploadPhotoUrl: action.payload.uploadPhotoUrl };
+    case "setComment": {
+      return { ...state, comment: { ...state.comment, [action.payload.id]: action.payload.commentText } };
+    }
+    default:
+      return state;
   }
 };
 function View() {
   const [state, dispatch] = useReducer(reducer, initial);
+  console.log(state.comment);
 
   useEffect(() => {
     const loadViewPosts = async () => {
@@ -154,28 +187,29 @@ function View() {
 
       // 監聽貼文變更
 
-      const unsubscribePost = api.getViewPosts(state.section, state.row + 1, state.seat + 1, (updatedPosts) => {
+      const unsubscribePost = api.getViewPosts(state.section, state.row + 1, state.seat + 1, (updatedPosts: Post[]) => {
         // 獲取並更新貼文
         console.log(updatedPosts);
         posts.push(...updatedPosts);
 
         // 更新貼文狀態
-        dispatch({ type: "setViewPosts", payload: { viewPosts: posts } });
+        dispatch({ type: "setViewPosts", payload: { viewPosts: posts as Post[] } });
 
         // 針對每篇貼文監聽留言
-        updatedPosts.forEach((post: any) => {
-          const unsubscribe = api.getViewComments(post.id, (updatedComments) => {
+        updatedPosts.forEach(async (post) => {
+          const unsubscribe = api.getViewComments(post.id, (updatedComments: object[]) => {
             console.log(updatedComments);
 
             // 更新對應貼文的留言
-            dispatch({ type: "setViewComments", payload: { viewComments: updatedComments, id: post.id } });
+            dispatch({ type: "setViewComments", payload: { viewComments: updatedComments as Post[], id: post.id } });
           });
+          console.log(post);
 
-          unsubscribes.push(unsubscribe);
+          unsubscribes.push(await unsubscribe);
         });
       });
 
-      unsubscribesPost.push(unsubscribePost);
+      unsubscribesPost.push(await unsubscribePost);
 
       // 清除訂閱
       return () => {
@@ -189,7 +223,7 @@ function View() {
 
   useEffect(() => {
     const getAllSeats = async () => {
-      const allSection = await api.getSections();
+      const allSection = (await api.getSections()) as Seats[];
 
       dispatch({ type: "getAllSeats", payload: { allSeats: allSection } });
     };
@@ -211,8 +245,8 @@ function View() {
     dispatch({ type: "selectSeat", payload: { seat: seat } });
   };
 
-  const handlerComment = async (id: string, content: string) => {
-    await api.setComment(id, content);
+  const handlerComment = async (id: string) => {
+    await api.setComment(id, state.comment[id]);
   };
   const sendImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target as HTMLInputElement;
@@ -224,6 +258,7 @@ function View() {
 
   return (
     <Container>
+      <Mask postClick={state.isPostClick} />
       <Banner>
         <VenueTitle>臺北流行音樂中心</VenueTitle>
         <VenueSubTitle>TAIPEI MUSIC CENTER</VenueSubTitle>
@@ -237,11 +272,19 @@ function View() {
         </NavItem>
       </Nav>
       <Main>
-        <PostVieBtn onClick={() => dispatch({ type: "togglePostClick" })}>發佈視角</PostVieBtn>
+        <PostVieBtn
+          onClick={() => {
+            dispatch({ type: "togglePostClick" });
+
+            document.body.style.overflow = "hidden";
+          }}
+        >
+          發佈視角
+        </PostVieBtn>
         <Post state={state} dispatch={dispatch} sendImage={sendImage} />
         <Sections handlerSection={handlerSection} />
         <Rows state={state} dispatch={dispatch} />
-        <Seat state={state} handlerSeat={handlerSeat} handlerComment={handlerComment} />
+        <Seat state={state} handlerSeat={handlerSeat} handlerComment={handlerComment} dispatch={dispatch} />
       </Main>
     </Container>
   );

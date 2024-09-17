@@ -18,6 +18,16 @@ import {
   uploadBytes,
   getDownloadURL,
 } from "../utils/firebase";
+import { Post, Comment } from "../pages/View";
+
+interface Data {
+  content: string;
+  concert: string;
+  note: string;
+  row: string;
+  seat: string;
+  section: string;
+}
 
 const api = {
   async findUser(name: string) {
@@ -78,7 +88,7 @@ const api = {
     });
   },
 
-  async uploadImage(photo: object) {
+  async uploadImage(photo: File) {
     const storageRef = ref(storage, `images/${photo.name}`);
     const uploadTask = await uploadBytes(storageRef, photo);
     console.log(photo);
@@ -96,7 +106,7 @@ const api = {
     return;
   },
 
-  async setViewPost(data: object, image: string) {
+  async setViewPost(data: Data, image: string) {
     await addDoc(collection(db, "viewPosts"), {
       content: data.content,
       concert: data.concert,
@@ -141,28 +151,28 @@ const api = {
     return row;
   },
 
-  async getViewPosts(section: string, row: number, seat: number, onUpdate: (comments: object[]) => void) {
+  async getViewPosts(section: string, row: number, seat: number, onUpdate: (post: Post[]) => void) {
     const q = query(collection(db, "viewPosts"), where("section", "==", section), where("row", "==", row), where("seat", "==", seat));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const updatedComments: object[] = [];
+      const updatedPosts: Post[] = [];
       querySnapshot.forEach((doc) => {
-        updatedComments.push({ id: doc.id, ...doc.data() });
+        updatedPosts.push({ id: doc.id, ...doc.data() });
       });
-      console.log(updatedComments);
+      console.log(updatedPosts);
 
-      onUpdate(updatedComments);
+      onUpdate(updatedPosts);
     });
     return unsubscribe;
   },
 
-  async getViewComments(id: string, onUpdate: (comments: object[]) => void) {
+  async getViewComments(id: string, onUpdate: (comments: Comment[]) => void) {
     console.log(id);
 
     const q = query(collection(db, `viewPosts/${id}/comments`), orderBy("createdTime"));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const updatedComments: object[] = [];
+      const updatedComments: Comment[] = [];
       querySnapshot.forEach((doc) => {
         updatedComments.push({ id: doc.id, ...doc.data() });
       });

@@ -37,14 +37,6 @@ const BtnBox = styled.div`
   display: flex;
   justify-content: center;
 `;
-const TransportationBtn = styled.button`
-  grid-column: span 2;
-  display: block;
-  margin: 0 auto 32px;
-  font-size: 24px;
-  font-weight: 600;
-  padding: 12px 24px;
-`;
 
 function TransportationPublic() {
   return (
@@ -63,8 +55,8 @@ function TransportationPublic() {
       </Nav>
       <Main>
         <BtnBox>
-          <TransportationBtn>大眾運輸</TransportationBtn>
-          <TransportationBtn>自行開車</TransportationBtn>
+          <StyleLink to="/transportation-public">大眾運輸</StyleLink>
+          <StyleLink to="/transportation-driving">自行開車</StyleLink>
         </BtnBox>
       </Main>
     </Container>

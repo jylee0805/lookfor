@@ -5,10 +5,16 @@ import useGoogleVisionAPI from "../../utils/useGoogleVisionAPI";
 import { Action } from ".";
 
 const PostContainer = styled.div<{ show: boolean }>`
-  position: absolute;
-  background: #e2e2e2;
+  position: fixed;
+  background: #ffffff;
   z-index: 5;
+  padding: 20px 30px;
   display: ${(props) => (props.show ? "block" : "none")};
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 15px;
+  box-shadow: 3px 3px 3px #6c6c6c;
 `;
 const FormContainer = styled.div`
   display: grid;
@@ -27,12 +33,20 @@ const Select = styled.select`
 const Content = styled.textarea`
   grid-column: span 2;
 `;
+const BtnBox = styled.div`
+  display: flex;
+  align-items: center;
+`;
 const Submit = styled.button``;
-const Cancel = styled.button``;
-const SelectPhotoBtn = styled.label``;
+const Cancel = styled.button`
+  margin-left: auto;
+`;
+const SelectPhotoBtn = styled.label`
+  text-align: center;
+`;
 const FileBtn = styled.input`
   visibility: hidden;
-  width: 30px;
+  width: 0;
 `;
 const ImagePreview = styled.img`
   width: 250px;
@@ -50,7 +64,7 @@ interface Props {
     row: number;
     seat: number;
     isPostClick: boolean;
-    selectPhoto: object;
+    selectPhoto: File | null;
     localPhotoUrl: string;
   };
   dispatch: React.Dispatch<Action>;
@@ -64,6 +78,7 @@ interface FormInputs {
   concert: string;
   note: string;
   content: string;
+  image: object;
 }
 
 function Post({ state, dispatch, sendImage }: Props) {
@@ -81,11 +96,12 @@ function Post({ state, dispatch, sendImage }: Props) {
   const filteredSeats = state.allSeats.filter((item) => item.sectionName === sectionValue);
   const uniqueRows = filteredSeats.length > 0 && Array.isArray(filteredSeats[0].row) ? filteredSeats[0].row : [];
   const seats = uniqueRows[rowValue - 1];
-  console.log(seats);
 
-  const onSubmit: SubmitHandler<FormInputs> = async (data: object) => {
+  const onSubmit: SubmitHandler<FormInputs> = async (data: FormInputs) => {
     let url;
     if (state.selectPhoto) {
+      console.log(state.selectPhoto);
+
       url = await api.uploadImage(state.selectPhoto);
 
       await handleAnalyzeImage(url);
@@ -118,6 +134,7 @@ function Post({ state, dispatch, sendImage }: Props) {
       content: "",
     });
     dispatch({ type: "togglePostClick" });
+    document.body.style.overflow = "scroll";
   };
 
   return (
@@ -126,7 +143,7 @@ function Post({ state, dispatch, sendImage }: Props) {
       <FormContainer>
         <Label>位置</Label>
         <FormRow>
-          <Select {...register("section")}>
+          <Select {...register("section", { required: true })}>
             <option value="">Select section</option>
             <option value="2A">2A</option>
             <option value="2B">2B</option>
@@ -144,14 +161,14 @@ function Post({ state, dispatch, sendImage }: Props) {
             <option value="3G">3G</option>
           </Select>
           <Label>區</Label>
-          <Select {...register("row")}>
+          <Select {...register("row", { required: true })}>
             <option value="">Select section</option>
             {uniqueRows.map((_, index) => (
               <option value={index + 1}>{index + 1}</option>
             ))}
           </Select>
           <Label>排</Label>
-          <Select {...register("seat")}>
+          <Select {...register("seat", { required: true })}>
             <option value="">Select section</option>
             {Array.from({ length: seats }).map((_, index) => (
               <option value={index + 1}>{index + 1}</option>
@@ -161,19 +178,21 @@ function Post({ state, dispatch, sendImage }: Props) {
         </FormRow>
 
         <Label>觀看場次</Label>
-        <Input type="text" defaultValue="" {...register("concert")} />
+        <Input type="text" defaultValue="" {...register("concert", { required: true })} />
         <Label>備註</Label>
-        <Input type="text" defaultValue="" {...register("note")} />
+        <Input type="text" defaultValue="" {...register("note", { required: true })} />
         <Content defaultValue="" {...register("content")}></Content>
       </FormContainer>
       {state.selectPhoto && <ImagePreview src={state.localPhotoUrl} />}
 
-      <SelectPhotoBtn>
-        選擇照片
-        <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" onChange={sendImage} />
-      </SelectPhotoBtn>
-      <Cancel onClick={() => handlerCancel()}>取消</Cancel>
-      <Submit onClick={handleSubmit(onSubmit)}>送出</Submit>
+      <BtnBox>
+        <SelectPhotoBtn>
+          選擇照片
+          <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" {...register("image", { required: true })} onChange={sendImage} />
+        </SelectPhotoBtn>
+        <Cancel onClick={() => handlerCancel()}>取消</Cancel>
+        <Submit onClick={handleSubmit(onSubmit)}>送出</Submit>
+      </BtnBox>
     </PostContainer>
   );
 }
