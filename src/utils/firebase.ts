@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { initializeApp, FirebaseError } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore, addDoc, collection, query, where, getDocs, doc, serverTimestamp, onSnapshot, orderBy } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -17,6 +17,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+const provider = new GoogleAuthProvider();
 
 export {
   auth,
@@ -38,4 +39,8 @@ export {
   ref,
   uploadBytes,
   getDownloadURL,
+  signInWithPopup,
+  provider,
+  GoogleAuthProvider,
+  FirebaseError,
 };

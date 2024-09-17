@@ -2,6 +2,8 @@ import styled from "styled-components";
 import SignUp from "./SignUp";
 import { useState } from "react";
 import LogIn from "./Login";
+import api from "../../utils/api";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   padding: 40px 80px;
@@ -46,6 +48,13 @@ const GoogleBtn = styled.button``;
 
 function Login() {
   const [isLogin, setIsLogin] = useState<boolean>(true);
+  const navigate = useNavigate();
+  const handlerGoogleLogin = async () => {
+    const response = await api.userLogInGoogle();
+    if (response?.user) {
+      navigate("/");
+    }
+  };
 
   return (
     <Container>
@@ -61,7 +70,7 @@ function Login() {
           <Or>or</Or>
           <Line />
         </OrBox>
-        <GoogleBtn>Login with Google</GoogleBtn>
+        <GoogleBtn onClick={handlerGoogleLogin}>Login with Google</GoogleBtn>
       </Card>
     </Container>
   );

@@ -102,6 +102,7 @@ interface State {
   localPhotoUrl: string;
   uploadPhotoUrl: string;
   comment: { [key: string]: string };
+  isLoading: boolean;
 }
 
 export type Action =
@@ -111,13 +112,12 @@ export type Action =
   | { type: "selectSeat"; payload: { seat: number } }
   | { type: "setViewPosts"; payload: { viewPosts: Post[] } }
   | { type: "setViewComments"; payload: { viewComments: Comment[]; id: string } }
-  | { type: "isSelectRow"; payload: { isSelectRow: boolean } }
   | { type: "togglePostClick" }
   | { type: "setSelectPhoto"; payload: { selectPhoto: File | null; localPhotoUrl: string } }
-  | { type: "setLocalPhotoUrl"; payload: { localPhotoUrl: string } }
   | { type: "setUploadPhotoUrl"; payload: { uploadPhotoUrl: string } }
+  | { type: "setComment"; payload: { commentText: string; id: string } }
   | { type: "isSelectSection" }
-  | { type: "setComment"; payload: { commentText: string; id: string } };
+  | { type: "setLoading" };
 
 const initial: State = {
   allSeats: [],
@@ -134,6 +134,7 @@ const initial: State = {
   localPhotoUrl: "",
   uploadPhotoUrl: "",
   comment: {},
+  isLoading: false,
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -170,6 +171,9 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, uploadPhotoUrl: action.payload.uploadPhotoUrl };
     case "setComment": {
       return { ...state, comment: { ...state.comment, [action.payload.id]: action.payload.commentText } };
+    }
+    case "setLoading": {
+      return { ...state, isLoading: !state.isLoading };
     }
     default:
       return state;
@@ -265,7 +269,7 @@ function View() {
       </Banner>
       <Nav>
         <NavItem>
-          <StyleLink to="/">視角分享</StyleLink>
+          <StyleLink to="/view">視角分享</StyleLink>
         </NavItem>
         <NavItem>
           <StyleLink to="/transportation-driving">交通資訊</StyleLink>

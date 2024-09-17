@@ -47,7 +47,7 @@ function TransportationPublic() {
       </Banner>
       <Nav>
         <NavItem>
-          <StyleLink to="/">視角分享</StyleLink>
+          <StyleLink to="/view">視角分享</StyleLink>
         </NavItem>
         <NavItem>
           <StyleLink to="/transportation-driving">交通資訊</StyleLink>

@@ -17,6 +17,10 @@ import {
   ref,
   uploadBytes,
   getDownloadURL,
+  signInWithPopup,
+  provider,
+  GoogleAuthProvider,
+  FirebaseError,
 } from "../utils/firebase";
 import { Post, Comment } from "../pages/View";
 
@@ -64,6 +68,47 @@ const api = {
         return "An unexpected error occurred.";
       }
     }
+  },
+
+  async userLogInGoogle() {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      /*const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential?.accessToken; */
+      const user = result.user;
+      return { user };
+    } catch (error) {
+      if (error instanceof FirebaseError) {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.log(errorCode);
+        console.log(errorMessage);
+        console.log(credential);
+      } else {
+        console.error("Unexpected error:", error);
+      }
+    }
+    /*signInWithPopup(auth, provider)
+      .then(async (result) => {
+        // 登入成功，取得 token、user
+        const credential = await GoogleAuthProvider.credentialFromResult(result);
+        //let token = credential.accessToken;
+
+        const user = result.user;
+        //console.log(token);
+        console.log(credential);
+        return result;
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.log(errorCode);
+        console.log(errorMessage);
+        console.log(credential);
+        return error.message;
+      });*/
   },
 
   userLogOut() {

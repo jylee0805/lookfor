@@ -94,13 +94,17 @@ const Map = styled.div`
 `;
 const Place = styled.div`
   width: 30%;
-  padding-top: 10px;
 `;
 const PlaceContent = styled.div`
   width: 100%;
-  padding-top: 10px;
 `;
 const PlaceTitle = styled.p`
+  font-size: 20px;
+  color: #000;
+  font-weight: 700;
+  margin-bottom: 10px;
+`;
+const PlaceName = styled.p`
   font-size: 16px;
   color: #000;
   font-weight: 700;
@@ -274,7 +278,8 @@ function TransportationDriving() {
             <Place>
               {selectedMarker && (
                 <PlaceContent>
-                  <PlaceTitle>{selectedMarker.name}</PlaceTitle>
+                  <PlaceTitle>詳細資訊</PlaceTitle>
+                  <PlaceName>{selectedMarker.name}</PlaceName>
                   <PlaceText>開放時間：{selectedMarker.openTime}</PlaceText>
                   <PlaceText>停車位：{selectedMarker.parkNum}</PlaceText>
                   <PlaceText>費用：{selectedMarker.fee}</PlaceText>

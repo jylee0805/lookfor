@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import avatar from "../../images/avatar.jpg";
-import { useState } from "react";
+
 import { Post, Comment, Action } from "./index";
 
 const SeatSection = styled.div<{ rowSelect: boolean }>`

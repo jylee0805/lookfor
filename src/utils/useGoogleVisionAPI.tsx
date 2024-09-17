@@ -41,9 +41,14 @@ const useGoogleVisionAPI = () => {
       }
 
       const data = await response.json();
+
       const labels = data.responses[0].localizedObjectAnnotations;
-      setLabels(labels.map((label: Label) => label.name).toString());
-      console.log(labels);
+
+      if (labels) {
+        setLabels(labels.map((label: Label) => label.name).toString());
+      } else {
+        setLabels("noObject");
+      }
     } catch (err) {
       setError("Failed to analyze image");
       console.error(err);

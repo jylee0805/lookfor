@@ -3,6 +3,8 @@ import styled from "styled-components";
 import api from "../../utils/api";
 import useGoogleVisionAPI from "../../utils/useGoogleVisionAPI";
 import { Action } from ".";
+import loading from "../../images/loading.gif";
+import { useEffect } from "react";
 
 const PostContainer = styled.div<{ show: boolean }>`
   position: fixed;
@@ -37,7 +39,12 @@ const BtnBox = styled.div`
   display: flex;
   align-items: center;
 `;
-const Submit = styled.button``;
+const Submit = styled.button`
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
+  padding: 5px;
+`;
 const Cancel = styled.button`
   margin-left: auto;
 `;
@@ -51,7 +58,9 @@ const FileBtn = styled.input`
 const ImagePreview = styled.img`
   width: 250px;
 `;
-
+const Loading = styled.img`
+  width: 30px;
+`;
 interface Seats {
   sectionName: string;
   row: number[];
@@ -66,6 +75,8 @@ interface Props {
     isPostClick: boolean;
     selectPhoto: File | null;
     localPhotoUrl: string;
+    isLoading: boolean;
+    uploadPhotoUrl: string;
   };
   dispatch: React.Dispatch<Action>;
   sendImage: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -88,8 +99,9 @@ function Post({ state, dispatch, sendImage }: Props) {
     handleSubmit,
     reset,
     watch,
-    //formState: { errors },
+    formState: { errors },
   } = useForm<FormInputs>();
+  const { getValues } = useForm<FormInputs>();
   const sectionValue = watch("section");
   const rowValue = parseInt(watch("row"));
 
@@ -97,22 +109,25 @@ function Post({ state, dispatch, sendImage }: Props) {
   const uniqueRows = filteredSeats.length > 0 && Array.isArray(filteredSeats[0].row) ? filteredSeats[0].row : [];
   const seats = uniqueRows[rowValue - 1];
 
-  const onSubmit: SubmitHandler<FormInputs> = async (data: FormInputs) => {
+  const onSubmit: SubmitHandler<FormInputs> = async () => {
     let url;
+    dispatch({ type: "setLoading" });
     if (state.selectPhoto) {
       console.log(state.selectPhoto);
 
       url = await api.uploadImage(state.selectPhoto);
 
       await handleAnalyzeImage(url);
+      dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: url } });
       console.log(labels);
 
-      dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: url } });
-      if (labels.includes("Person")) {
+      /*if (labels.includes("Person")) {
         alert("請確認圖片不包含人物");
+        dispatch({ type: "setLoading" });
         return;
       } else {
         await api.setViewPost(data, url);
+        dispatch({ type: "setLoading" });
         reset({
           section: "",
           row: "",
@@ -120,10 +135,55 @@ function Post({ state, dispatch, sendImage }: Props) {
           concert: "",
           note: "",
           content: "",
+          image: undefined,
         });
-      }
+        dispatch({ type: "togglePostClick" });
+        dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
+        alert("發布成功");
+      }*/
     }
   };
+
+  useEffect(() => {
+    let ignore = false;
+
+    const handlerPost = async () => {
+      const formValues = getValues();
+      if (labels.includes("Person")) {
+        alert("請確認圖片不包含人物");
+        dispatch({ type: "setLoading" });
+        return;
+      } else if (labels === "") {
+        return;
+      } else {
+        if (formValues) {
+          await api.setViewPost(formValues, state.uploadPhotoUrl);
+        }
+        dispatch({ type: "setLoading" });
+        reset({
+          section: "",
+          row: "",
+          seat: "",
+          concert: "",
+          note: "",
+          content: "",
+          image: undefined,
+        });
+        dispatch({ type: "togglePostClick" });
+        dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
+        alert("發布成功");
+      }
+    };
+    if (!ignore) {
+      handlerPost();
+    }
+
+    return () => {
+      handlerPost();
+      ignore = true;
+    };
+  }, [labels]);
+
   const handlerCancel = () => {
     reset({
       section: "",
@@ -180,7 +240,7 @@ function Post({ state, dispatch, sendImage }: Props) {
         <Label>觀看場次</Label>
         <Input type="text" defaultValue="" {...register("concert", { required: true })} />
         <Label>備註</Label>
-        <Input type="text" defaultValue="" {...register("note", { required: true })} />
+        <Input type="text" defaultValue="" {...register("note")} />
         <Content defaultValue="" {...register("content")}></Content>
       </FormContainer>
       {state.selectPhoto && <ImagePreview src={state.localPhotoUrl} />}
@@ -188,10 +248,11 @@ function Post({ state, dispatch, sendImage }: Props) {
       <BtnBox>
         <SelectPhotoBtn>
           選擇照片
-          <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" {...register("image", { required: true })} onChange={sendImage} />
+          <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" {...register("image", { required: "請選擇照片" })} onChange={sendImage} />
         </SelectPhotoBtn>
+        {errors.image && <p>{errors.image.message}</p>}
         <Cancel onClick={() => handlerCancel()}>取消</Cancel>
-        <Submit onClick={handleSubmit(onSubmit)}>送出</Submit>
+        <Submit onClick={handleSubmit(onSubmit)}>送出{state.isLoading && <Loading src={loading} />}</Submit>
       </BtnBox>
     </PostContainer>
   );
