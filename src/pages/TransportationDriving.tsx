@@ -276,9 +276,9 @@ function TransportationDriving() {
               </GoogleMap>
             </Map>
             <Place>
+              <PlaceTitle>詳細資訊</PlaceTitle>
               {selectedMarker && (
                 <PlaceContent>
-                  <PlaceTitle>詳細資訊</PlaceTitle>
                   <PlaceName>{selectedMarker.name}</PlaceName>
                   <PlaceText>開放時間：{selectedMarker.openTime}</PlaceText>
                   <PlaceText>停車位：{selectedMarker.parkNum}</PlaceText>

@@ -35,6 +35,7 @@ const SignUpBtn = styled(Input)`
 
 interface Props {
   isLogin: boolean;
+  setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface FormInputs {
@@ -44,7 +45,7 @@ interface FormInputs {
   checkPassword: string;
 }
 
-function SignUp({ isLogin }: Props) {
+function SignUp({ isLogin, setIsLogin }: Props) {
   const {
     register,
     handleSubmit,
@@ -69,6 +70,8 @@ function SignUp({ isLogin }: Props) {
     }
     if (response instanceof Object) {
       await api.setUser(data.name, response.user.uid);
+      setIsLogin(true);
+      alert("註冊成功");
     }
   };
 

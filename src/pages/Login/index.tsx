@@ -63,8 +63,8 @@ function Login() {
           <SelectBtn onClick={() => setIsLogin(true)}>Log In</SelectBtn>
           <SelectBtn onClick={() => setIsLogin(false)}>Sign Up</SelectBtn>
         </ButtonGroup>
-        <LogIn isLogin={isLogin} />
-        <SignUp isLogin={isLogin} />
+        {isLogin ? <LogIn isLogin={isLogin} /> : <SignUp isLogin={isLogin} setIsLogin={setIsLogin} />}
+
         <OrBox>
           <Line />
           <Or>or</Or>

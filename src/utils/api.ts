@@ -123,13 +123,11 @@ const api = {
       });
   },
 
-  getLoginState() {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        return true;
-      } else {
-        return false;
-      }
+  async getLoginState() {
+    return new Promise((resolve) => {
+      onAuthStateChanged(auth, (user) => {
+        resolve(user?.uid); // 轉換為 boolean
+      });
     });
   },
 
@@ -151,18 +149,22 @@ const api = {
     return;
   },
 
-  async setViewPost(data: Data, image: string) {
-    await addDoc(collection(db, "viewPosts"), {
-      content: data.content,
-      concert: data.concert,
-      image: image,
-      note: data.note,
-      row: parseInt(data.row),
-      seat: parseInt(data.seat),
-      section: data.section,
-      createdTime: serverTimestamp(),
-      userUID: "",
-    });
+  async setViewPost(data: Data, image: string, uid: string) {
+    console.log(data, image, uid);
+
+    if (uid) {
+      await addDoc(collection(db, "viewPosts"), {
+        content: data.content || "",
+        concert: data.concert,
+        image: image,
+        note: data.note || "",
+        row: parseInt(data.row),
+        seat: parseInt(data.seat),
+        section: data.section,
+        createdTime: serverTimestamp(),
+        userUID: uid,
+      });
+    }
     return;
   },
 

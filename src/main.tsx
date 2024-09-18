@@ -13,7 +13,7 @@ import TransportationPublic from "./pages/TransportationPublic.tsx";
 
 import "./index.css";
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>

@@ -8,6 +8,7 @@ import { useEffect } from "react";
 
 const PostContainer = styled.div<{ show: boolean }>`
   position: fixed;
+  width: 50%;
   background: #ffffff;
   z-index: 5;
   padding: 20px 30px;
@@ -25,12 +26,16 @@ const FormContainer = styled.div`
 `;
 const FormRow = styled.div`
   display: flex;
+  align-items: center;
 `;
 const PostTitle = styled.h3``;
 const Label = styled.p``;
 const Input = styled.input``;
 const Select = styled.select`
   flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #949494;
+  border-radius: 5px;
 `;
 const Content = styled.textarea`
   grid-column: span 2;
@@ -99,9 +104,10 @@ function Post({ state, dispatch, sendImage }: Props) {
     handleSubmit,
     reset,
     watch,
+    getValues,
     formState: { errors },
   } = useForm<FormInputs>();
-  const { getValues } = useForm<FormInputs>();
+
   const sectionValue = watch("section");
   const rowValue = parseInt(watch("row"));
 
@@ -157,7 +163,10 @@ function Post({ state, dispatch, sendImage }: Props) {
         return;
       } else {
         if (formValues) {
-          await api.setViewPost(formValues, state.uploadPhotoUrl);
+          const response = (await api.getLoginState()) as string;
+          console.log(formValues);
+
+          await api.setViewPost(formValues, state.uploadPhotoUrl, response);
         }
         dispatch({ type: "setLoading" });
         reset({
@@ -169,9 +178,12 @@ function Post({ state, dispatch, sendImage }: Props) {
           content: "",
           image: undefined,
         });
+        console.log(state.isPostClick);
+
         dispatch({ type: "togglePostClick" });
         dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
         alert("發布成功");
+        document.body.style.overflow = "scroll";
       }
     };
     if (!ignore) {
@@ -183,7 +195,9 @@ function Post({ state, dispatch, sendImage }: Props) {
       ignore = true;
     };
   }, [labels]);
-
+  useEffect(() => {
+    console.log(state.isPostClick);
+  }, [state.isPostClick]);
   const handlerCancel = () => {
     reset({
       section: "",
@@ -221,6 +235,7 @@ function Post({ state, dispatch, sendImage }: Props) {
             <option value="3G">3G</option>
           </Select>
           <Label>區</Label>
+
           <Select {...register("row", { required: true })}>
             <option value="">Select section</option>
             {uniqueRows.map((_, index) => (
@@ -238,6 +253,7 @@ function Post({ state, dispatch, sendImage }: Props) {
         </FormRow>
 
         <Label>觀看場次</Label>
+
         <Input type="text" defaultValue="" {...register("concert", { required: true })} />
         <Label>備註</Label>
         <Input type="text" defaultValue="" {...register("note")} />
