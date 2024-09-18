@@ -30,7 +30,10 @@ const FormRow = styled.div`
 `;
 const PostTitle = styled.h3``;
 const Label = styled.p``;
-const Input = styled.input``;
+const Input = styled.input`
+  border: 1px solid #949494;
+  border-radius: 5px;
+`;
 const Select = styled.select`
   flex-grow: 1;
   padding: 8px;
@@ -39,6 +42,8 @@ const Select = styled.select`
 `;
 const Content = styled.textarea`
   grid-column: span 2;
+  border: 1px solid #949494;
+  border-radius: 5px;
 `;
 const BtnBox = styled.div`
   display: flex;
@@ -126,27 +131,6 @@ function Post({ state, dispatch, sendImage }: Props) {
       await handleAnalyzeImage(url);
       dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: url } });
       console.log(labels);
-
-      /*if (labels.includes("Person")) {
-        alert("請確認圖片不包含人物");
-        dispatch({ type: "setLoading" });
-        return;
-      } else {
-        await api.setViewPost(data, url);
-        dispatch({ type: "setLoading" });
-        reset({
-          section: "",
-          row: "",
-          seat: "",
-          concert: "",
-          note: "",
-          content: "",
-          image: undefined,
-        });
-        dispatch({ type: "togglePostClick" });
-        dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
-        alert("發布成功");
-      }*/
     }
   };
 
@@ -163,8 +147,9 @@ function Post({ state, dispatch, sendImage }: Props) {
         return;
       } else {
         if (formValues) {
-          const response = (await api.getLoginState()) as string;
           console.log(formValues);
+
+          const response = (await api.getLoginState()) as string;
 
           await api.setViewPost(formValues, state.uploadPhotoUrl, response);
         }
@@ -178,7 +163,6 @@ function Post({ state, dispatch, sendImage }: Props) {
           content: "",
           image: undefined,
         });
-        console.log(state.isPostClick);
 
         dispatch({ type: "togglePostClick" });
         dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
@@ -191,13 +175,10 @@ function Post({ state, dispatch, sendImage }: Props) {
     }
 
     return () => {
-      handlerPost();
       ignore = true;
     };
   }, [labels]);
-  useEffect(() => {
-    console.log(state.isPostClick);
-  }, [state.isPostClick]);
+
   const handlerCancel = () => {
     reset({
       section: "",
@@ -219,6 +200,9 @@ function Post({ state, dispatch, sendImage }: Props) {
         <FormRow>
           <Select {...register("section", { required: true })}>
             <option value="">Select section</option>
+            <option value="VIPA">VIPA</option>
+            <option value="VIPB">VIPB</option>
+            <option value="VIPC">VIPC</option>
             <option value="2A">2A</option>
             <option value="2B">2B</option>
             <option value="2C">2C</option>

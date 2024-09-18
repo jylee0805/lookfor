@@ -65,8 +65,9 @@ function Sections({ handlerSection }: Props) {
     >
       <Title>區域選擇</Title>
       <Vip>
-        <VipFirst data-section="2A"></VipFirst>
-        <VipSecond data-section="2A"></VipSecond>
+        <VipFirst data-section="VIPA">VIPA</VipFirst>
+        <SecondB data-section="VIPB">VIPB</SecondB>
+        <VipSecond data-section="VIPC">VIPC</VipSecond>
       </Vip>
       <Second>
         <SecondB data-section="2A">2A</SecondB>

@@ -67,6 +67,7 @@ export interface Comment {
   userUID?: string;
   createdTime?: string;
   id: string;
+  userName?: string;
 }
 export interface Post {
   image?: string;
@@ -80,6 +81,7 @@ export interface Post {
   seat?: number;
   section?: string;
   userUID?: string;
+  userName?: string;
 }
 
 interface Seats {
@@ -151,15 +153,30 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, viewPosts: action.payload.viewPosts };
     case "setViewComments": {
       const posts = JSON.parse(JSON.stringify(state.viewPosts));
-      posts.forEach((post: Post) => {
+      /* posts.forEach((post: Post, index) => {
         if (post.id === action.payload.id) {
+          console.log(action.payload.viewComments);
           post.comment = action.payload.viewComments;
+          return post;
+        } else {
+          return post;
         }
-        return post;
       });
-      console.log(posts);
+      console.log(posts);*/
+      console.log(state.viewPosts);
 
-      return { ...state, viewPosts: posts };
+      const updatedPosts = posts.map((post: Post, index: number) => {
+        if (post.id === action.payload.id) {
+          return {
+            ...post,
+            comment: action.payload.viewComments,
+          };
+        }
+
+        return state.viewPosts[index];
+      });
+
+      return { ...state, viewPosts: updatedPosts };
     }
     case "isSelectSection":
       return { ...state, isSelectSection: true };
@@ -181,36 +198,71 @@ const reducer = (state: State, action: Action): State => {
 };
 function View() {
   const [state, dispatch] = useReducer(reducer, initial);
-  console.log(state.comment);
 
   useEffect(() => {
     const loadViewPosts = async () => {
       const unsubscribesPost: (() => void)[] = [];
       const unsubscribes: (() => void)[] = [];
-      const posts: object[] = [];
-
+      let posts: Post[] = [];
+      let comments: Comment[] = [];
       // 監聽貼文變更
 
       const unsubscribePost = api.getViewPosts(state.section, state.row + 1, state.seat + 1, (updatedPosts: Post[]) => {
-        // 獲取並更新貼文
-        console.log(updatedPosts);
-        posts.push(...updatedPosts);
+        posts = JSON.parse(JSON.stringify(updatedPosts));
 
-        // 更新貼文狀態
-        dispatch({ type: "setViewPosts", payload: { viewPosts: posts as Post[] } });
+        const fetchUserNames = async () => {
+          const userNamesPromises = posts.map(async (post) => {
+            if (post.userUID) {
+              const userName = await api.getUser(post.userUID);
 
-        // 針對每篇貼文監聽留言
-        updatedPosts.forEach(async (post) => {
-          const unsubscribe = api.getViewComments(post.id, (updatedComments: object[]) => {
-            console.log(updatedComments);
-
-            // 更新對應貼文的留言
-            dispatch({ type: "setViewComments", payload: { viewComments: updatedComments as Post[], id: post.id } });
+              return userName;
+            }
+            return null;
           });
-          console.log(post);
+          const userNames = await Promise.all(userNamesPromises);
+
+          return userNames;
+        };
+        fetchUserNames().then((userNames) => {
+          posts.forEach((post, index) => {
+            post.userName = userNames[index];
+          });
+        });
+
+        posts.forEach(async (post) => {
+          const unsubscribe = api.getViewComments(post.id, (updatedComments: Comment[]) => {
+            console.log(updatedComments);
+            comments = JSON.parse(JSON.stringify(updatedComments));
+            console.log(comments);
+
+            const fetchUserNames = async () => {
+              const userNamesPromises = comments.map(async (comment) => {
+                if (comment.userUID) {
+                  const userName = await api.getUser(comment.userUID);
+
+                  return userName;
+                }
+                return null;
+              });
+
+              const userNames = await Promise.all(userNamesPromises);
+
+              return userNames;
+            };
+            fetchUserNames().then((userNames) => {
+              comments.forEach((comment, index) => {
+                comment.userName = userNames[index];
+              });
+            });
+
+            post.comment = comments;
+          });
 
           unsubscribes.push(await unsubscribe);
         });
+
+        console.log(posts);
+        dispatch({ type: "setViewPosts", payload: { viewPosts: posts } });
       });
 
       unsubscribesPost.push(await unsubscribePost);
@@ -250,7 +302,10 @@ function View() {
   };
 
   const handlerComment = async (id: string) => {
-    await api.setComment(id, state.comment[id]);
+    const response = (await api.getLoginState()) as string;
+    const userName = await api.getUser(response);
+    await api.setComment(id, state.comment[id], response, userName);
+    dispatch({ type: "setComment", payload: { id: id, commentText: "" } });
   };
   const sendImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target as HTMLInputElement;

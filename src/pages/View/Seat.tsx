@@ -14,6 +14,8 @@ const Seats = styled.div`
   display: flex;
   column-gap: 10px;
   justify-content: center;
+  overflow-x: scroll;
+  padding-left: 480px;
 `;
 const Title = styled.h4`
   font-size: 32px;
@@ -136,8 +138,9 @@ function Seat({ state, handlerSeat, handlerComment, dispatch }: Props) {
             <ContentBox>
               <UserBox>
                 <Avatar src={avatar} />
-                <UserName>User Name</UserName>
+                <UserName>{post.userName}</UserName>
               </UserBox>
+              <Note>{post.concert}</Note>
               <Note>{post.note}</Note>
               <Content>{post.content}</Content>
               <CommentSection>
@@ -146,7 +149,7 @@ function Seat({ state, handlerSeat, handlerComment, dispatch }: Props) {
                     <CommentBox key={index}>
                       <UserBox>
                         <CommentAvatar src={avatar} />
-                        <CommentUserName>User Name</CommentUserName>
+                        <CommentUserName>{comment.userName}</CommentUserName>
                       </UserBox>
                       <CommentText>{comment.content}</CommentText>
                     </CommentBox>

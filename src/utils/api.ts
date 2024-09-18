@@ -37,11 +37,17 @@ const api = {
   async findUser(name: string) {
     const q = query(collection(db, "users"), where("userName", "==", name));
     const querySnapshot = await getDocs(q);
-    console.log(querySnapshot);
 
     return querySnapshot.docs;
   },
+  async getUser(id: string) {
+    if (id) {
+      const q = query(collection(db, "users"), where("UID", "==", id));
+      const querySnapshot = await getDocs(q);
 
+      return querySnapshot.docs[0].data().userName;
+    }
+  },
   async userSignUp(email: string, password: string) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -126,6 +132,8 @@ const api = {
   async getLoginState() {
     return new Promise((resolve) => {
       onAuthStateChanged(auth, (user) => {
+        console.log(user);
+
         resolve(user?.uid); // 轉換為 boolean
       });
     });
@@ -150,8 +158,6 @@ const api = {
   },
 
   async setViewPost(data: Data, image: string, uid: string) {
-    console.log(data, image, uid);
-
     if (uid) {
       await addDoc(collection(db, "viewPosts"), {
         content: data.content || "",
@@ -162,17 +168,19 @@ const api = {
         seat: parseInt(data.seat),
         section: data.section,
         createdTime: serverTimestamp(),
+
         userUID: uid,
       });
     }
     return;
   },
 
-  async setComment(id: string, content: string) {
+  async setComment(id: string, content: string, uid: string, userName: string) {
     await addDoc(collection(db, `viewPosts/${id}/comments`), {
       content: content,
       createdTime: serverTimestamp(),
-      userUID: "",
+      userUID: uid,
+      userName: userName,
     });
     return;
   },
@@ -214,8 +222,6 @@ const api = {
   },
 
   async getViewComments(id: string, onUpdate: (comments: Comment[]) => void) {
-    console.log(id);
-
     const q = query(collection(db, `viewPosts/${id}/comments`), orderBy("createdTime"));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
