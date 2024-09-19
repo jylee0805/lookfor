@@ -105,6 +105,7 @@ interface State {
   uploadPhotoUrl: string;
   comment: { [key: string]: string };
   isLoading: boolean;
+  isCommentEditMode: string;
 }
 
 export type Action =
@@ -119,7 +120,8 @@ export type Action =
   | { type: "setUploadPhotoUrl"; payload: { uploadPhotoUrl: string } }
   | { type: "setComment"; payload: { commentText: string; id: string } }
   | { type: "isSelectSection" }
-  | { type: "setLoading" };
+  | { type: "setLoading" }
+  | { type: "toggleCommentMode"; payload: { isCommentEditMode: string } };
 
 const initial: State = {
   allSeats: [],
@@ -137,6 +139,7 @@ const initial: State = {
   uploadPhotoUrl: "",
   comment: {},
   isLoading: false,
+  isCommentEditMode: "",
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -153,16 +156,6 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, viewPosts: action.payload.viewPosts };
     case "setViewComments": {
       const posts = JSON.parse(JSON.stringify(state.viewPosts));
-      /* posts.forEach((post: Post, index) => {
-        if (post.id === action.payload.id) {
-          console.log(action.payload.viewComments);
-          post.comment = action.payload.viewComments;
-          return post;
-        } else {
-          return post;
-        }
-      });
-      console.log(posts);*/
       console.log(state.viewPosts);
 
       const updatedPosts = posts.map((post: Post, index: number) => {
@@ -191,6 +184,9 @@ const reducer = (state: State, action: Action): State => {
     }
     case "setLoading": {
       return { ...state, isLoading: !state.isLoading };
+    }
+    case "toggleCommentMode": {
+      return { ...state, isCommentEditMode: action.payload.isCommentEditMode };
     }
     default:
       return state;
@@ -297,6 +293,16 @@ function View() {
 
   const deleteComment = async (post: string, id: string) => {
     await api.deleteComment(post, id);
+    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.filter((post) => post.comment?.filter((comment) => comment.id != id)) } });
+  };
+
+  const editPost = async (id: string) => {
+    await api.deleteViewPost(id);
+    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.filter((post) => post.id !== id) } });
+  };
+
+  const editComment = async (post: string, id: string) => {
+    await api.updateComment(post, id);
     dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.filter((post) => post.comment?.filter((comment) => comment.id != id)) } });
   };
 

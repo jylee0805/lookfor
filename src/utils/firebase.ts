@@ -1,6 +1,6 @@
 import { initializeApp, FirebaseError } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore, addDoc, collection, query, where, getDocs, doc, serverTimestamp, onSnapshot, orderBy, deleteDoc } from "firebase/firestore";
+import { getFirestore, addDoc, collection, query, where, getDocs, doc, serverTimestamp, onSnapshot, orderBy, deleteDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
@@ -44,4 +44,5 @@ export {
   GoogleAuthProvider,
   FirebaseError,
   deleteDoc,
+  updateDoc,
 };

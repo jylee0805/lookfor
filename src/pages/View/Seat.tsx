@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import avatar from "../../images/avatar.jpg";
-
+import { useForm, SubmitHandler } from "react-hook-form";
 import { Post, Comment, Action } from "./index";
+import api from "../../utils/api";
 
 const SeatSection = styled.div<{ rowSelect: boolean }>`
   grid-column: span 2;
@@ -88,6 +89,7 @@ const CommentAvatar = styled.img`
 `;
 const CommentUserName = styled.p``;
 const CommentText = styled.p``;
+const EditCommentText = styled.input``;
 
 const TypeIn = styled.div`
   margin-top: auto;
@@ -116,6 +118,7 @@ interface Props {
     viewPosts: Post[];
     viewComments: Comment[];
     comment: { [key: string]: string };
+    isCommentEditMode: string;
   };
   dispatch: React.Dispatch<Action>;
   handlerSeat: (seat: number) => void;
@@ -124,7 +127,30 @@ interface Props {
   deleteComment: (post: string, id: string) => void;
 }
 
+interface CommentEdit {
+  comment: string;
+}
+
 function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, dispatch }: Props) {
+  const {
+    register: registerEditComment,
+    handleSubmit: handlerEditComment,
+    formState: { errors: errorsEditComment },
+  } = useForm<CommentEdit>();
+
+  const createSubmitHandler = (postId: string, commentId: string) => {
+    const onSubmitEditComment: SubmitHandler<CommentEdit> = async (data) => {
+      try {
+        await api.updateComment(postId, commentId, data.comment);
+        console.log("提交成功");
+        dispatch({ type: "toggleCommentMode", payload: { isCommentEditMode: "" } });
+      } catch (error) {
+        console.error("提交失敗:", error);
+      }
+    };
+    return onSubmitEditComment;
+  };
+
   return (
     <SeatSection rowSelect={state.isSelectRow}>
       <Seats>
@@ -169,11 +195,18 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
                           <CommentAvatar src={avatar} />
                           <CommentUserName>{comment.userName}</CommentUserName>
                         </UserBox>
-                        <FeatureBtn>編輯</FeatureBtn>
+                        <FeatureBtn onClick={() => dispatch({ type: "toggleCommentMode", payload: { isCommentEditMode: comment.id } })}>編輯</FeatureBtn>
                         <FeatureBtn onClick={() => deleteComment(post.id, comment.id)}>刪除</FeatureBtn>
                       </CommentHeader>
 
-                      <CommentText>{comment.content}</CommentText>
+                      {state.isCommentEditMode === comment.id ? (
+                        <div>
+                          <EditCommentText type="text" defaultValue={comment.content} {...registerEditComment("comment")} />
+                          <Send onClick={handlerEditComment(createSubmitHandler(post.id, comment.id))}>送出</Send>
+                        </div>
+                      ) : (
+                        <CommentText>{comment.content}</CommentText>
+                      )}
                     </CommentBox>
                   ))}
               </CommentSection>

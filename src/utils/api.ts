@@ -23,6 +23,7 @@ import {
   FirebaseError,
   deleteDoc,
   doc,
+  updateDoc,
 } from "../utils/firebase";
 import { Post, Comment } from "../pages/View";
 
@@ -174,14 +175,38 @@ const api = {
 
   async deleteViewPost(id: string) {
     try {
-      const PostDoc = doc(db, "viewPosts", id);
-      await deleteDoc(PostDoc);
+      const postDoc = doc(db, "viewPosts", id);
+      await deleteDoc(postDoc);
       console.log("Document deleted with ID: ", id);
     } catch (e) {
       console.error("Error deleting document: ", e);
     }
   },
+  async updateViewPost(id: string) {
+    try {
+      const postDoc = doc(db, "viewPosts", id);
+      await updateDoc(postDoc, {
+        content: "",
+        concert: "",
+        note: "",
+      });
+      console.log("Document updated with ID: ", id);
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  },
 
+  async updateComment(post: string, id: string, content: string) {
+    try {
+      const commentDoc = doc(db, `viewPosts/${post}/comments`, id);
+      await updateDoc(commentDoc, {
+        content: content,
+      });
+      console.log("Document updated with ID: ", id);
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  },
   async setComment(id: string, content: string, uid: string, userName: string) {
     await addDoc(collection(db, `viewPosts/${id}/comments`), {
       content: content,
