@@ -21,6 +21,8 @@ import {
   provider,
   GoogleAuthProvider,
   FirebaseError,
+  deleteDoc,
+  doc,
 } from "../utils/firebase";
 import { Post, Comment } from "../pages/View";
 
@@ -95,26 +97,6 @@ const api = {
         console.error("Unexpected error:", error);
       }
     }
-    /*signInWithPopup(auth, provider)
-      .then(async (result) => {
-        // 登入成功，取得 token、user
-        const credential = await GoogleAuthProvider.credentialFromResult(result);
-        //let token = credential.accessToken;
-
-        const user = result.user;
-        //console.log(token);
-        console.log(credential);
-        return result;
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        console.log(errorCode);
-        console.log(errorMessage);
-        console.log(credential);
-        return error.message;
-      });*/
   },
 
   userLogOut() {
@@ -175,6 +157,31 @@ const api = {
     return;
   },
 
+  async getViewPosts(section: string, row: number, seat: number, onUpdate: (post: Post[]) => void) {
+    const q = query(collection(db, "viewPosts"), where("section", "==", section), where("row", "==", row), where("seat", "==", seat));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const updatedPosts: Post[] = [];
+      querySnapshot.forEach((doc) => {
+        updatedPosts.push({ id: doc.id, ...doc.data() });
+      });
+      console.log(updatedPosts);
+
+      onUpdate(updatedPosts);
+    });
+    return unsubscribe;
+  },
+
+  async deleteViewPost(id: string) {
+    try {
+      const PostDoc = doc(db, "viewPosts", id);
+      await deleteDoc(PostDoc);
+      console.log("Document deleted with ID: ", id);
+    } catch (e) {
+      console.error("Error deleting document: ", e);
+    }
+  },
+
   async setComment(id: string, content: string, uid: string, userName: string) {
     await addDoc(collection(db, `viewPosts/${id}/comments`), {
       content: content,
@@ -183,6 +190,31 @@ const api = {
       userName: userName,
     });
     return;
+  },
+
+  async getViewComments(id: string, onUpdate: (comments: Comment[]) => void) {
+    const q = query(collection(db, `viewPosts/${id}/comments`), orderBy("createdTime"));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const updatedComments: Comment[] = [];
+      querySnapshot.forEach((doc) => {
+        updatedComments.push({ id: doc.id, ...doc.data() });
+      });
+      console.log(updatedComments);
+
+      onUpdate(updatedComments);
+    });
+    return unsubscribe;
+  },
+
+  async deleteComment(post: string, id: string) {
+    try {
+      const CommentDoc = doc(db, `viewPosts/${post}/comments`, id);
+      await deleteDoc(CommentDoc);
+      console.log("Document deleted with ID: ", id);
+    } catch (e) {
+      console.error("Error deleting document: ", e);
+    }
   },
 
   async getSections() {
@@ -206,37 +238,16 @@ const api = {
     return row;
   },
 
-  async getViewPosts(section: string, row: number, seat: number, onUpdate: (post: Post[]) => void) {
-    const q = query(collection(db, "viewPosts"), where("section", "==", section), where("row", "==", row), where("seat", "==", seat));
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const updatedPosts: Post[] = [];
-      querySnapshot.forEach((doc) => {
-        updatedPosts.push({ id: doc.id, ...doc.data() });
-      });
-      console.log(updatedPosts);
-
-      onUpdate(updatedPosts);
-    });
-    return unsubscribe;
-  },
-
-  async getViewComments(id: string, onUpdate: (comments: Comment[]) => void) {
-    const q = query(collection(db, `viewPosts/${id}/comments`), orderBy("createdTime"));
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const updatedComments: Comment[] = [];
-      querySnapshot.forEach((doc) => {
-        updatedComments.push({ id: doc.id, ...doc.data() });
-      });
-      console.log(updatedComments);
-
-      onUpdate(updatedComments);
-    });
-    return unsubscribe;
-  },
-
   async getConcerts() {
+    const q = query(collection(db, "concerts"));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      console.log(doc);
+    });
+    console.log(querySnapshot);
+  },
+
+  async getConcertDetail() {
     const q = query(collection(db, "concerts"));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -252,6 +263,16 @@ const api = {
       console.log(doc);
     });
     console.log(querySnapshot);
+  },
+
+  async deleteMerchPost(id: string) {
+    try {
+      const MerchPostDoc = doc(db, "merchPost", id);
+      await deleteDoc(MerchPostDoc);
+      console.log("Document deleted with ID: ", id);
+    } catch (e) {
+      console.error("Error deleting document: ", e);
+    }
   },
 };
 

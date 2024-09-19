@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useLoadScript, GoogleMap, MarkerF } from "@react-google-maps/api";
 import { useState } from "react";
 import parkingData from "../utils/parking.json";
+import pin from "../images/pin.png";
+import selectPin from "../images/google-maps.png";
 
 const Container = styled.div``;
 const Banner = styled.div`
@@ -144,6 +146,8 @@ function TransportationDriving() {
 
   const handleMarkerClick = (place: Place) => {
     setSelectedMarker(place);
+    console.log(place);
+
     /*if (map) {
       const service = new window.google.maps.places.PlacesService(map);
       const request = {
@@ -240,6 +244,7 @@ function TransportationDriving() {
       });
   }
 */
+
   return (
     <Container>
       <Banner>
@@ -272,7 +277,10 @@ function TransportationDriving() {
           <MapContainer>
             <Map>
               <GoogleMap zoom={16} center={center} mapContainerStyle={containerStyle} onLoad={onLoad}>
-                {places && places.map((place, index) => <MarkerF key={index} position={{ lat: place.lat, lng: place.lng }} onClick={() => handleMarkerClick(place)} />)}
+                {places &&
+                  places.map((place, index) => (
+                    <MarkerF key={index} position={{ lat: place.lat, lng: place.lng }} onClick={() => handleMarkerClick(place)} icon={place.name === selectedMarker?.name ? selectPin : pin} />
+                  ))}
               </GoogleMap>
             </Map>
             <Place>

@@ -43,6 +43,17 @@ const UserBox = styled.div`
   margin-bottom: 20px;
   column-gap: 10px;
 `;
+const PostHeader = styled.div`
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+`;
+const CommentHeader = styled.div`
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+`;
+const FeatureBtn = styled.button``;
 const ImgBox = styled.div`
   width: 50%;
   text-align: center;
@@ -109,9 +120,11 @@ interface Props {
   dispatch: React.Dispatch<Action>;
   handlerSeat: (seat: number) => void;
   handlerComment: (id: string) => void;
+  deletePost: (id: string) => void;
+  deleteComment: (post: string, id: string) => void;
 }
 
-function Seat({ state, handlerSeat, handlerComment, dispatch }: Props) {
+function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, dispatch }: Props) {
   return (
     <SeatSection rowSelect={state.isSelectRow}>
       <Seats>
@@ -136,10 +149,14 @@ function Seat({ state, handlerSeat, handlerComment, dispatch }: Props) {
             </ImgBox>
 
             <ContentBox>
-              <UserBox>
-                <Avatar src={avatar} />
-                <UserName>{post.userName}</UserName>
-              </UserBox>
+              <PostHeader>
+                <UserBox>
+                  <Avatar src={avatar} />
+                  <UserName>{post.userName}</UserName>
+                </UserBox>
+                <FeatureBtn>編輯</FeatureBtn>
+                <FeatureBtn onClick={() => deletePost(post.id)}>刪除</FeatureBtn>
+              </PostHeader>
               <Note>{post.concert}</Note>
               <Note>{post.note}</Note>
               <Content>{post.content}</Content>
@@ -147,10 +164,15 @@ function Seat({ state, handlerSeat, handlerComment, dispatch }: Props) {
                 {post.comment &&
                   post.comment.map((comment, index) => (
                     <CommentBox key={index}>
-                      <UserBox>
-                        <CommentAvatar src={avatar} />
-                        <CommentUserName>{comment.userName}</CommentUserName>
-                      </UserBox>
+                      <CommentHeader>
+                        <UserBox>
+                          <CommentAvatar src={avatar} />
+                          <CommentUserName>{comment.userName}</CommentUserName>
+                        </UserBox>
+                        <FeatureBtn>編輯</FeatureBtn>
+                        <FeatureBtn onClick={() => deleteComment(post.id, comment.id)}>刪除</FeatureBtn>
+                      </CommentHeader>
+
                       <CommentText>{comment.content}</CommentText>
                     </CommentBox>
                   ))}

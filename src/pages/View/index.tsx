@@ -290,6 +290,16 @@ function View() {
     };
   }, []);
 
+  const deletePost = async (id: string) => {
+    await api.deleteViewPost(id);
+    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.filter((post) => post.id !== id) } });
+  };
+
+  const deleteComment = async (post: string, id: string) => {
+    await api.deleteComment(post, id);
+    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.filter((post) => post.comment?.filter((comment) => comment.id != id)) } });
+  };
+
   const handlerSection = async (section: string) => {
     const rows = await api.getRows(section);
     const sectionAry: number[] = Array.isArray(rows) ? rows : [];
@@ -343,7 +353,7 @@ function View() {
         <Post state={state} dispatch={dispatch} sendImage={sendImage} />
         <Sections handlerSection={handlerSection} />
         <Rows state={state} dispatch={dispatch} />
-        <Seat state={state} handlerSeat={handlerSeat} handlerComment={handlerComment} dispatch={dispatch} />
+        <Seat state={state} handlerSeat={handlerSeat} handlerComment={handlerComment} dispatch={dispatch} deletePost={deletePost} deleteComment={deleteComment} />
       </Main>
     </Container>
   );
