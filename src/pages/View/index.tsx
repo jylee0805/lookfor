@@ -106,6 +106,7 @@ interface State {
   comment: { [key: string]: string };
   isLoading: boolean;
   isCommentEditMode: string;
+  isPostEditMode: Post;
 }
 
 export type Action =
@@ -121,7 +122,8 @@ export type Action =
   | { type: "setComment"; payload: { commentText: string; id: string } }
   | { type: "isSelectSection" }
   | { type: "setLoading" }
-  | { type: "toggleCommentMode"; payload: { isCommentEditMode: string } };
+  | { type: "toggleCommentMode"; payload: { isCommentEditMode: string } }
+  | { type: "setPostMode"; payload: { isPostEditMode: Post } };
 
 const initial: State = {
   allSeats: [],
@@ -140,6 +142,7 @@ const initial: State = {
   comment: {},
   isLoading: false,
   isCommentEditMode: "",
+  isPostEditMode: { id: "" },
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -187,6 +190,9 @@ const reducer = (state: State, action: Action): State => {
     }
     case "toggleCommentMode": {
       return { ...state, isCommentEditMode: action.payload.isCommentEditMode };
+    }
+    case "setPostMode": {
+      return { ...state, isPostEditMode: action.payload.isPostEditMode };
     }
     default:
       return state;
@@ -293,16 +299,6 @@ function View() {
 
   const deleteComment = async (post: string, id: string) => {
     await api.deleteComment(post, id);
-    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.filter((post) => post.comment?.filter((comment) => comment.id != id)) } });
-  };
-
-  const editPost = async (id: string) => {
-    await api.deleteViewPost(id);
-    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.filter((post) => post.id !== id) } });
-  };
-
-  const editComment = async (post: string, id: string) => {
-    await api.updateComment(post, id);
     dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.filter((post) => post.comment?.filter((comment) => comment.id != id)) } });
   };
 

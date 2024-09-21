@@ -132,25 +132,36 @@ interface CommentEdit {
 }
 
 function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, dispatch }: Props) {
-  const {
-    register: registerEditComment,
-    handleSubmit: handlerEditComment,
-    formState: { errors: errorsEditComment },
-  } = useForm<CommentEdit>();
+  const { register: registerEditComment, handleSubmit: handlerEditComment } = useForm<CommentEdit>();
 
-  const createSubmitHandler = (postId: string, commentId: string) => {
+  const createSubmitHandler = (postId: string, commentId: string): SubmitHandler<CommentEdit> => {
     const onSubmitEditComment: SubmitHandler<CommentEdit> = async (data) => {
-      try {
-        await api.updateComment(postId, commentId, data.comment);
-        console.log("提交成功");
-        dispatch({ type: "toggleCommentMode", payload: { isCommentEditMode: "" } });
-      } catch (error) {
-        console.error("提交失敗:", error);
-      }
+      await api.updateComment(postId, commentId, data.comment);
+      console.log("提交成功");
+      dispatch({ type: "toggleCommentMode", payload: { isCommentEditMode: "" } });
+
+      const update = state.viewPosts.map((item) => {
+        if (item.id == postId) {
+          const updatedComments = item.comment?.map((comment) => {
+            if (comment.id == commentId) {
+              return { ...comment, content: data.comment };
+            }
+            return comment;
+          });
+          return { ...item, comment: updatedComments };
+        }
+        return item;
+      });
+
+      dispatch({ type: "setViewPosts", payload: { viewPosts: update } });
     };
     return onSubmitEditComment;
   };
-
+  const handlerEditPost = (post: Post) => {
+    dispatch({ type: "setPostMode", payload: { isPostEditMode: post } });
+    dispatch({ type: "togglePostClick" });
+    //dispatch({ type: "setSelectPhoto", payload: { selectPhoto: target.files[0], localPhotoUrl: URL.createObjectURL(target.files[0]) } });
+  };
   return (
     <SeatSection rowSelect={state.isSelectRow}>
       <Seats>
@@ -180,7 +191,7 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
                   <Avatar src={avatar} />
                   <UserName>{post.userName}</UserName>
                 </UserBox>
-                <FeatureBtn>編輯</FeatureBtn>
+                <FeatureBtn onClick={() => handlerEditPost(post)}>編輯</FeatureBtn>
                 <FeatureBtn onClick={() => deletePost(post.id)}>刪除</FeatureBtn>
               </PostHeader>
               <Note>{post.concert}</Note>

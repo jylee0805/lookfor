@@ -80,6 +80,7 @@ interface Props {
   state: {
     allSeats: Seats[];
     section: string;
+    viewPosts: Post[];
     row: number;
     seat: number;
     isPostClick: boolean;
@@ -87,6 +88,7 @@ interface Props {
     localPhotoUrl: string;
     isLoading: boolean;
     uploadPhotoUrl: string;
+    isPostEditMode: Post;
   };
   dispatch: React.Dispatch<Action>;
   sendImage: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -110,8 +112,24 @@ function Post({ state, dispatch, sendImage }: Props) {
     reset,
     watch,
     getValues,
+
     formState: { errors },
   } = useForm<FormInputs>();
+
+  useEffect(() => {
+    if (state.isPostEditMode.section) {
+      const values = {
+        section: state.isPostEditMode.section,
+        row: state.isPostEditMode.row,
+        seat: state.isPostEditMode.seat,
+        concert: state.isPostEditMode.concert,
+        note: state.isPostEditMode.note,
+        content: state.isPostEditMode.content,
+        image: state.isPostEditMode.image,
+      };
+      reset(values);
+    }
+  }, [state.isPostEditMode]);
 
   const sectionValue = watch("section");
   const rowValue = parseInt(watch("row"));
@@ -123,11 +141,13 @@ function Post({ state, dispatch, sendImage }: Props) {
   const onSubmit: SubmitHandler<FormInputs> = async () => {
     let url;
     dispatch({ type: "setLoading" });
-    if (state.selectPhoto) {
+
+    if (state.isPostEditMode.image) {
+      await handleAnalyzeImage(state.isPostEditMode.image);
+      dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: state.isPostEditMode.image } });
+    } else if (state.selectPhoto) {
       console.log(state.selectPhoto);
-
       url = await api.uploadImage(state.selectPhoto);
-
       await handleAnalyzeImage(url);
       dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: url } });
       console.log(labels);
@@ -148,10 +168,34 @@ function Post({ state, dispatch, sendImage }: Props) {
       } else {
         if (formValues) {
           console.log(formValues);
+          console.log(state.isPostEditMode.name);
 
-          const response = (await api.getLoginState()) as string;
+          if (state.isPostEditMode.id !== "") {
+            console.log("我在更新");
 
-          await api.setViewPost(formValues, state.uploadPhotoUrl, response);
+            await api.updateViewPost(state.isPostEditMode.id, formValues, state.uploadPhotoUrl);
+
+            const update = state.viewPosts.map((post) => {
+              if (post.id === state.isPostEditMode.id) {
+                return {
+                  ...post,
+                  content: formValues.content,
+                  concert: formValues.concert,
+                  image: state.uploadPhotoUrl,
+                  note: formValues.note,
+                  row: parseInt(formValues.row),
+                  seat: parseInt(formValues.seat),
+                  section: formValues.section,
+                };
+              }
+            });
+            dispatch({ type: "setViewPosts", payload: { viewPosts: update } });
+          } else {
+            console.log("我在上傳");
+
+            const response = (await api.getLoginState()) as string;
+            await api.setViewPost(formValues, state.uploadPhotoUrl, response);
+          }
         }
         dispatch({ type: "setLoading" });
         reset({
@@ -189,12 +233,13 @@ function Post({ state, dispatch, sendImage }: Props) {
       content: "",
     });
     dispatch({ type: "togglePostClick" });
+    dispatch({ type: "setPostMode", payload: { isPostEditMode: { id: "" } } });
     document.body.style.overflow = "scroll";
   };
 
   return (
     <PostContainer show={state.isPostClick}>
-      <PostTitle>發佈視角</PostTitle>
+      <PostTitle>{state.isPostEditMode.section ? "更新視角" : "發布視角"}</PostTitle>
       <FormContainer>
         <Label>位置</Label>
         <FormRow>
@@ -223,14 +268,18 @@ function Post({ state, dispatch, sendImage }: Props) {
           <Select {...register("row", { required: true })}>
             <option value="">Select section</option>
             {uniqueRows.map((_, index) => (
-              <option value={index + 1}>{index + 1}</option>
+              <option value={index + 1} key={index}>
+                {index + 1}
+              </option>
             ))}
           </Select>
           <Label>排</Label>
           <Select {...register("seat", { required: true })}>
             <option value="">Select section</option>
             {Array.from({ length: seats }).map((_, index) => (
-              <option value={index + 1}>{index + 1}</option>
+              <option value={index + 1} key={index}>
+                {index + 1}
+              </option>
             ))}
           </Select>
           <Label>號</Label>
@@ -244,11 +293,12 @@ function Post({ state, dispatch, sendImage }: Props) {
         <Content defaultValue="" {...register("content")}></Content>
       </FormContainer>
       {state.selectPhoto && <ImagePreview src={state.localPhotoUrl} />}
+      {state.isPostEditMode.image && <ImagePreview src={state.isPostEditMode.image} />}
 
       <BtnBox>
         <SelectPhotoBtn>
           選擇照片
-          <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" {...register("image", { required: "請選擇照片" })} onChange={sendImage} />
+          <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" {...register("image", { required: state.isPostEditMode.image ? false : "請選擇照片" })} onChange={sendImage} />
         </SelectPhotoBtn>
         {errors.image && <p>{errors.image.message}</p>}
         <Cancel onClick={() => handlerCancel()}>取消</Cancel>

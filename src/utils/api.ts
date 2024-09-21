@@ -24,8 +24,11 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  limit,
 } from "../utils/firebase";
 import { Post, Comment } from "../pages/View";
+import { Concerts } from "../pages/ConcertList";
+import { Detail } from "../pages/Concert";
 
 interface Data {
   content: string;
@@ -151,7 +154,6 @@ const api = {
         seat: parseInt(data.seat),
         section: data.section,
         createdTime: serverTimestamp(),
-
         userUID: uid,
       });
     }
@@ -182,13 +184,17 @@ const api = {
       console.error("Error deleting document: ", e);
     }
   },
-  async updateViewPost(id: string) {
+  async updateViewPost(id: string, data: Data, image: string) {
     try {
       const postDoc = doc(db, "viewPosts", id);
       await updateDoc(postDoc, {
-        content: "",
-        concert: "",
-        note: "",
+        content: data.content || "",
+        concert: data.concert,
+        image: image,
+        note: data.note || "",
+        row: parseInt(data.row),
+        seat: parseInt(data.seat),
+        section: data.section,
       });
       console.log("Document updated with ID: ", id);
     } catch (e) {
@@ -264,21 +270,27 @@ const api = {
   },
 
   async getConcerts() {
-    const q = query(collection(db, "concerts"));
+    const q = query(collection(db, "concerts"), orderBy("date", "desc"), limit(10));
     const querySnapshot = await getDocs(q);
+    const data: Concerts[] = [];
     querySnapshot.forEach((doc) => {
-      console.log(doc);
+      const concertData = { ...doc.data(), id: doc.id };
+      data.push(concertData as Concerts);
     });
-    console.log(querySnapshot);
+    console.log(data);
+    return data;
   },
 
-  async getConcertDetail() {
-    const q = query(collection(db, "concerts"));
+  async getConcertDetail(concert: string) {
+    const q = query(collection(db, `concerts/${concert}/details`));
     const querySnapshot = await getDocs(q);
+    let detail: Detail | null = null;
     querySnapshot.forEach((doc) => {
-      console.log(doc);
+      detail = doc.data() as Detail;
     });
-    console.log(querySnapshot);
+    console.log(detail);
+
+    return detail;
   },
 
   async getMerchPost(concertId: string) {
