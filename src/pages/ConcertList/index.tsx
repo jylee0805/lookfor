@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 const Container = styled.div`
   padding: 60px 60px;
 `;
+
 const Title = styled.h3`
   font-size: 36px;
   margin-bottom: 40px;
@@ -15,11 +16,12 @@ const AllList = styled.ul``;
 const ListItem = styled.li`
   display: flex;
   align-items: center;
-  border: 1px solid #bcbcbc;
+  box-shadow: 2px 2px 5px #dbddae50;
   border-radius: 20px;
   padding: 15px 50px;
   column-gap: 20px;
   margin-bottom: 25px;
+  background: #fff;
 `;
 const DateContainer = styled.div`
   margin-right: 30px;
@@ -56,7 +58,7 @@ const DetailItem = styled.p`
 `;
 export interface Concerts {
   concertName: string;
-  date: string;
+  date: string[];
   images: string;
   place: string;
   concertId: string;
@@ -73,7 +75,7 @@ function ConcertList() {
       const dateString = item.date[0];
       const date = new Date(dateString);
 
-      const options = { month: "short", day: "2-digit" };
+      const options = { month: "short" as const, day: "2-digit" as const };
       const formattedDate = date.toLocaleDateString("en-US", options);
 
       return { ...item, firstDay: formattedDate };

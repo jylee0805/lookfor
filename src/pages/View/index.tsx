@@ -8,6 +8,7 @@ import { useEffect, useReducer } from "react";
 import Post from "./Post";
 
 const Container = styled.div``;
+
 const Mask = styled.div<{ postClick: boolean }>`
   display: ${(props) => (props.postClick ? "block" : "none")};
   background: #3e3e3e99;

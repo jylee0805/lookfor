@@ -29,6 +29,7 @@ import {
 import { Post, Comment } from "../pages/View";
 import { Concerts } from "../pages/ConcertList";
 import { Detail } from "../pages/Concert";
+import { MerchPost } from "../pages/FansSupport";
 
 interface Data {
   content: string;
@@ -293,15 +294,37 @@ const api = {
     return detail;
   },
 
-  async getMerchPost(concertId: string) {
-    const q = query(collection(db, "merchPost"), where("concertId", "==", concertId));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      console.log(doc);
+  async setMerchPost(merch: object) {
+    await addDoc(collection(db, "merchPost"), {
+      ...merch,
+      createdTime: serverTimestamp(),
     });
-    console.log(querySnapshot);
+    return;
   },
 
+  async getMerchPost(concertId: string, onUpdate: (post: MerchPost[]) => void) {
+    const q = query(collection(db, "merchPost"), where("concertId", "==", concertId), orderBy("createdTime", "desc"));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const data: MerchPost[] = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() } as MerchPost);
+      });
+      console.log(data);
+
+      onUpdate(data);
+    });
+    return unsubscribe;
+  },
+  async updateMerchPost(id: string, merch: object) {
+    try {
+      const postDoc = doc(db, "merchPost", id);
+      await updateDoc(postDoc, merch);
+      console.log("Document updated with ID: ", id);
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  },
   async deleteMerchPost(id: string) {
     try {
       const MerchPostDoc = doc(db, "merchPost", id);
