@@ -1,12 +1,24 @@
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import photo from "../../images/avatar.jpg";
 import FanPost from "./FanPost";
 
 const Container = styled.div`
   padding: 60px 120px;
+`;
+const Mask = styled.div<{ postClick: boolean }>`
+  display: ${(props) => (props.postClick ? "block" : "none")};
+  background: #3e3e3e99;
+  width: 100%;
+  height: auto;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
 `;
 const ConcertName = styled.h3`
   font-size: 40px;
@@ -58,7 +70,28 @@ const PostItem = styled.li`
 const PostHeader = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+`;
+const MoreContainer = styled.div`
+  position: relative;
+  margin-left: auto;
+`;
+const MoreBtn = styled.button``;
+const FeatureBtnContainer = styled.div<{ open: boolean }>`
+  position: absolute;
+  display: ${(props) => (props.open ? "flex" : "none")};
+  flex-direction: column;
+  background: #fff;
+  box-shadow: 0px 3px 10px #67676730;
+`;
+const FeatureBtn = styled.button`
+  background: none;
+  transition: none;
+  border: none;
+  &:hover {
+    border: none;
+    transition: none;
+  }
 `;
 const HeadShot = styled.img`
   width: 40px;
@@ -168,6 +201,7 @@ function FansSupport() {
   const [state, dispatch] = useReducer(reducer, initial);
   const location = useLocation();
   const { concert } = location.state || {};
+  const [isMoreClick, setIsMoreClick] = useState<string>("");
 
   const navigate = useNavigate();
 
@@ -183,6 +217,8 @@ function FansSupport() {
 
         const fetchUserNames = async () => {
           const userNamesPromises = posts.map(async (post) => {
+            console.log(post);
+
             if (post.userUID) {
               const userName = await api.getUser(post.userUID);
 
@@ -192,9 +228,11 @@ function FansSupport() {
           });
 
           const userNames = await Promise.all(userNamesPromises);
+          console.log(userNames);
 
           return userNames;
         };
+
         fetchUserNames().then((userNames) => {
           posts.forEach((post, index) => {
             post.userName = userNames[index];
@@ -245,6 +283,7 @@ function FansSupport() {
   };
   return (
     <Container>
+      <Mask postClick={state.isPostClick} />
       <ConcertName>{concert.concertName}</ConcertName>
       <BtnBox>
         <PageBtn onClick={() => navigate(`/concert?concert=${concert.id}`, { state: { concert } })}>演唱會資訊</PageBtn>
@@ -259,13 +298,18 @@ function FansSupport() {
         <FanPost concert={concert} dispatch={dispatch} state={state} />
         <PostList>
           {state.postData &&
-            state.postData.map((item) => (
-              <PostItem>
+            state.postData.map((item, index) => (
+              <PostItem key={index}>
                 <PostHeader>
                   <HeadShot src={photo} />
                   <UserName>{item.userName}</UserName>
-                  <button onClick={() => dispatch({ type: "toggleIsEditMode", payload: { isEditMode: item, isPostClick: true } })}>編輯</button>
-                  <button onClick={() => deleteMerchPost(item.id ? item.id : "")}>刪除</button>
+                  <MoreContainer>
+                    <MoreBtn onClick={() => setIsMoreClick(item.id ? item.id : "")}>更多</MoreBtn>
+                    <FeatureBtnContainer open={isMoreClick === item.id}>
+                      <FeatureBtn onClick={() => dispatch({ type: "toggleIsEditMode", payload: { isEditMode: item, isPostClick: true } })}>編輯</FeatureBtn>
+                      <FeatureBtn onClick={() => deleteMerchPost(item.id ? item.id : "")}>刪除</FeatureBtn>
+                    </FeatureBtnContainer>
+                  </MoreContainer>
                 </PostHeader>
                 <ImportInfo>
                   <ImportInfoContent>時間</ImportInfoContent>
@@ -279,7 +323,10 @@ function FansSupport() {
                 </ImportInfo>
                 <InfoContent>{item.content}</InfoContent>
                 <ImageContainer>
-                  <Image src={photo} />
+                  {item.image.map((item) => (
+                    <Image src={item} />
+                  ))}
+                  {/* <Image src={photo} /> */}
                 </ImageContainer>
               </PostItem>
             ))}

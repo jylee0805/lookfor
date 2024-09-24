@@ -24,12 +24,12 @@ import {
   deleteDoc,
   doc,
   updateDoc,
-  limit,
 } from "../utils/firebase";
-import { Post, Comment } from "../pages/View";
+import { PostState, Comment } from "../pages/View";
 import { Concerts } from "../pages/ConcertList";
 import { Detail } from "../pages/Concert";
 import { MerchPost } from "../pages/FansSupport";
+import { Place, PlaceAvailable } from "../pages/TransportationDriving";
 
 interface Data {
   content: string;
@@ -161,11 +161,11 @@ const api = {
     return;
   },
 
-  async getViewPosts(section: string, row: number, seat: number, onUpdate: (post: Post[]) => void) {
+  async getViewPosts(section: string, row: number, seat: number, onUpdate: (post: PostState[]) => void) {
     const q = query(collection(db, "viewPosts"), where("section", "==", section), where("row", "==", row), where("seat", "==", seat));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const updatedPosts: Post[] = [];
+      const updatedPosts: PostState[] = [];
       querySnapshot.forEach((doc) => {
         updatedPosts.push({ id: doc.id, ...doc.data() });
       });
@@ -271,7 +271,7 @@ const api = {
   },
 
   async getConcerts() {
-    const q = query(collection(db, "concerts"), orderBy("date", "desc"), limit(10));
+    const q = query(collection(db, "concerts"), orderBy("date", "asc"));
     const querySnapshot = await getDocs(q);
     const data: Concerts[] = [];
     querySnapshot.forEach((doc) => {
@@ -330,6 +330,45 @@ const api = {
       const MerchPostDoc = doc(db, "merchPost", id);
       await deleteDoc(MerchPostDoc);
       console.log("Document deleted with ID: ", id);
+    } catch (e) {
+      console.error("Error deleting document: ", e);
+    }
+  },
+  async getParkInfo(max: number[], min: number[]) {
+    try {
+      const parkInfo = await fetch("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json");
+      console.log(max, min);
+
+      if (parkInfo.ok) {
+        const data = await parkInfo.json();
+        const need = data.data.park.filter((item) => {
+          if (parseFloat(item.tw97x) > min[0] && parseFloat(item.tw97x) < max[0] && parseFloat(item.tw97y) > min[1] && parseFloat(item.tw97y) < max[1]) {
+            return item;
+          }
+        });
+        const result = need.map((item) => {
+          return { lng: item.tw97x, lat: item.tw97y, name: item.name, parkNum: item.summary, fee: item.payex, openTime: item.serviceTime, address: item.address, placeId: item.id };
+        });
+
+        return result;
+      }
+    } catch (e) {
+      console.error("Error deleting document: ", e);
+    }
+  },
+  async getParkAvailable(places: Place[]) {
+    try {
+      const park = await fetch("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json");
+
+      if (park.ok) {
+        const data = await park.json();
+        const need = data.data.park.filter((item: PlaceAvailable) => {
+          return places.some((place) => place.placeId === item.id);
+        });
+        console.log(need);
+
+        return need;
+      }
     } catch (e) {
       console.error("Error deleting document: ", e);
     }

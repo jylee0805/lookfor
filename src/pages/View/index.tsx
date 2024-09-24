@@ -53,7 +53,7 @@ const StyleLink = styled(Link)`
 `;
 const Main = styled.main`
   display: grid;
-  grid-template-columns: 55% 1fr;
+  grid-template-columns: 60% 1fr;
 `;
 const PostVieBtn = styled.button`
   grid-column: span 2;
@@ -70,7 +70,7 @@ export interface Comment {
   id: string;
   userName?: string;
 }
-export interface Post {
+export interface PostState {
   image?: string;
   note?: string;
   content?: string;
@@ -99,7 +99,7 @@ interface State {
   isSelectRow: boolean;
   isSelectSection: boolean;
   isPostClick: boolean;
-  viewPosts: Post[];
+  viewPosts: PostState[];
   viewComments: Comment[];
   selectPhoto: File | null;
   localPhotoUrl: string;
@@ -107,7 +107,7 @@ interface State {
   comment: { [key: string]: string };
   isLoading: boolean;
   isCommentEditMode: string;
-  isPostEditMode: Post;
+  isPostEditMode: PostState;
 }
 
 export type Action =
@@ -115,7 +115,7 @@ export type Action =
   | { type: "selectSection"; payload: { section: string; rowSeats: number[]; isSelectRow: boolean } }
   | { type: "selectRow"; payload: { row: number; isSelectRow: boolean } }
   | { type: "selectSeat"; payload: { seat: number } }
-  | { type: "setViewPosts"; payload: { viewPosts: Post[] } }
+  | { type: "setViewPosts"; payload: { viewPosts: PostState[] } }
   | { type: "setViewComments"; payload: { viewComments: Comment[]; id: string } }
   | { type: "togglePostClick" }
   | { type: "setSelectPhoto"; payload: { selectPhoto: File | null; localPhotoUrl: string } }
@@ -124,7 +124,7 @@ export type Action =
   | { type: "isSelectSection" }
   | { type: "setLoading" }
   | { type: "toggleCommentMode"; payload: { isCommentEditMode: string } }
-  | { type: "setPostMode"; payload: { isPostEditMode: Post } };
+  | { type: "setPostMode"; payload: { isPostEditMode: PostState } };
 
 const initial: State = {
   allSeats: [],
@@ -162,7 +162,7 @@ const reducer = (state: State, action: Action): State => {
       const posts = JSON.parse(JSON.stringify(state.viewPosts));
       console.log(state.viewPosts);
 
-      const updatedPosts = posts.map((post: Post, index: number) => {
+      const updatedPosts = posts.map((post: PostState, index: number) => {
         if (post.id === action.payload.id) {
           return {
             ...post,
@@ -206,11 +206,11 @@ function View() {
     const loadViewPosts = async () => {
       const unsubscribesPost: (() => void)[] = [];
       const unsubscribes: (() => void)[] = [];
-      let posts: Post[] = [];
+      let posts: PostState[] = [];
       let comments: Comment[] = [];
       // 監聽貼文變更
 
-      const unsubscribePost = api.getViewPosts(state.section, state.row + 1, state.seat + 1, (updatedPosts: Post[]) => {
+      const unsubscribePost = api.getViewPosts(state.section, state.row + 1, state.seat + 1, (updatedPosts: PostState[]) => {
         posts = JSON.parse(JSON.stringify(updatedPosts));
 
         const fetchUserNames = async () => {
@@ -231,6 +231,7 @@ function View() {
             post.userName = userNames[index];
           });
         });
+        console.log("我有更新到這");
 
         posts.forEach(async (post) => {
           const unsubscribe = api.getViewComments(post.id, (updatedComments: Comment[]) => {
@@ -239,6 +240,7 @@ function View() {
             console.log(comments);
 
             const fetchUserNames = async () => {
+              console.log("我有更新到這123");
               const userNamesPromises = comments.map(async (comment) => {
                 if (comment.userUID) {
                   const userName = await api.getUser(comment.userUID);
@@ -266,6 +268,7 @@ function View() {
 
         console.log(posts);
         dispatch({ type: "setViewPosts", payload: { viewPosts: posts } });
+        console.log("這裡也有");
       });
 
       unsubscribesPost.push(await unsubscribePost);
@@ -299,8 +302,10 @@ function View() {
   };
 
   const deleteComment = async (post: string, id: string) => {
+    console.log(post, id);
+
     await api.deleteComment(post, id);
-    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.filter((post) => post.comment?.filter((comment) => comment.id != id)) } });
+    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.map((post) => ({ ...post, comment: post.comment?.filter((comment) => comment.id !== id) })) } });
   };
 
   const handlerSection = async (section: string) => {

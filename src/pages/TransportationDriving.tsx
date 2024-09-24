@@ -2,9 +2,10 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useLoadScript, GoogleMap, MarkerF } from "@react-google-maps/api";
 import { useState } from "react";
-import parkingData from "../utils/parking.json";
 import pin from "../images/pin.png";
 import selectPin from "../images/google-maps.png";
+import api from "../utils/api";
+import proj4 from "proj4";
 
 const Container = styled.div``;
 const Banner = styled.div`
@@ -118,132 +119,77 @@ const PlaceText = styled.p`
   line-height: 1.8;
 `;
 
-interface Place {
-  lat: number;
-  lng: number;
+export interface Place {
+  lat: number | string;
+  lng: number | string;
   name: string;
   parkNum: string;
   fee: string;
   openTime: string;
   address?: string;
   placeId?: string;
+  availablecar?: number;
+  availablemotor?: number;
+}
+
+export interface PlaceAvailable {
+  availablebus: number;
+  availablecar: number;
+  availablehandicap: number;
+  availableheavymotor: number;
+  availablemotor: number;
+  id: string;
 }
 function TransportationDriving() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyA3EzkV4hLZiO3UWwyXgtWQxZHRc85JmHs",
     libraries: ["places"],
   });
-  const center = { lat: 25.05312208941785, lng: 121.60058876881236 };
   const [places, setPlaces] = useState<Place[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<Place | null>(null);
 
-  console.log(selectedMarker);
+  const tw97 = "+proj=tmerc +lat_0=0 +lon_0=121 +k=1 +x_0=250000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
+  const wgs84 = "EPSG:4326"; // WGS84 坐标系
 
-  const onLoad = () => {
-    console.log(typeof parkingData);
-    setPlaces(parkingData);
+  const center = { lat: 25.052391331855265, lng: 121.59855174326229 };
+  const wgs84Min = [121.59412155976037, 25.048075142191188];
+  const wgs84Max = [121.60305597786436, 25.056169036644455];
+  const tw97Max = proj4(wgs84, tw97, wgs84Max);
+  const tw97Min = proj4(wgs84, tw97, wgs84Min);
+
+  const onLoad = async () => {
+    try {
+      const res = await api.getParkInfo(tw97Max, tw97Min); // 直接在 onLoad 中呼叫 getParkInfo
+      console.log(res); // 使用回傳的資料
+      const result = res.map((element: Place) => {
+        const wgs = proj4(tw97, wgs84, [parseFloat(element.lng as string), parseFloat(element.lat as string)]);
+        return { ...element, lng: wgs[0], lat: wgs[1] };
+      });
+
+      const resAvailable = await api.getParkAvailable(result);
+      console.log(resAvailable);
+      const all = result.map((item: Place) => {
+        const matchedRes = resAvailable.find((res: PlaceAvailable) => item.placeId === res.id);
+        return {
+          ...item,
+          availablecar: matchedRes?.availablecar,
+          availablemotor: matchedRes?.availablemotor,
+        };
+      });
+      console.log(all);
+
+      console.log(result);
+
+      setPlaces(all); // 更新 places 狀態
+    } catch (error) {
+      console.error("Error loading park info:", error);
+    }
   };
-
   const handleMarkerClick = (place: Place) => {
     setSelectedMarker(place);
     console.log(place);
-
-    /*if (map) {
-      const service = new window.google.maps.places.PlacesService(map);
-      const request = {
-        placeId: place.placeId,
-        fields: ["name", "formatted_address"], // 要求地址字段
-      };
-
-      service.getDetails(request, (result, status) => {
-        if (result && result.formatted_address && status === window.google.maps.places.PlacesServiceStatus.OK) {
-          setSelectedMarker({
-            ...place,
-            address: result.formatted_address, // 更新地址
-          });
-          console.log(result?.formatted_address);
-        } else {
-          console.error("未能獲取地標詳細信息:", status);
-        }
-      });
-    }*/
   };
   if (!isLoaded) return <div>Loading...</div>;
-  /*useEffect(() => {
-    async function getCar() {
-      await GetAuthorizationHeader();
-      GetApiResponse();
-    }
-    getCar();
-  }, []);
-  //console.log(places);
-
-  
-
-  async function GetAuthorizationHeader() {
-    const parameter = {
-      grant_type: "client_credentials",
-      client_id: "smexoshinee17-cbb9d762-6467-4908",
-      client_secret: "7f4b5b3d-73c6-4d3f-8a3c-2479d662d182",
-    };
-
-    const auth_url = "https://tdx.transportdata.tw/auth/realms/TDXConnect/protocol/openid-connect/token";
-
-    const urlEncodedData = new URLSearchParams(parameter).toString();
-
-    fetch(auth_url, {
-      method: "POST",
-      headers: {
-        "Accept-Encoding": "br, gzip",
-        "Content-Type": "application/x-www-form-urlencoded", // 根據伺服器要求設置 Content-Type
-      },
-      body: urlEncodedData,
-      //credentials: "include", // 根據需求設定 credentials
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.json().then((err) => {
-            throw new Error(`Server responded with error: ${JSON.stringify(err)}`);
-          });
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setToken(data);
-      })
-      .catch((error) => {
-        console.error("There was a problem with the fetch operation:", error);
-        console.log("Error details:", error.message);
-      });
-  }
-
-  function GetApiResponse() {
-    //"https://tdx.transportdata.tw/api/basic/v2/Rail/TRA/LiveTrainDelay?$top=30&$format=JSON"
-    fetch("https://tdx.transportdata.tw/api/basic/v1/Parking/OffStreet/CarPark/City/Taipei?$format=JSON", {
-      method: "GET",
-      headers: {
-        authorization: `Bearer ${token.access_token}`,
-        "Accept-Encoding": "br,gzip",
-        "Content-Type": "application/x-www-form-urlencoded", // 根據伺服器要求設置 Content-Type
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.json().then((err) => {
-            throw new Error(`Server responded with error: ${JSON.stringify(err)}`);
-          });
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log(JSON.stringify(data));
-      })
-      .catch((error) => {
-        console.error("There was a problem with the fetch operation:", error);
-        console.log("Error details:", error.message);
-      });
-  }
-*/
 
   return (
     <Container>
@@ -279,7 +225,19 @@ function TransportationDriving() {
               <GoogleMap zoom={16} center={center} mapContainerStyle={containerStyle} onLoad={onLoad}>
                 {places &&
                   places.map((place, index) => (
-                    <MarkerF key={index} position={{ lat: place.lat, lng: place.lng }} onClick={() => handleMarkerClick(place)} icon={place.name === selectedMarker?.name ? selectPin : pin} />
+                    <MarkerF
+                      key={index}
+                      position={{ lat: place.lat as number, lng: place.lng as number }}
+                      onClick={() => handleMarkerClick(place)}
+                      icon={place.name === selectedMarker?.name ? selectPin : pin}
+                      label={{
+                        text: place.availablecar === undefined ? " " : place.availablecar === -9 ? "0" : place.availablecar.toString(),
+                        color: "#000000",
+                        fontWeight: "700",
+                        fontSize: "18px",
+                      }}
+                      // label={place.availablecar === undefined ? "" : place.availablecar === -9 ? "0" : place.availablecar.toString()}
+                    />
                   ))}
               </GoogleMap>
             </Map>

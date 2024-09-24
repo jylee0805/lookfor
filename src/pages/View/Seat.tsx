@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import avatar from "../../images/avatar.jpg";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Post, Comment, Action } from "./index";
+import { PostState, Comment, Action } from "./index";
 import api from "../../utils/api";
 
 const SeatSection = styled.div<{ rowSelect: boolean }>`
@@ -12,11 +12,12 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
   display: ${(props) => (props.rowSelect ? "block" : "none")};
 `;
 const Seats = styled.div`
+  width: 70%;
   display: flex;
   column-gap: 10px;
-  justify-content: center;
+  justify-content: flex-start;
   overflow-x: scroll;
-  padding-left: 480px;
+  margin: 0 auto;
 `;
 const Title = styled.h4`
   font-size: 32px;
@@ -115,7 +116,7 @@ interface Props {
     row: number;
     seat: number;
     isSelectRow: boolean;
-    viewPosts: Post[];
+    viewPosts: PostState[];
     viewComments: Comment[];
     comment: { [key: string]: string };
     isCommentEditMode: string;
@@ -132,7 +133,7 @@ interface CommentEdit {
 }
 
 function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, dispatch }: Props) {
-  const { register: registerEditComment, handleSubmit: handlerEditComment } = useForm<CommentEdit>();
+  const { register: registerEditComment, setValue, handleSubmit: handlerEditComment } = useForm<CommentEdit>();
 
   const createSubmitHandler = (postId: string, commentId: string): SubmitHandler<CommentEdit> => {
     const onSubmitEditComment: SubmitHandler<CommentEdit> = async (data) => {
@@ -142,8 +143,11 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
 
       const update = state.viewPosts.map((item) => {
         if (item.id == postId) {
+          console.log("1");
+
           const updatedComments = item.comment?.map((comment) => {
             if (comment.id == commentId) {
+              console.log("2");
               return { ...comment, content: data.comment };
             }
             return comment;
@@ -157,10 +161,14 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
     };
     return onSubmitEditComment;
   };
-  const handlerEditPost = (post: Post) => {
+
+  const handleComment = (id: string, content: string) => {
+    dispatch({ type: "toggleCommentMode", payload: { isCommentEditMode: id } });
+    setValue("comment", content);
+  };
+  const handlerEditPost = (post: PostState) => {
     dispatch({ type: "setPostMode", payload: { isPostEditMode: post } });
     dispatch({ type: "togglePostClick" });
-    //dispatch({ type: "setSelectPhoto", payload: { selectPhoto: target.files[0], localPhotoUrl: URL.createObjectURL(target.files[0]) } });
   };
   return (
     <SeatSection rowSelect={state.isSelectRow}>
@@ -179,7 +187,7 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
       </Seats>
       <Title> 視角分享</Title>
       {state.viewPosts && state.viewPosts.length !== 0 ? (
-        state.viewPosts.map((post: Post, index) => (
+        state.viewPosts.map((post: PostState, index) => (
           <Card key={index}>
             <ImgBox>
               <Img src={post.image} />
@@ -194,8 +202,8 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
                 <FeatureBtn onClick={() => handlerEditPost(post)}>編輯</FeatureBtn>
                 <FeatureBtn onClick={() => deletePost(post.id)}>刪除</FeatureBtn>
               </PostHeader>
-              <Note>{post.concert}</Note>
-              <Note>{post.note}</Note>
+              <Note>場次 {post.concert}</Note>
+              <Note>備註 {post.note}</Note>
               <Content>{post.content}</Content>
               <CommentSection>
                 {post.comment &&
@@ -206,13 +214,13 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
                           <CommentAvatar src={avatar} />
                           <CommentUserName>{comment.userName}</CommentUserName>
                         </UserBox>
-                        <FeatureBtn onClick={() => dispatch({ type: "toggleCommentMode", payload: { isCommentEditMode: comment.id } })}>編輯</FeatureBtn>
+                        <FeatureBtn onClick={() => handleComment(comment.id, comment.content as string)}>編輯</FeatureBtn>
                         <FeatureBtn onClick={() => deleteComment(post.id, comment.id)}>刪除</FeatureBtn>
                       </CommentHeader>
 
                       {state.isCommentEditMode === comment.id ? (
                         <div>
-                          <EditCommentText type="text" defaultValue={comment.content} {...registerEditComment("comment")} />
+                          <EditCommentText type="text" {...registerEditComment("comment")} />
                           <Send onClick={handlerEditComment(createSubmitHandler(post.id, comment.id))}>送出</Send>
                         </div>
                       ) : (

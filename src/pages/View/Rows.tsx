@@ -4,7 +4,7 @@ import { Action } from ".";
 const Title = styled.h4``;
 const RowSection = styled.div<{ isSelectSection: boolean }>`
   display: ${(props) => (props.isSelectSection ? "block" : "none")};
-  padding: 0 100px;
+  padding: 60px 100px;
 `;
 const RowBtn = styled.button`
   display: block;

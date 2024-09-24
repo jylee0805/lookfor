@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 
 const Container = styled.div`
   padding: 60px 60px;
@@ -80,13 +81,20 @@ function ConcertList() {
 
       return { ...item, firstDay: formattedDate };
     });
+    console.log(all);
+
     setConcertData(all);
   };
   useEffect(() => {
+    const today = dayjs().format("YYYY/MM/DD");
+
     const getConcert = async () => {
       const data = await api.getConcerts();
-      setConcertData(data);
-      stringToTime(data);
+      const result = data.filter((item) => item.date[0] > today);
+      console.log(result);
+
+      setConcertData(result);
+      stringToTime(result);
     };
     getConcert();
   }, []);

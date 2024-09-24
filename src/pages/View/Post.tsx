@@ -5,6 +5,7 @@ import useGoogleVisionAPI from "../../utils/useGoogleVisionAPI";
 import { Action } from ".";
 import loading from "../../images/loading.gif";
 import { useEffect } from "react";
+import { PostState } from "./index";
 
 const PostContainer = styled.div<{ show: boolean }>`
   position: fixed;
@@ -22,41 +23,60 @@ const PostContainer = styled.div<{ show: boolean }>`
 const FormContainer = styled.div`
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 10px;
+  gap: 15px;
+  margin-bottom: 15px;
 `;
 const FormRow = styled.div`
   display: flex;
   align-items: center;
 `;
-const PostTitle = styled.h3``;
-const Label = styled.p``;
+const PostTitle = styled.h3`
+  font-size: 24px;
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 15px;
+`;
+const Label = styled.p`
+  margin: 0 15px 0 5px;
+`;
 const Input = styled.input`
-  border: 1px solid #949494;
+  border: 1px solid #d2d2d2;
   border-radius: 5px;
+  padding: 5px;
 `;
 const Select = styled.select`
-  flex-grow: 1;
-  padding: 8px;
-  border: 1px solid #949494;
+  border: 1px solid #d2d2d2;
   border-radius: 5px;
+  padding: 5px;
 `;
 const Content = styled.textarea`
   grid-column: span 2;
-  border: 1px solid #949494;
+  border: 1px solid #d2d2d2;
   border-radius: 5px;
+  padding: 5px;
+  height: 100px;
+  resize: none;
 `;
 const BtnBox = styled.div`
   display: flex;
   align-items: center;
 `;
-const Submit = styled.button`
+
+const Btn = styled.button`
+  border: none;
+  background: #191919;
+  color: #fff;
+  padding: 5px 15px;
+  margin-left: auto;
+  &:hover {
+    background: #565656;
+  }
+`;
+const Submit = styled(Btn)<{ load: boolean }>`
+  padding: ${(props) => (props.load ? "0 15px" : "5px 15px")};
+  margin-left: 5px;
   display: flex;
   align-items: center;
-  column-gap: 5px;
-  padding: 5px;
-`;
-const Cancel = styled.button`
-  margin-left: auto;
 `;
 const SelectPhotoBtn = styled.label`
   text-align: center;
@@ -80,7 +100,7 @@ interface Props {
   state: {
     allSeats: Seats[];
     section: string;
-    viewPosts: Post[];
+    viewPosts: PostState[];
     row: number;
     seat: number;
     isPostClick: boolean;
@@ -88,7 +108,7 @@ interface Props {
     localPhotoUrl: string;
     isLoading: boolean;
     uploadPhotoUrl: string;
-    isPostEditMode: Post;
+    isPostEditMode: PostState;
   };
   dispatch: React.Dispatch<Action>;
   sendImage: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -120,12 +140,11 @@ function Post({ state, dispatch, sendImage }: Props) {
     if (state.isPostEditMode.section) {
       const values = {
         section: state.isPostEditMode.section,
-        row: state.isPostEditMode.row,
-        seat: state.isPostEditMode.seat,
+        row: state.isPostEditMode.row?.toString(),
+        seat: state.isPostEditMode.seat?.toString(),
         concert: state.isPostEditMode.concert,
         note: state.isPostEditMode.note,
         content: state.isPostEditMode.content,
-        image: state.isPostEditMode.image,
       };
       reset(values);
     }
@@ -143,8 +162,45 @@ function Post({ state, dispatch, sendImage }: Props) {
     dispatch({ type: "setLoading" });
 
     if (state.isPostEditMode.image) {
+      const formValues = getValues();
+      console.log("我在這");
+
       await handleAnalyzeImage(state.isPostEditMode.image);
+      console.log("這裡");
+
       dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: state.isPostEditMode.image } });
+      await api.updateViewPost(state.isPostEditMode.id, formValues, state.uploadPhotoUrl);
+
+      const update = state.viewPosts.map((post) => {
+        if (post.id === state.isPostEditMode.id) {
+          return {
+            ...post,
+            content: formValues.content,
+            concert: formValues.concert,
+            image: state.uploadPhotoUrl,
+            note: formValues.note,
+            row: parseInt(formValues.row),
+            seat: parseInt(formValues.seat),
+            section: formValues.section,
+          };
+        }
+      });
+      dispatch({ type: "setViewPosts", payload: { viewPosts: update as PostState[] } });
+
+      dispatch({ type: "setLoading" });
+      reset({
+        section: "",
+        row: "",
+        seat: "",
+        concert: "",
+        note: "",
+        content: "",
+      });
+
+      dispatch({ type: "togglePostClick" });
+      dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
+      alert("發布成功");
+      document.body.style.overflow = "scroll";
     } else if (state.selectPhoto) {
       console.log(state.selectPhoto);
       url = await api.uploadImage(state.selectPhoto);
@@ -168,7 +224,6 @@ function Post({ state, dispatch, sendImage }: Props) {
       } else {
         if (formValues) {
           console.log(formValues);
-          console.log(state.isPostEditMode.name);
 
           if (state.isPostEditMode.id !== "") {
             console.log("我在更新");
@@ -189,7 +244,7 @@ function Post({ state, dispatch, sendImage }: Props) {
                 };
               }
             });
-            dispatch({ type: "setViewPosts", payload: { viewPosts: update } });
+            dispatch({ type: "setViewPosts", payload: { viewPosts: update as PostState[] } });
           } else {
             console.log("我在上傳");
 
@@ -221,7 +276,7 @@ function Post({ state, dispatch, sendImage }: Props) {
     return () => {
       ignore = true;
     };
-  }, [labels]);
+  }, [labels, state.uploadPhotoUrl]);
 
   const handlerCancel = () => {
     reset({
@@ -244,7 +299,7 @@ function Post({ state, dispatch, sendImage }: Props) {
         <Label>位置</Label>
         <FormRow>
           <Select {...register("section", { required: true })}>
-            <option value="">Select section</option>
+            <option value="">請選擇區域</option>
             <option value="VIPA">VIPA</option>
             <option value="VIPB">VIPB</option>
             <option value="VIPC">VIPC</option>
@@ -266,7 +321,7 @@ function Post({ state, dispatch, sendImage }: Props) {
           <Label>區</Label>
 
           <Select {...register("row", { required: true })}>
-            <option value="">Select section</option>
+            <option value="">請選擇排數</option>
             {uniqueRows.map((_, index) => (
               <option value={index + 1} key={index}>
                 {index + 1}
@@ -275,7 +330,7 @@ function Post({ state, dispatch, sendImage }: Props) {
           </Select>
           <Label>排</Label>
           <Select {...register("seat", { required: true })}>
-            <option value="">Select section</option>
+            <option value="">請選擇座位</option>
             {Array.from({ length: seats }).map((_, index) => (
               <option value={index + 1} key={index}>
                 {index + 1}
@@ -287,10 +342,10 @@ function Post({ state, dispatch, sendImage }: Props) {
 
         <Label>觀看場次</Label>
 
-        <Input type="text" defaultValue="" {...register("concert", { required: true })} />
+        <Input type="text" defaultValue="" {...register("concert", { required: true })} placeholder="2024 SUPER JUNIOR <SUPER SHOW SPIN-OFF : Halftime>" />
         <Label>備註</Label>
-        <Input type="text" defaultValue="" {...register("note")} />
-        <Content defaultValue="" {...register("content")}></Content>
+        <Input type="text" defaultValue="" {...register("note")} placeholder="會被欄杆擋住、冷氣很冷..." />
+        <Content defaultValue="" {...register("content")} placeholder="演唱會心得或是視角感受分享..."></Content>
       </FormContainer>
       {state.selectPhoto && <ImagePreview src={state.localPhotoUrl} />}
       {state.isPostEditMode.image && <ImagePreview src={state.isPostEditMode.image} />}
@@ -301,8 +356,11 @@ function Post({ state, dispatch, sendImage }: Props) {
           <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" {...register("image", { required: state.isPostEditMode.image ? false : "請選擇照片" })} onChange={sendImage} />
         </SelectPhotoBtn>
         {errors.image && <p>{errors.image.message}</p>}
-        <Cancel onClick={() => handlerCancel()}>取消</Cancel>
-        <Submit onClick={handleSubmit(onSubmit)}>送出{state.isLoading && <Loading src={loading} />}</Submit>
+        <Btn onClick={() => handlerCancel()}>取消</Btn>
+        <Submit onClick={handleSubmit(onSubmit)} load={state.isLoading}>
+          送出
+          {state.isLoading && <Loading src={loading} />}
+        </Submit>
       </BtnBox>
     </PostContainer>
   );
