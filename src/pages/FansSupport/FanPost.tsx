@@ -189,8 +189,8 @@ function FanPost({ concert, state, dispatch }: Props) {
       image: state.isEditMode.content ? state.isEditMode.image.concat(urls) : urls,
       userUID: UID,
     };
-    if (state.isEditMode.userUID) {
-      await api.updateMerchPost(state.isEditMode.userUID, allData);
+    if (state.isEditMode.id) {
+      await api.updateMerchPost(state.isEditMode.id, allData);
     } else {
       console.log(allData);
 

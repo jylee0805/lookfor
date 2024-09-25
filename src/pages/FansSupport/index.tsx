@@ -317,7 +317,7 @@ function FansSupport() {
                   <ImportInfoContent>地點</ImportInfoContent>
                   <ImportInfoContent>{item.passPlace}</ImportInfoContent>
                   <ImportInfoContent>狀態</ImportInfoContent>
-                  <ImportInfoContent>{item.passState}</ImportInfoContent>
+                  <ImportInfoContent>{item.passState === "0" ? "未發放" : item.passState === "1" ? "發放中" : "發放完畢"}</ImportInfoContent>
                   <ImportInfoContent>領取資格</ImportInfoContent>
                   <ImportInfoContent>{item.qualify}</ImportInfoContent>
                 </ImportInfo>
