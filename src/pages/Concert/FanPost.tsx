@@ -4,7 +4,7 @@ import { TimePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { Concerts } from "../ConcertList";
 import api from "../../utils/api";
-import { State, Action, MerchPost } from "./index";
+import { State, Action, MerchPost } from "../Concert/FanSupport";
 import { useEffect } from "react";
 
 const Container = styled.div<{ isPostClick: boolean }>`

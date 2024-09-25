@@ -7,6 +7,7 @@ import api from "../../utils/api";
 import { useEffect, useReducer, useContext } from "react";
 import Post from "./Post";
 import { AuthContext } from "../../utils/AuthContextProvider";
+
 const Container = styled.div``;
 
 const Mask = styled.div<{ postClick: boolean }>`
@@ -220,7 +221,7 @@ function View() {
             if (post.userUID) {
               const userName = await api.getUser(post.userUID);
 
-              return userName;
+              return userName.userName;
             }
             return null;
           });
@@ -247,7 +248,7 @@ function View() {
                 if (comment.userUID) {
                   const userName = await api.getUser(comment.userUID);
 
-                  return userName;
+                  return userName.userName;
                 }
                 return null;
               });

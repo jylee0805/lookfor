@@ -3,10 +3,9 @@ import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import { Container } from "@mui/material";
 
-const Container = styled.div`
-  padding: 60px 60px;
-`;
+const CustomizedContainer = styled(Container)``;
 
 const Title = styled.h3`
   font-size: 36px;
@@ -100,7 +99,7 @@ function ConcertList() {
   }, []);
 
   return (
-    <Container>
+    <CustomizedContainer maxWidth="lg">
       <Title>演唱會資訊</Title>
 
       <AllList>
@@ -122,7 +121,7 @@ function ConcertList() {
             </ListItem>
           ))}
       </AllList>
-    </Container>
+    </CustomizedContainer>
   );
 }
 

@@ -6,7 +6,7 @@ import App from "./App.tsx";
 import Home from "./pages/Home.tsx";
 import Concert from "./pages/Concert";
 import ConcertList from "./pages/ConcertList";
-import FansSupport from "./pages/FansSupport";
+import FansSupport from "./pages/Concert/FanSupport.tsx";
 import Login from "./pages/Login";
 import View from "./pages/View";
 import TransportationDriving from "./pages/TransportationDriving.tsx";

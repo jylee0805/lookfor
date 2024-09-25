@@ -128,10 +128,6 @@ interface FormInputs {
 function Post({ state, dispatch, sendImage }: Props) {
   const authContext = useContext(AuthContext);
 
-  if (authContext) {
-    console.log(authContext.loginState);
-  }
-
   const { labels, handleAnalyzeImage } = useGoogleVisionAPI();
   const {
     register,

@@ -1,15 +1,11 @@
 import styled from "styled-components";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import api from "../../utils/api";
 import { useEffect, useReducer, useState, useContext } from "react";
 import photo from "../../images/avatar.jpg";
 import FanPost from "./FanPost";
-
 import { AuthContext } from "../../utils/AuthContextProvider";
 
-const Container = styled.div`
-  padding: 60px 120px;
-`;
 const Mask = styled.div<{ postClick: boolean }>`
   display: ${(props) => (props.postClick ? "block" : "none")};
   background: #3e3e3e99;
@@ -22,28 +18,9 @@ const Mask = styled.div<{ postClick: boolean }>`
   left: 0;
   z-index: 1;
 `;
-const ConcertName = styled.h3`
-  font-size: 40px;
-  margin-bottom: 40px;
-  font-weight: 700;
-  text-align: center;
-`;
-const BtnBox = styled.div`
-  border-radius: 50px;
-  box-shadow: 0 4px 4px #00000025;
-  padding: 6px 30px;
-  width: 360px;
-  text-align: center;
-  margin: 0 auto 30px;
-`;
-const PageBtn = styled.button`
-  background: none;
-  border: none;
-  display: inline-block;
-  padding: 5px 25px;
-`;
 
-const Content = styled.div`
+const Content = styled.div<{ changePage: string }>`
+  display: ${(props) => (props.changePage === "fanSupport" ? "block" : "none")};
   width: 75%;
   margin: 0 auto;
 `;
@@ -197,7 +174,11 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-function FansSupport() {
+interface Props {
+  changePage: string;
+}
+
+function FansSupport({ changePage }: Props) {
   // const queryParams = new URLSearchParams(window.location.search);
   // const concertId = queryParams.get("concert") || "";
   const [state, dispatch] = useReducer(reducer, initial);
@@ -205,7 +186,6 @@ function FansSupport() {
   const { concert } = location.state || {};
   const [isMoreClick, setIsMoreClick] = useState<string>("");
   const authContext = useContext(AuthContext);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const loadViewPosts = async () => {
@@ -224,7 +204,7 @@ function FansSupport() {
             if (post.userUID) {
               const userName = await api.getUser(post.userUID);
 
-              return userName;
+              return userName.userName;
             }
             return null;
           });
@@ -292,15 +272,9 @@ function FansSupport() {
     dispatch({ type: "toggleIsPostClick", payload: { isPostClick: true } });
   };
   return (
-    <Container>
+    <>
       <Mask postClick={state.isPostClick} />
-      <ConcertName>{concert.concertName}</ConcertName>
-      <BtnBox>
-        <PageBtn onClick={() => navigate(`/concert?concert=${concert.id}`, { state: { concert } })}>演唱會資訊</PageBtn>
-        <PageBtn onClick={() => navigate(`/fanssupport?concert=${concert.id}`, { state: { concert } })}>應援物發放資訊</PageBtn>
-      </BtnBox>
-
-      <Content>
+      <Content changePage={changePage}>
         <FeatureBox>
           <SortBtn onClick={() => handleSort()}>{state.sort === "createdTime" ? "依發放時間排序" : "依貼文發布時間排序"}</SortBtn>
           <CreateBtn onClick={() => handlePostClick()}>發佈資訊</CreateBtn>
@@ -342,7 +316,7 @@ function FansSupport() {
             ))}
         </PostList>
       </Content>
-    </Container>
+    </>
   );
 }
 

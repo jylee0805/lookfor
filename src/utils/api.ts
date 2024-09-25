@@ -24,12 +24,14 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  getDoc,
 } from "../utils/firebase";
 import { PostState, Comment } from "../pages/View";
 import { Concerts } from "../pages/ConcertList";
-import { Detail } from "../pages/Concert";
-import { MerchPost } from "../pages/FansSupport";
+import { Detail } from "../pages/Concert/FanSupport";
+import { MerchPost } from "../pages/Concert/FanSupport";
 import { Place, PlaceAvailable } from "../pages/TransportationDriving";
+import Profile from "../pages/Profile";
 
 interface Data {
   content: string;
@@ -48,11 +50,22 @@ const api = {
     return querySnapshot.docs;
   },
   async getUser(id: string) {
-    if (id) {
-      const q = query(collection(db, "users"), where("UID", "==", id));
-      const querySnapshot = await getDocs(q);
+    const q = query(collection(db, "users"), where("UID", "==", id));
 
-      return querySnapshot.docs[0].data().userName;
+    const querySnapshot = await getDocs(q);
+    console.log(querySnapshot.docs[0].data());
+    const list: Profile = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Profile;
+    console.log(list);
+
+    return list;
+  },
+  async updateUser(id: string, update: object) {
+    try {
+      const postDoc = doc(db, "users", id);
+      await updateDoc(postDoc, update);
+      console.log("Document updated with ID: ", id);
+    } catch (e) {
+      console.error("Error updating document: ", e);
     }
   },
   async userSignUp(email: string, password: string) {
@@ -155,6 +168,30 @@ const api = {
       });
     }
     return;
+  },
+
+  async getUserViewPosts(uid: string) {
+    const q = query(collection(db, "viewPosts"), where("userUID", "==", uid));
+
+    const querySnapshot = await getDocs(q);
+    const list: PostState[] = [];
+    querySnapshot.forEach((doc) => {
+      list.push({ id: doc.id, ...doc.data() } as PostState);
+    });
+
+    return list;
+  },
+
+  async getUserMerchPosts(uid: string) {
+    const q = query(collection(db, "merchPost"), where("userUID", "==", uid));
+
+    const querySnapshot = await getDocs(q);
+    const list: MerchPost[] = [];
+    querySnapshot.forEach((doc) => {
+      list.push({ id: doc.id, ...doc.data() } as MerchPost);
+    });
+
+    return list;
   },
 
   async getViewPosts(section: string, row: number, seat: number, onUpdate: (post: PostState[]) => void) {
@@ -277,7 +314,19 @@ const api = {
     console.log(data);
     return data;
   },
+  async getConcert(id: string) {
+    console.log(id);
 
+    const q = doc(db, "concerts", `${id}`);
+    const querySnapshot = await getDoc(q);
+    console.log(querySnapshot.data());
+    // querySnapshot.forEach((doc) => {
+    //   const concertData = { ...doc.data(), id: doc.id };
+    //   data.push(concertData as Concerts);
+    // });
+
+    return querySnapshot.data();
+  },
   async getConcertDetail(concert: string) {
     const q = query(collection(db, `concerts/${concert}/details`));
     const querySnapshot = await getDocs(q);

@@ -1,7 +1,8 @@
 import styled from "styled-components";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import api from "../../utils/api";
 import { useEffect, useState } from "react";
+import FansSupport from "./FanSupport";
 
 const Container = styled.div`
   padding: 60px 120px;
@@ -37,8 +38,8 @@ const SubTitle = styled.p`
   font-size: 24px;
   letter-spacing: 10px;
 `;
-const Content = styled.div`
-  display: grid;
+const Content = styled.div<{ pageChange: string }>`
+  display: ${(props) => (props.pageChange === "concert" ? "grid" : "none")};
   grid-template-columns: auto 1fr;
   row-gap: 30px;
   column-gap: 50px;
@@ -75,7 +76,7 @@ function Concert() {
   const location = useLocation();
   const { concert } = location.state || {};
   const [detailData, setDetailData] = useState<Detail | null>(null);
-  const navigate = useNavigate();
+  const [changePage, setChangePage] = useState<string>("concert");
   console.log(concert);
   useEffect(() => {
     const getDetail = async (concertId: string) => {
@@ -89,12 +90,12 @@ function Concert() {
     <Container>
       <ConcertName>{concert.concertName}</ConcertName>
       <BtnBox>
-        <PageBtn onClick={() => navigate(`/concert?concert=${concert.id}`, { state: { concert } })}>演唱會資訊</PageBtn>
-        <PageBtn onClick={() => navigate(`/fanssupport?concert=${concert.id}`, { state: { concert } })}>應援物發放資訊</PageBtn>
+        <PageBtn onClick={() => setChangePage("concert")}>演唱會資訊</PageBtn>
+        <PageBtn onClick={() => setChangePage("fanSupport")}>應援物發放資訊</PageBtn>
       </BtnBox>
       <PosterBox>{detailData?.images && <Poster src={detailData.images} />}</PosterBox>
 
-      <Content>
+      <Content pageChange={changePage}>
         <Title>演出資訊</Title>
         <SubTitle>演出日期</SubTitle>
         <List>{concert.date && concert.date.map((item: string) => <li>{item}</li>)}</List>
@@ -120,6 +121,7 @@ function Concert() {
           <li>※活動當天入場時需配合嚴格安檢，活動相關內容及詳細辦法請關注活動主辦單位 APPLEWOOD及APPLEWOOD TAIWAN 官方臉書及拓元售票網頁。 以上活動內容，主辦單位保留異動之權力</li>
         </List> */}
       </Content>
+      <FansSupport changePage={changePage} />
     </Container>
   );
 }

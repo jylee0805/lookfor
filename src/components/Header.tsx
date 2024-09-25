@@ -33,6 +33,7 @@ const LogOutBtn = styled.button`
   color: #000000;
   background: none;
 `;
+
 function Header() {
   const authContext = useContext(AuthContext);
 
