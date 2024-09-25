@@ -2,8 +2,9 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import logo from "../images/logo.png";
 import api from "../utils/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { auth, onAuthStateChanged } from "../utils/firebase";
+import { AuthContext } from "../utils/AuthContextProvider";
 
 const Container = styled.header`
   display: flex;
@@ -33,6 +34,12 @@ const LogOutBtn = styled.button`
   background: none;
 `;
 function Header() {
+  const authContext = useContext(AuthContext);
+
+  if (authContext) {
+    console.log(authContext.loginState);
+  }
+
   const [isLogin, setIsLogin] = useState(false);
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -44,8 +51,9 @@ function Header() {
     });
   }, []);
 
-  const handlerLogout = () => {
-    api.userLogOut();
+  const handlerLogout = async () => {
+    const loginState = await api.userLogOut();
+    authContext?.setLoginState(loginState as string);
   };
 
   return (

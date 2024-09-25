@@ -2,11 +2,11 @@ import styled from "styled-components";
 import Sections from "./Sections";
 import Rows from "./Rows";
 import Seat from "./Seat";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useContext } from "react";
 import Post from "./Post";
-
+import { AuthContext } from "../../utils/AuthContextProvider";
 const Container = styled.div``;
 
 const Mask = styled.div<{ postClick: boolean }>`
@@ -201,6 +201,8 @@ const reducer = (state: State, action: Action): State => {
 };
 function View() {
   const [state, dispatch] = useReducer(reducer, initial);
+  const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadViewPosts = async () => {
@@ -333,6 +335,16 @@ function View() {
     }
   };
 
+  const handlePostClick = () => {
+    if (authContext?.loginState === null) {
+      alert("請先登入");
+      navigate("/login");
+      return;
+    }
+    dispatch({ type: "togglePostClick" });
+    document.body.style.overflow = "hidden";
+  };
+
   return (
     <Container>
       <Mask postClick={state.isPostClick} />
@@ -349,15 +361,7 @@ function View() {
         </NavItem>
       </Nav>
       <Main>
-        <PostVieBtn
-          onClick={() => {
-            dispatch({ type: "togglePostClick" });
-
-            document.body.style.overflow = "hidden";
-          }}
-        >
-          發佈視角
-        </PostVieBtn>
+        <PostVieBtn onClick={() => handlePostClick()}>發佈視角</PostVieBtn>
         <Post state={state} dispatch={dispatch} sendImage={sendImage} />
         <Sections handlerSection={handlerSection} />
         <Rows state={state} dispatch={dispatch} />

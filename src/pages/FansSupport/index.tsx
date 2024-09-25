@@ -1,9 +1,11 @@
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useState, useContext } from "react";
 import photo from "../../images/avatar.jpg";
 import FanPost from "./FanPost";
+
+import { AuthContext } from "../../utils/AuthContextProvider";
 
 const Container = styled.div`
   padding: 60px 120px;
@@ -202,7 +204,7 @@ function FansSupport() {
   const location = useLocation();
   const { concert } = location.state || {};
   const [isMoreClick, setIsMoreClick] = useState<string>("");
-
+  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -281,6 +283,14 @@ function FansSupport() {
       dispatch({ type: "setSort", payload: { sort: "createdTime", postData: sort } });
     }
   };
+
+  const handlePostClick = () => {
+    if (authContext?.loginState === null) {
+      alert("請先登入");
+      return;
+    }
+    dispatch({ type: "toggleIsPostClick", payload: { isPostClick: true } });
+  };
   return (
     <Container>
       <Mask postClick={state.isPostClick} />
@@ -293,7 +303,7 @@ function FansSupport() {
       <Content>
         <FeatureBox>
           <SortBtn onClick={() => handleSort()}>{state.sort === "createdTime" ? "依發放時間排序" : "依貼文發布時間排序"}</SortBtn>
-          <CreateBtn onClick={() => dispatch({ type: "toggleIsPostClick", payload: { isPostClick: true } })}>發佈資訊</CreateBtn>
+          <CreateBtn onClick={() => handlePostClick()}>發佈資訊</CreateBtn>
         </FeatureBox>
         <FanPost concert={concert} dispatch={dispatch} state={state} />
         <PostList>

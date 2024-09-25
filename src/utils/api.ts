@@ -86,8 +86,8 @@ const api = {
   async userLogInGoogle() {
     try {
       const result = await signInWithPopup(auth, provider);
-      /*const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential?.accessToken; */
+      console.log(result);
+
       const user = result.user;
       return { user };
     } catch (error) {
@@ -104,24 +104,20 @@ const api = {
     }
   },
 
-  userLogOut() {
-    signOut(auth)
-      .then(() => {
-        console.log("登出成功");
-
-        return "登出成功";
-      })
-      .catch((error) => {
-        return error;
-      });
+  async userLogOut() {
+    try {
+      await signOut(auth);
+      return auth.currentUser;
+    } catch (error) {
+      console.error("登出失败", error);
+      return error;
+    }
   },
 
   async getLoginState() {
     return new Promise((resolve) => {
-      onAuthStateChanged(auth, (user) => {
-        console.log(user);
-
-        resolve(user?.uid); // 轉換為 boolean
+      onAuthStateChanged(auth, () => {
+        resolve(auth.currentUser?.uid); // 轉換為 boolean
       });
     });
   },

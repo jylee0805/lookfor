@@ -4,8 +4,9 @@ import api from "../../utils/api";
 import useGoogleVisionAPI from "../../utils/useGoogleVisionAPI";
 import { Action } from ".";
 import loading from "../../images/loading.gif";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { PostState } from "./index";
+import { AuthContext } from "../../utils/AuthContextProvider";
 
 const PostContainer = styled.div<{ show: boolean }>`
   position: fixed;
@@ -125,6 +126,12 @@ interface FormInputs {
 }
 
 function Post({ state, dispatch, sendImage }: Props) {
+  const authContext = useContext(AuthContext);
+
+  if (authContext) {
+    console.log(authContext.loginState);
+  }
+
   const { labels, handleAnalyzeImage } = useGoogleVisionAPI();
   const {
     register,
@@ -248,8 +255,7 @@ function Post({ state, dispatch, sendImage }: Props) {
           } else {
             console.log("我在上傳");
 
-            const response = (await api.getLoginState()) as string;
-            await api.setViewPost(formValues, state.uploadPhotoUrl, response);
+            await api.setViewPost(formValues, state.uploadPhotoUrl, authContext?.loginState as string);
           }
         }
         dispatch({ type: "setLoading" });

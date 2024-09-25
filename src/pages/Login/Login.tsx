@@ -2,6 +2,8 @@ import styled from "styled-components";
 import { useForm, SubmitHandler } from "react-hook-form";
 import api from "../../utils/api";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../utils/AuthContextProvider";
 
 const LoginBox = styled.div<{ isLogin: boolean }>`
   width: 100%;
@@ -37,6 +39,8 @@ interface FormInputs {
 
 function LogIn({ isLogin }: Props) {
   const navigate = useNavigate();
+  const authContext = useContext(AuthContext);
+
   const {
     register,
     handleSubmit,
@@ -53,6 +57,8 @@ function LogIn({ isLogin }: Props) {
       alert("無效的 mail");
       return;
     }
+
+    authContext?.setLoginState(response.uid as string);
     navigate("/");
   };
 

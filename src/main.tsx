@@ -13,6 +13,7 @@ import TransportationDriving from "./pages/TransportationDriving.tsx";
 import TransportationPublic from "./pages/TransportationPublic.tsx";
 
 import "./index.css";
+import Profile from "./pages/Profile.tsx";
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
@@ -27,6 +28,7 @@ createRoot(document.getElementById("root") as HTMLElement).render(
           <Route path="concert" element={<Concert />} />
           <Route path="fanssupport" element={<FansSupport />} />
           <Route path="login" element={<Login />} />
+          <Route path="profile" element={<Profile />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

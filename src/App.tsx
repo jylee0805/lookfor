@@ -3,14 +3,17 @@ import GlobalStyle from "./GlobalStyle";
 import Header from "./components/Header";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AuthContextProvider } from "./utils/AuthContextProvider";
 
 function App() {
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <GlobalStyle />
-      <Header />
-      <Outlet />
-    </LocalizationProvider>
+    <AuthContextProvider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <GlobalStyle />
+        <Header />
+        <Outlet />
+      </LocalizationProvider>
+    </AuthContextProvider>
   );
 }
 
