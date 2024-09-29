@@ -25,10 +25,11 @@ import {
   doc,
   updateDoc,
   getDoc,
+  arrayUnion,
 } from "../utils/firebase";
 import { PostState, Comment } from "../pages/View";
 import { Concerts } from "../pages/ConcertList";
-import { Detail } from "../pages/Concert/FanSupport";
+import { Detail } from "../pages/Concert";
 import { MerchPost } from "../pages/Concert/FanSupport";
 import { Place, PlaceAvailable } from "../pages/TransportationDriving";
 import Profile from "../pages/Profile";
@@ -53,10 +54,7 @@ const api = {
     const q = query(collection(db, "users"), where("UID", "==", id));
 
     const querySnapshot = await getDocs(q);
-    console.log(querySnapshot.docs[0].data());
     const list: Profile = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Profile;
-    console.log(list);
-
     return list;
   },
   async updateUser(id: string, update: object) {
@@ -151,6 +149,52 @@ const api = {
       UID: uid,
     });
     return;
+  },
+
+  async getKeepPost(uid: string) {
+    console.log(uid);
+
+    try {
+      // 查找 userId 等於 uid 的文件
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("UID", "==", uid));
+
+      // 執行查詢
+      const querySnapshot = await getDocs(q);
+
+      console.log(querySnapshot.docs[0].data());
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  },
+
+  async setKeepPost(uid: string, keepId: string) {
+    console.log(uid);
+
+    try {
+      // 查找 userId 等於 uid 的文件
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("UID", "==", uid));
+
+      // 執行查詢
+      const querySnapshot = await getDocs(q);
+
+      // 如果找到了對應的文件
+      querySnapshot.forEach(async (docSnapshot) => {
+        // 更新 keepIds 欄位，將新的 keepId 添加到陣列中
+        await updateDoc(docSnapshot.ref, {
+          keepIds: arrayUnion(keepId), // 使用 arrayUnion 來避免重複加入相同的值
+        });
+      });
+
+      if (querySnapshot.empty) {
+        console.log("No matching documents.");
+      } else {
+        console.log("KeepId added to user's keepIds array");
+      }
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
   },
 
   async setViewPost(data: Data, image: string, uid: string) {
@@ -355,7 +399,6 @@ const api = {
       querySnapshot.forEach((doc) => {
         data.push({ id: doc.id, ...doc.data() } as MerchPost);
       });
-      console.log(data);
 
       onUpdate(data);
     });

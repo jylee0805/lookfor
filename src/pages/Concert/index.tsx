@@ -5,13 +5,25 @@ import { useEffect, useState } from "react";
 import FansSupport from "./FanSupport";
 
 const Container = styled.div`
-  padding: 60px 120px;
+  width: 80%;
+  margin: 60px auto;
+  @media (max-width: 992px) {
+    width: 90%;
+  }
+  @media (max-width: 768px) {
+  }
 `;
 const ConcertName = styled.h3`
-  font-size: 40px;
+  font-size: 2.2rem;
   margin-bottom: 40px;
   font-weight: 700;
   text-align: center;
+  @media (max-width: 992px) {
+    font-size: 1.96rem;
+  }
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
+  }
 `;
 const BtnBox = styled.div`
   border-radius: 50px;
@@ -20,52 +32,96 @@ const BtnBox = styled.div`
   width: 360px;
   text-align: center;
   margin: 0 auto 30px;
+  @media (max-width: 575px) {
+    width: 320px;
+    padding: 6px 10px;
+  }
 `;
 const PageBtn = styled.button`
   background: none;
   border: none;
   display: inline-block;
-  padding: 5px 25px;
+  padding: 5px 0px;
+  width: 50%;
 `;
 
 const Poster = styled.img``;
 const PosterBox = styled.div`
   width: 768px;
-  margin: 0 auto 60px;
+  margin: 0 auto 40px;
   text-align: center;
-`;
-const SubTitle = styled.p`
-  font-size: 24px;
-  letter-spacing: 10px;
-`;
-const Content = styled.div<{ pageChange: string }>`
-  display: ${(props) => (props.pageChange === "concert" ? "grid" : "none")};
-  grid-template-columns: auto 1fr;
-  row-gap: 30px;
-  column-gap: 50px;
-`;
-const Text = styled.p`
-  font-size: 24px;
-  line-height: 1.5;
-`;
-const List = styled.ul`
-  font-size: 24px;
-  line-height: 2;
+  grid-column: span 2;
+  @media (max-width: 992px) {
+    width: 75%;
+    margin: 0 auto 20px;
+  }
 `;
 
+const Content = styled.div<{ pageChange: string }>`
+  display: ${(props) => (props.pageChange === "concert" ? "grid" : "none")};
+  grid-template-columns: 150px 1fr;
+  row-gap: 30px;
+  column-gap: 50px;
+  @media (max-width: 992px) {
+    font-size: 1.96rem;
+  }
+  @media (max-width: 768px) {
+    row-gap: 25px;
+    column-gap: 15px;
+  }
+  @media (max-width: 575px) {
+    grid-template-columns: 100px auto;
+    row-gap: 20px;
+    column-gap: 0px;
+  }
+`;
 const Title = styled.h4`
-  font-size: 32px;
+  font-size: 1.96rem;
   letter-spacing: 10px;
   font-weight: 700;
   grid-column: span 2;
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+`;
+
+const SubTitle = styled.p`
+  font-size: 1.4rem;
+  letter-spacing: 10px;
+  display: flex;
+  margin: auto;
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    letter-spacing: 5px;
+  }
+`;
+const Text = styled.p`
+  font-size: 1.4rem;
+  line-height: 1.5;
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+`;
+const List = styled.ul`
+  font-size: 1.4rem;
+  line-height: 2;
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 const WebLink = styled.a`
-  font-size: 24px;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  @media (max-width: 768px) {
+    font-size: 1rem;
+
+    word-wrap: break-word; /* 自動換行 */
+    word-break: break-all; /* 確保長單詞換行 */
+  }
 `;
 
 export interface Detail {
-  images: string;
   ticketPrice: string;
   ticketSaleTime: string[];
   ticketSaleWebsite: string;
@@ -93,9 +149,9 @@ function Concert() {
         <PageBtn onClick={() => setChangePage("concert")}>演唱會資訊</PageBtn>
         <PageBtn onClick={() => setChangePage("fanSupport")}>應援物發放資訊</PageBtn>
       </BtnBox>
-      <PosterBox>{detailData?.images && <Poster src={detailData.images} />}</PosterBox>
 
       <Content pageChange={changePage}>
+        <PosterBox>{concert?.images && <Poster src={concert.images} />}</PosterBox>
         <Title>演出資訊</Title>
         <SubTitle>演出日期</SubTitle>
         <List>{concert.date && concert.date.map((item: string) => <li>{item}</li>)}</List>
@@ -121,7 +177,7 @@ function Concert() {
           <li>※活動當天入場時需配合嚴格安檢，活動相關內容及詳細辦法請關注活動主辦單位 APPLEWOOD及APPLEWOOD TAIWAN 官方臉書及拓元售票網頁。 以上活動內容，主辦單位保留異動之權力</li>
         </List> */}
       </Content>
-      <FansSupport changePage={changePage} />
+      <FansSupport changePage={changePage} concert={concert} />
     </Container>
   );
 }

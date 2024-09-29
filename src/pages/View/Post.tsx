@@ -10,9 +10,9 @@ import { AuthContext } from "../../utils/AuthContextProvider";
 
 const PostContainer = styled.div<{ show: boolean }>`
   position: fixed;
-  width: 50%;
+  width: 60%;
   background: #ffffff;
-  z-index: 5;
+  z-index: 10;
   padding: 20px 30px;
   display: ${(props) => (props.show ? "block" : "none")};
   left: 50%;
@@ -20,16 +20,37 @@ const PostContainer = styled.div<{ show: boolean }>`
   transform: translate(-50%, -50%);
   border-radius: 15px;
   box-shadow: 3px 3px 3px #6c6c6c;
+  @media (max-width: 992px) {
+    width: 80%;
+  }
+  @media (max-width: 575px) {
+    padding: 20px 15px;
+  }
 `;
 const FormContainer = styled.div`
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 15px;
   margin-bottom: 15px;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0px;
+  }
 `;
 const FormRow = styled.div`
   display: flex;
   align-items: center;
+  @media (max-width: 768px) {
+    margin-bottom: 10px;
+    margin-left: 5px;
+  }
+  @media (max-width: 575px) {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    row-gap: 10px;
+    column-gap: 5px;
+    margin-top: 10px;
+  }
 `;
 const PostTitle = styled.h3`
   font-size: 24px;
@@ -44,6 +65,10 @@ const Input = styled.input`
   border: 1px solid #d2d2d2;
   border-radius: 5px;
   padding: 5px;
+  @media (max-width: 768px) {
+    margin-bottom: 10px;
+    margin-left: 5px;
+  }
 `;
 const Select = styled.select`
   border: 1px solid #d2d2d2;
@@ -57,6 +82,10 @@ const Content = styled.textarea`
   padding: 5px;
   height: 100px;
   resize: none;
+  @media (max-width: 768px) {
+    grid-column: span 1;
+    margin-left: 5px;
+  }
 `;
 const BtnBox = styled.div`
   display: flex;

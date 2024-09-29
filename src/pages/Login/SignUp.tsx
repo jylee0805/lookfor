@@ -8,6 +8,7 @@ const SignUpBox = styled.div<{ isLogin: boolean }>`
   row-gap: 15px;
   display: flex;
   display: ${(props) => (props.isLogin ? "none" : "flex")};
+  margin-top: 15px;
 `;
 const Input = styled.input`
   border-radius: 30px;
@@ -18,11 +19,17 @@ const Input = styled.input`
   width: 100%;
   font-size: 16px;
   line-height: 1.5;
+  @media (max-width: 575px) {
+    font-size: 14px;
+  }
 `;
 const Label = styled.label`
   font-size: 16px;
   line-height: 1.5;
   color: #000;
+  @media (max-width: 575px) {
+    font-size: 14px;
+  }
 `;
 const Require = styled.span`
   font-size: 16px;

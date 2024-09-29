@@ -10,7 +10,7 @@ const LoginBox = styled.div<{ isLogin: boolean }>`
   display: ${(props) => (props.isLogin ? "flex" : "none")};
   flex-direction: column;
   row-gap: 25px;
-  margin-top: 68px;
+  margin-top: 50px;
 `;
 
 const Input = styled.input`
@@ -22,6 +22,9 @@ const Input = styled.input`
   width: 100%;
   font-size: 16px;
   line-height: 1.5;
+  @media (max-width: 575px) {
+    font-size: 14px;
+  }
 `;
 
 const LoginBtn = styled(Input)`

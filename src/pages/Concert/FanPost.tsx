@@ -8,6 +8,7 @@ import { State, Action, MerchPost } from "../Concert/FanSupport";
 import { useEffect } from "react";
 
 const Container = styled.div<{ isPostClick: boolean }>`
+  width: 60%;
   padding: 20px 30px;
   display: ${(props) => (props.isPostClick ? "block" : "none")};
   position: fixed;
@@ -16,6 +17,10 @@ const Container = styled.div<{ isPostClick: boolean }>`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  border-radius: 15px;
+  @media (max-width: 992px) {
+    width: 80%;
+  }
 `;
 const Title = styled.h3`
   font-size: 24px;
@@ -25,16 +30,25 @@ const Title = styled.h3`
 `;
 const Label = styled.p``;
 const InputContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr;
   margin-bottom: 15px;
   column-gap: 20px;
   row-gap: 15px;
+  @media (max-width: 768px) {
+    grid-template-columns: auto 1fr;
+  }
 `;
 const Input = styled.input`
   border: 1px solid #d2d2d2;
   border-radius: 5px;
   padding: 5px;
+`;
+const QualifyInput = styled(Input)`
+  grid-column: span 3;
+  @media (max-width: 768px) {
+    grid-column: span 1;
+  }
 `;
 const CustomTimePicker = styled(TimePicker)({
   "& .MuiInputBase-root": {
@@ -43,7 +57,6 @@ const CustomTimePicker = styled(TimePicker)({
     padding: "0px", // 調整內距
     fontSize: "14px",
     height: "30px",
-    width: "150px",
   },
   "& .MuiOutlinedInput-notchedOutline": {
     borderColor: "#d2d2d2", // 修改邊框顏色
@@ -56,11 +69,7 @@ const CustomTimePicker = styled(TimePicker)({
     padding: "0px 8px",
   },
 });
-const ColumnContainer = styled.div`
-  display: flex;
-  column-gap: 15px;
-  align-items: center;
-`;
+
 const Select = styled.select`
   border: 1px solid #d2d2d2;
   border-radius: 5px;
@@ -86,9 +95,14 @@ const MoreContent = styled.textarea`
   border-radius: 5px;
   padding: 5px;
   flex-grow: 1;
+  grid-column: span 4;
+  @media (max-width: 768px) {
+    grid-column: span 2;
+    height: 80px;
+  }
 `;
 const Image = styled.img`
-  width: 65px;
+  width: 120px;
   margin-bottom: 15px;
 `;
 const SelectPhotoBtn = styled.label`
@@ -135,7 +149,6 @@ function FanPost({ concert, state, dispatch }: Props) {
       };
       reset(values);
     }
-    console.log(state.isEditMode);
   }, [state.isEditMode]);
 
   const day = concert.date.map((item) => {
@@ -144,7 +157,6 @@ function FanPost({ concert, state, dispatch }: Props) {
       return dayOnly;
     }
   });
-  console.log(state.isEditMode);
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     console.log(data);
@@ -225,42 +237,32 @@ function FanPost({ concert, state, dispatch }: Props) {
     <Container isPostClick={state.isPostClick}>
       <Title>建立資訊</Title>
       <InputContainer>
-        <ColumnContainer>
-          <Label>日期</Label>
-          <Select {...register("day", { required: true })}>
-            <option value="">請選擇日期</option>
-            {concert.date && day.map((item) => <option value={item}>{item}</option>)}
-          </Select>
-        </ColumnContainer>
-        <ColumnContainer>
-          <Label>時間</Label>
-          <Controller
-            name="time"
-            control={control}
-            render={({ field }) => (
-              <CustomTimePicker
-                value={field.value}
-                onChange={(newValue) => field.onChange(newValue)} // 更新時間
-              />
-            )}
-          />
-        </ColumnContainer>
-        <ColumnContainer>
-          <Label>狀態</Label>
-          <Select {...register("status", { required: true })}>
-            <option value="0">未發放</option>
-            <option value="1">發放中</option>
-            <option value="2">發放完畢</option>
-          </Select>
-        </ColumnContainer>
-        <ColumnContainer>
-          <Label>地點</Label>
-          <Input type="text" {...register("place", { required: true })} />
-        </ColumnContainer>
-        <ColumnContainer>
-          <Label>領取資格</Label>
-          <Input type="text" {...register("qualify", { required: true })} />
-        </ColumnContainer>
+        <Label>日期</Label>
+        <Select {...register("day", { required: true })}>
+          <option value="">請選擇日期</option>
+          {concert.date && day.map((item) => <option value={item}>{item}</option>)}
+        </Select>
+        <Label>時間</Label>
+        <Controller
+          name="time"
+          control={control}
+          render={({ field }) => (
+            <CustomTimePicker
+              value={field.value}
+              onChange={(newValue) => field.onChange(newValue)} // 更新時間
+            />
+          )}
+        />
+        <Label>狀態</Label>
+        <Select {...register("status", { required: true })}>
+          <option value="0">未發放</option>
+          <option value="1">發放中</option>
+          <option value="2">發放完畢</option>
+        </Select>
+        <Label>地點</Label>
+        <Input type="text" {...register("place", { required: true })} />
+        <Label>領取資格</Label>
+        <QualifyInput type="text" {...register("qualify", { required: true })} />
         <MoreContent {...register("more", { required: true })}></MoreContent>
       </InputContainer>
       {state.localPhotoUrl && state.localPhotoUrl.map((item) => <Image src={item} />)}

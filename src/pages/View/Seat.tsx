@@ -3,13 +3,25 @@ import avatar from "../../images/avatar.jpg";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { PostState, Comment, Action } from "./index";
 import api from "../../utils/api";
+import Pagination from "@mui/material/Pagination";
+import SendIcon from "@mui/icons-material/Send";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useEffect, useState } from "react";
 
 const SeatSection = styled.div<{ rowSelect: boolean }>`
   grid-column: span 2;
   margin-top: 80px;
-  padding: 0 100px;
+  padding: 0 60px;
   margin-bottom: 80px;
   display: ${(props) => (props.rowSelect ? "block" : "none")};
+  color: #fff;
+  @media (max-width: 992px) {
+    grid-column: span 1;
+    padding: 0 60px;
+  }
+  @media (max-width: 575px) {
+    padding: 0 20px;
+  }
 `;
 const Seats = styled.div`
   width: 70%;
@@ -20,48 +32,103 @@ const Seats = styled.div`
   margin: 0 auto;
 `;
 const Title = styled.h4`
-  font-size: 32px;
+  font-size: 1.96rem;
   font-weight: 600;
+  margin: 25px 0;
+  @media (max-width: 575px) {
+    font-size: 1.5px;
+  }
 `;
 const SeatBtn = styled.button<{ selected: boolean }>`
+  padding: 0;
   width: 40px;
   height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
   border: 2px solid ${(props) => (props.selected ? "#328c48" : "transparent")};
+  @media (max-width: 992px) {
+    width: 30px;
+    height: 30px;
+  }
 `;
 const Card = styled.div`
   border-radius: 10px;
   display: flex;
   column-gap: 35px;
   padding: 15px 20px;
-  box-shadow: 3px 3px 3px #d2d2d2;
-  height: 520px;
+  box-shadow: 3px 3px 3px #000000;
+  height: 480px;
+  background: #00000090;
+  margin-bottom: 25px;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    row-gap: 20px;
+    padding: 25px;
+    height: auto;
+  }
 `;
 const UserBox = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
   column-gap: 10px;
 `;
 const PostHeader = styled.div`
   display: flex;
   align-items: center;
   column-gap: 10px;
+  margin-bottom: 20px;
 `;
 const CommentHeader = styled.div`
   display: flex;
   align-items: center;
   column-gap: 10px;
+  margin-bottom: 5px;
 `;
-const FeatureBtn = styled.button``;
+
+const FeatureBox = styled.div`
+  margin-left: auto;
+  position: relative;
+`;
+const FeatureList = styled.ul`
+  position: absolute;
+  background: #fff;
+  width: 70px;
+  right: 0;
+  border-radius: 8px;
+`;
+const FeatureItem = styled.li`
+  padding: 0;
+`;
+const FeatureBtn = styled.button`
+  padding: 0;
+  color: #fff;
+  background: none;
+  border: none;
+`;
+const FeatureInnerBtn = styled(FeatureBtn)`
+  display: block;
+  margin: 0 auto;
+  padding: 10px 18px;
+
+  color: #000;
+`;
+
 const ImgBox = styled.div`
   width: 50%;
   text-align: center;
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 300px;
+    text-align: center;
+  }
+  @media (max-width: 575px) {
+    height: 100%;
+  }
 `;
 const Img = styled.img`
   border-radius: 10px;
+  object-fit: contain;
 `;
 const ContentBox = styled.div`
   flex-grow: 1;
@@ -81,8 +148,25 @@ const Avatar = styled.img`
 const CommentSection = styled.div`
   height: 80%;
   overflow-y: scroll;
+  margin-bottom: 15px;
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: #fff3e7;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #ff9e5a;
+  }
+  @media (max-width: 768px) {
+    max-height: 150px;
+  }
 `;
-const CommentBox = styled.div``;
+const CommentBox = styled.div`
+  margin-bottom: 15px;
+`;
 const CommentAvatar = styled.img`
   width: 30px;
   height: 30px;
@@ -96,14 +180,22 @@ const TypeIn = styled.div`
   margin-top: auto;
   display: flex;
   padding: 0 5px;
+  align-items: center;
 `;
 
 const Type = styled.input`
   margin-top: auto;
-  padding: 10px 5px;
+  padding: 10px 15px;
   flex-grow: 1;
+  border-radius: 10px;
+  border: 1px solid #d2d2d2;
 `;
-const Send = styled.button``;
+const Send = styled.button`
+  color: #fff;
+  background: none;
+  padding: 0 15px;
+  border: none;
+`;
 const NoView = styled.p`
   font-size: 24px;
   text-align: center;
@@ -122,7 +214,6 @@ interface Props {
     isCommentEditMode: string;
   };
   dispatch: React.Dispatch<Action>;
-  handlerSeat: (seat: number) => void;
   handlerComment: (id: string) => void;
   deletePost: (id: string) => void;
   deleteComment: (post: string, id: string) => void;
@@ -132,8 +223,16 @@ interface CommentEdit {
   comment: string;
 }
 
-function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, dispatch }: Props) {
+function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Props) {
   const { register: registerEditComment, setValue, handleSubmit: handlerEditComment } = useForm<CommentEdit>();
+
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const createSubmitHandler = (postId: string, commentId: string): SubmitHandler<CommentEdit> => {
     const onSubmitEditComment: SubmitHandler<CommentEdit> = async (data) => {
@@ -170,9 +269,13 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
     dispatch({ type: "setPostMode", payload: { isPostEditMode: post } });
     dispatch({ type: "togglePostClick" });
   };
+  const handlerChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    dispatch({ type: "selectSeat", payload: { seat: value - 1 } });
+  };
+
   return (
     <SeatSection rowSelect={state.isSelectRow}>
-      <Seats>
+      {/* <Seats>
         {Array.from({ length: state.rowSeats[state.row] }).map((_, index) => (
           <SeatBtn
             key={index}
@@ -184,7 +287,31 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
             {index + 1}
           </SeatBtn>
         ))}
-      </Seats>
+      </Seats>{" "} */}
+      <Pagination
+        count={state.rowSeats[state.row]}
+        siblingCount={1}
+        boundaryCount={windowWidth >= 992 ? 5 : windowWidth >= 768 ? 4 : windowWidth >= 575 ? 2 : 0}
+        size={windowWidth >= 575 ? "large" : "medium"}
+        onChange={handlerChange}
+        sx={{
+          "& .MuiPagination-ul": {
+            justifyContent: "center",
+          },
+          "& .MuiPaginationItem-root": {
+            color: "#fff", // 修改文字顏色
+            // 修改背景顏色
+            "&:hover": {
+              backgroundColor: "#ccc", // 滑鼠懸停時變色
+            },
+          },
+          "& .css-1v2f1lm-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected": {
+            // backgroundImage: "linear-gradient(239deg, #ffe53b 0%, #ff5001 74%)",
+            background: "#fff",
+            color: "#000", // 被選中時的文字顏色
+          },
+        }}
+      />
       <Title> 視角分享</Title>
       {state.viewPosts && state.viewPosts.length !== 0 ? (
         state.viewPosts.map((post: PostState, index) => (
@@ -199,8 +326,21 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
                   <Avatar src={avatar} />
                   <UserName>{post.userName}</UserName>
                 </UserBox>
-                <FeatureBtn onClick={() => handlerEditPost(post)}>編輯</FeatureBtn>
-                <FeatureBtn onClick={() => deletePost(post.id)}>刪除</FeatureBtn>
+
+                <FeatureBox>
+                  <FeatureBtn>
+                    <MoreVertIcon />
+                  </FeatureBtn>
+                  <FeatureList>
+                    <FeatureItem>
+                      <FeatureInnerBtn onClick={() => handlerEditPost(post)}>編輯</FeatureInnerBtn>
+                    </FeatureItem>
+                    <FeatureItem>
+                      {" "}
+                      <FeatureInnerBtn onClick={() => deletePost(post.id)}>刪除</FeatureInnerBtn>
+                    </FeatureItem>
+                  </FeatureList>
+                </FeatureBox>
               </PostHeader>
               <Note>場次 {post.concert}</Note>
               <Note>備註 {post.note}</Note>
@@ -214,8 +354,20 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
                           <CommentAvatar src={avatar} />
                           <CommentUserName>{comment.userName}</CommentUserName>
                         </UserBox>
-                        <FeatureBtn onClick={() => handleComment(comment.id, comment.content as string)}>編輯</FeatureBtn>
-                        <FeatureBtn onClick={() => deleteComment(post.id, comment.id)}>刪除</FeatureBtn>
+                        <FeatureBox>
+                          <FeatureBtn>
+                            <MoreVertIcon />
+                          </FeatureBtn>
+                          <FeatureList>
+                            <FeatureItem>
+                              <FeatureInnerBtn onClick={() => handleComment(comment.id, comment.content as string)}>編輯</FeatureInnerBtn>
+                            </FeatureItem>
+                            <FeatureItem>
+                              {" "}
+                              <FeatureInnerBtn onClick={() => deleteComment(post.id, comment.id)}>刪除</FeatureInnerBtn>
+                            </FeatureItem>
+                          </FeatureList>
+                        </FeatureBox>
                       </CommentHeader>
 
                       {state.isCommentEditMode === comment.id ? (
@@ -231,7 +383,9 @@ function Seat({ state, handlerSeat, handlerComment, deletePost, deleteComment, d
               </CommentSection>
               <TypeIn>
                 <Type type="text" placeholder="留言..." value={state.comment[post.id]} onChange={(e) => dispatch({ type: "setComment", payload: { id: post.id, commentText: e.target.value } })} />
-                <Send onClick={() => handlerComment(post.id)}>送出</Send>
+                <Send onClick={() => handlerComment(post.id)}>
+                  <SendIcon />
+                </Send>
               </TypeIn>
             </ContentBox>
           </Card>

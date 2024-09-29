@@ -1,15 +1,31 @@
 import styled from "styled-components";
 import { Action } from ".";
 
-const Title = styled.h4``;
 const RowSection = styled.div<{ isSelectSection: boolean }>`
   display: ${(props) => (props.isSelectSection ? "block" : "none")};
-  padding: 60px 100px;
+  padding: 0px 60px 60px 0;
+  color: white;
+  @media (max-width: 992px) {
+    padding: 0px 80px;
+    margin-top: 150px;
+  }
+  @media (max-width: 575px) {
+    padding: 0px 60px;
+    margin-top: 100px;
+  }
+`;
+const Title = styled.h4`
+  font-size: 1.5rem;
+  margin-bottom: 25px;
 `;
 const RowBtn = styled.button`
   display: block;
   width: 100%;
   margin-bottom: 10px;
+  border: none;
+  &:hover {
+    background: #d2d2d2;
+  }
 `;
 interface Props {
   state: {

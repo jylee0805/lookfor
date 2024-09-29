@@ -6,74 +6,105 @@ import pin from "../images/pin.png";
 import selectPin from "../images/google-maps.png";
 import api from "../utils/api";
 import proj4 from "proj4";
+import VenueHeader from "../components/VenueHeader";
 
 const Container = styled.div``;
-const Banner = styled.div`
-  text-align: center;
-  padding: 200px 0;
-`;
-const VenueTitle = styled.h2`
-  font-size: 48px;
-  line-height: 1.5;
-  letter-spacing: 1rem;
-`;
-const VenueSubTitle = styled.h3`
-  font-size: 48px;
-  line-height: 1.5;
-  letter-spacing: 5px;
-`;
-const Nav = styled.ul`
-  background: #f8f8f8;
-  display: flex;
-  justify-content: space-around;
-  padding: 0 20px;
-  margin-bottom: 42px;
-`;
-const NavItem = styled.li``;
-const StyleLink = styled(Link)`
-  display: inline-block;
-  font-weight: 600;
-  font-size: 24px;
-  letter-spacing: 4px;
-  color: #000;
-  padding: 10px;
-`;
-const Main = styled.main`
-  width: 70%;
-  margin: 0 auto;
-  margin-bottom: 80px;
-`;
+
 const BtnBox = styled.div`
   display: flex;
   justify-content: center;
+  box-shadow: 2px 2px 6px #5a5a5a50;
+  border-radius: 50px;
+  max-width: fit-content;
+  margin: 0 auto;
+  padding: 0px 20px;
+
+  border: 2px solid transparent;
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+  background-image: linear-gradient(to right, #222, #222), linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
+`;
+const StyleLink = styled(Link)`
+  display: inline-block;
+  font-weight: 600;
+  font-size: 1.5rem;
+  letter-spacing: 4px;
+  color: #fff;
+  padding: 10px 30px;
+  @media (max-width: 575px) {
+    font-size: 1.2rem;
+  }
+  &:hover {
+    background: linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
+    background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+`;
+const Main = styled.main`
+  width: 80%;
+  margin: 0 auto;
+  margin-bottom: 80px;
 `;
 
 const Content = styled.div`
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 30px;
+  line-height: 2;
+  @media (max-width: 992px) {
+    grid-template-columns: auto;
+  }
+  @media (max-width: 768px) {
+    gap: 20px;
+  }
 `;
 const SubTitle = styled.h4`
-  font-size: 28px;
+  font-size: 1.96rem;
   font-weight: 900;
   letter-spacing: 10px;
   padding: 0 50px;
   display: flex;
-  align-items: center;
+  margin: auto;
+  @media (max-width: 992px) {
+    padding: 0;
+  }
+  @media (max-width: 575px) {
+    font-size: 1.5rem;
+  }
 `;
 const ParkSubTitle = styled(SubTitle)`
   grid-column: span 2;
+  margin: 0;
+  @media (max-width: 992px) {
+    grid-column: span 1;
+  }
 `;
-const Station = styled.p``;
-const Away = styled.p``;
+const Station = styled.p`
+  font-size: 1.2rem;
+  font-weight: 700;
+`;
+const Away = styled.p`
+  margin-bottom: 25px;
+
+  @media (max-width: 992px) {
+  }
+`;
 const Detail = styled.div`
-  padding: 50px 0;
+  padding: 50px 0 20px;
+  @media (max-width: 992px) {
+    grid-template-columns: auto;
+    padding: 0;
+  }
 `;
 const Line = styled.div`
   grid-column: span 2;
   width: 100%;
   height: 1px;
-  background: #000;
+  background: #d2d2d2;
+  @media (max-width: 992px) {
+    grid-column: span 1;
+  }
 `;
 
 const containerStyle = {
@@ -85,6 +116,14 @@ const MapContainer = styled.div`
   grid-column: span 2;
   display: flex;
   column-gap: 20px;
+  @media (max-width: 992px) {
+    grid-column: span 1;
+    flex-direction: column;
+    row-gap: 25px;
+  }
+  @media (max-width: 992px) {
+    padding: 0;
+  }
 `;
 const Map = styled.div`
   flex-grow: 1;
@@ -97,25 +136,24 @@ const Map = styled.div`
 `;
 const Place = styled.div`
   width: 30%;
+  @media (max-width: 992px) {
+    width: 100%;
+  }
 `;
 const PlaceContent = styled.div`
   width: 100%;
 `;
 const PlaceTitle = styled.p`
-  font-size: 20px;
-  color: #000;
+  font-size: 1.2rem;
+
   font-weight: 700;
   margin-bottom: 10px;
 `;
 const PlaceName = styled.p`
-  font-size: 16px;
-  color: #000;
   font-weight: 700;
   margin-bottom: 10px;
 `;
 const PlaceText = styled.p`
-  font-size: 15px;
-  color: #000;
   line-height: 1.8;
 `;
 
@@ -193,18 +231,7 @@ function TransportationDriving() {
 
   return (
     <Container>
-      <Banner>
-        <VenueTitle>臺北流行音樂中心</VenueTitle>
-        <VenueSubTitle>TAIPEI MUSIC CENTER</VenueSubTitle>
-      </Banner>
-      <Nav>
-        <NavItem>
-          <StyleLink to="/view">視角分享</StyleLink>
-        </NavItem>
-        <NavItem>
-          <StyleLink to="/transportation-driving">交通資訊</StyleLink>
-        </NavItem>
-      </Nav>
+      <VenueHeader />
       <Main>
         <BtnBox>
           <StyleLink to="/transportation-public">大眾運輸</StyleLink>
@@ -213,10 +240,14 @@ function TransportationDriving() {
         <Content>
           <SubTitle>自行開車</SubTitle>
           <Detail>
-            <Station>昆陽站</Station>
-            <Away>距離本中心約 600 公尺距離。請從 4 號出口出站，向東步行約 8 分鐘抵達。</Away>
-            <Station>南港站</Station>
-            <Away>距離本中心約 900 公尺。請由 1A 連通道出站，沿指標前行至 CITYLINK B 棟，由一樓走出大門後，沿市民大道向西步行約 11 分鐘抵達。</Away>
+            <Station>國道一號北上</Station>
+            <Away>17-內湖出口（南港方向），下交流道 → 往南港方向 → 成功路二段 → 過成功橋 → 順行向陽路 → 左轉南港路二段 → 右轉東側道路 → 抵達臺北流行音樂中心</Away>
+            <Station>國道三號北上</Station>
+            <Away>14-南港出口下交流道 → 左轉橫科路 → 經力行橋 → 順行研究院路一段 101 巷 → 右轉研究院路一段 → 左轉忠孝東路 → 右轉向陽路 → 右轉南港路二段 → 右轉東側道路 → 抵達臺北流行音樂中心</Away>
+            <Station>國道一號南下</Station>
+            <Away>17-B 內湖出口下交流道 → 往南港方向 → 成功路二段 → 過成功橋 → 順行向陽路 → 左轉南港路二段 → 右轉東側道路 → 抵達臺北流行音樂中心</Away>
+            <Station>國道三號南下</Station>
+            <Away>12-新台五路出口下交流道 → 往南港方向 → 右轉新台五路一段（台五線） → 左轉大同路一段（台五線） → 順行南港路一段 → 順行南港路二段 → 左轉東側道路 → 抵達臺北流行音樂中心</Away>
           </Detail>
           <Line />
           <ParkSubTitle>停車資訊</ParkSubTitle>

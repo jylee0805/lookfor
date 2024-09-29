@@ -6,11 +6,10 @@ import api from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
-  padding: 40px 80px;
+  padding: 40px 5%;
 `;
 const Card = styled.div`
-  width: 530px;
-  height: 670px;
+  width: 480px;
   display: flex;
   flex-direction: column;
   padding: 32px 56px;
@@ -19,6 +18,16 @@ const Card = styled.div`
   margin-left: auto;
   border-radius: 20px;
   row-gap: 25px;
+  @media (max-width: 992px) {
+    margin: 0 auto;
+  }
+  @media (max-width: 575px) {
+    width: 95%;
+    margin: 0 auto;
+    padding: 32px 10%;
+    font-size: 15px;
+    row-gap: 10px;
+  }
 `;
 const ButtonGroup = styled.div`
   width: 100%;
@@ -27,6 +36,9 @@ const ButtonGroup = styled.div`
 const SelectBtn = styled.button`
   display: block;
   flex-grow: 1;
+  @media (max-width: 575px) {
+    font-size: 14px;
+  }
 `;
 const OrBox = styled.div`
   display: flex;
@@ -37,6 +49,9 @@ const Or = styled.p`
   line-height: 1.5;
   color: #767676;
   margin: 0 8px;
+  @media (max-width: 575px) {
+    font-size: 14px;
+  }
 `;
 const Line = styled.div`
   height: 1px;
@@ -44,7 +59,13 @@ const Line = styled.div`
   background: #d2d2d2;
   flex-grow: 1;
 `;
-const GoogleBtn = styled.button``;
+const GoogleBtn = styled.button`
+  display: block;
+  width: 100%;
+  @media (max-width: 575px) {
+    font-size: 14px;
+  }
+`;
 
 function Login() {
   const [isLogin, setIsLogin] = useState<boolean>(true);

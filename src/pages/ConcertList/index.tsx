@@ -3,43 +3,44 @@ import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import { Container } from "@mui/material";
 
-const CustomizedContainer = styled(Container)``;
-
+const CustomizedContainer = styled.div`
+  width: 85%;
+  margin: 60px auto;
+  @media (max-width: 992px) {
+    width: 90%;
+  }
+  @media (max-width: 768px) {
+    width: 90%;
+  }
+`;
 const Title = styled.h3`
-  font-size: 36px;
+  font-size: 1.96rem;
   margin-bottom: 40px;
   font-weight: 700;
 `;
-const AllList = styled.ul``;
+const AllList = styled.ul`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  @media (max-width: 992px) {
+    gap: 15px;
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
 const ListItem = styled.li`
-  display: flex;
-  align-items: center;
-  box-shadow: 2px 2px 5px #dbddae50;
+  box-shadow: 3px 5px 6px #5d5d5d50;
   border-radius: 20px;
-  padding: 15px 50px;
   column-gap: 20px;
   margin-bottom: 25px;
-  background: #fff;
+  background: #ffffff;
+  @media (max-width: 992px) {
+    margin-bottom: 10px;
+  }
 `;
-const DateContainer = styled.div`
-  margin-right: 30px;
-  text-align: center;
-`;
-const Month = styled.p`
-  font-size: 32px;
-  margin-bottom: -15px;
-  width: 50px;
-`;
-const Day = styled.p`
-  font-size: 60px;
-`;
-const Line = styled.div`
-  width: 1px;
-  height: 100px;
-  background: #000;
-`;
+
 const More = styled.button`
   display: block;
   align-items: center;
@@ -49,12 +50,31 @@ const More = styled.button`
   border: 1px solid #d2d2d2;
 `;
 const Detail = styled.div`
-  flex-grow: 1;
+  margin: 15px 30px 20px;
 `;
 const DetailItem = styled.p`
-  font-size: 20px;
   color: #545454;
   line-height: 2;
+`;
+const DetailName = styled(DetailItem)`
+  font-size: 1.2rem;
+  font-weight: 700;
+  grid-column: span 2;
+  @media (max-width: 992px) {
+    font-size: 1.1rem;
+  }
+`;
+const DetailPlace = styled(DetailItem)`
+  grid-column: span 2;
+`;
+const ImageBox = styled.div`
+  height: 240px;
+`;
+const Image = styled.img`
+  object-fit: cover;
+  object-position: 0% 10%;
+  width: 100%;
+  border-radius: 20px 20px 0 0;
 `;
 export interface Concerts {
   concertName: string;
@@ -105,19 +125,16 @@ function ConcertList() {
       <AllList>
         {concertData &&
           concertData.map((concert, index) => (
-            <ListItem key={index}>
-              <DateContainer>
-                <Month>{concert.firstDay === "Invalid Date" ? "" : concert.firstDay}</Month>
-                <Day></Day>
-              </DateContainer>
-              <Line />
+            <ListItem key={index} onClick={() => navigate(`/concert?concert=${concert.id}`, { state: { concert } })}>
+              <ImageBox>
+                <Image src={concert.images} />
+              </ImageBox>
               <Detail>
-                <DetailItem>{concert.concertName}</DetailItem>
+                <DetailName>{concert.concertName}</DetailName>
                 {concert.date && Array.from({ length: concert.date.length }).map((_, index) => <DetailItem key={index}>{concert.date[index]}</DetailItem>)}
 
-                <DetailItem>{concert.place}</DetailItem>
+                <DetailPlace>{concert.place}</DetailPlace>
               </Detail>
-              <More onClick={() => navigate(`/concert?concert=${concert.id}`, { state: { concert } })}>更多內容</More>
             </ListItem>
           ))}
       </AllList>

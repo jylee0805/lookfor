@@ -18,86 +18,141 @@ import ThirdBPhoto from "../../images/Vector 9-12.svg";
 import ThirdAPhoto from "../../images/Vector 9-13.svg";
 
 const SelectSection = styled.div`
-  padding: 60px;
+  max-width: 780px;
+  padding: 0 30px;
+  padding-right: 0;
+  @media (max-width: 992px) {
+    padding: 0;
+    width: 768px;
+    margin: 0 auto;
+  }
+  @media (max-width: 768px) {
+    width: 575px;
+  }
+  @media (max-width: 575px) {
+    width: 360px;
+    padding: 0;
+  }
 `;
 const Title = styled.h4`
-  font-size: 32px;
+  font-size: 1.96rem;
   font-weight: 600;
+  color: #fff;
+  margin-bottom: 25px;
 `;
 const Vip = styled.div`
-  display: flex;
-
-  column-gap: 20px;
-  justify-content: center;
-  align-items: end;
-  margin-bottom: 15px;
+  position: relative;
+  height: 160px;
+  @media (max-width: 768px) {
+    height: 120px;
+  }
+  @media (max-width: 575px) {
+    height: 100px;
+  }
+  @media (max-width: 475px) {
+    height: 80px;
+  }
+  @media (max-width: 375px) {
+    height: 60px;
+  }
 `;
 const Second = styled.div`
   position: relative;
-  height: 200px;
+  height: 180px;
+  @media (max-width: 768px) {
+    height: 140px;
+  }
+  @media (max-width: 575px) {
+    height: 80px;
+  }
 `;
 const Third = styled.div`
   height: 300px;
   position: relative;
+  @media (max-width: 768px) {
+    height: 200px;
+  }
+  @media (max-width: 575px) {
+    height: 150px;
+  }
 `;
-// const Section = styled.div`
-//   width: 163px;
-//   height: 150px;
-//   background: #d2d2d2;
-// `;
+
 const VipA = styled.div`
-  width: 163px;
+  width: 20.6%;
   height: 160px;
+  position: absolute;
+  top: 0;
+  left: 15%;
   background-color: #d2d2d2; /* 初始顏色 */
   mask-image: url("${VIPAPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
+  mask-size: contain;
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
-  position: relative;
+  @media (max-width: 575px) {
+    height: 100%;
+  }
 `;
 const VipB = styled.div`
-  width: 171px;
+  width: 22%;
   height: 161px;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 38%;
   background-color: #d2d2d2; /* 初始顏色 */
   mask-image: url("${VIPBPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
+  mask-size: contain;
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+  }
 `;
 const VipC = styled.div`
-  width: 159px;
+  width: 20.5%;
   height: 160px;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 63%;
   background-color: #d2d2d2; /* 初始顏色 */
   mask-image: url("${VIPCPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
+  mask-size: contain;
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
+  }
+  @media (max-width: 575px) {
+    height: 100%;
   }
 `;
 
 const SecondG = styled.div`
-  width: 120px;
+  width: 16%;
   height: 150px;
   position: absolute;
-  top: -10px;
-  left: 79.5%;
+  top: -5px;
+  left: 81.5%;
   background-color: #d2d2d2; /* 初始顏色 */
   mask-image: url("${SecondGPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
+  mask-size: contain;
+
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+  }
 `;
 const SecondF = styled.div`
-  width: 110px;
+  width: 14.2%;
   height: 165px;
   position: absolute;
   top: 47px;
@@ -110,9 +165,13 @@ const SecondF = styled.div`
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+    top: 25px;
+  }
 `;
 const SecondE = styled.div`
-  width: 100px;
+  width: 12.9%;
   height: 156px;
 
   position: absolute;
@@ -126,9 +185,13 @@ const SecondE = styled.div`
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+    top: 38px;
+  }
 `;
 const SecondD = styled.div`
-  width: 117px;
+  width: 15.1%;
   height: 148px;
 
   position: absolute;
@@ -142,9 +205,13 @@ const SecondD = styled.div`
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+    top: 42px;
+  }
 `;
 const SecondC = styled.div`
-  width: 100px;
+  width: 12.9%;
   height: 156px;
 
   position: absolute;
@@ -158,9 +225,13 @@ const SecondC = styled.div`
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+    top: 38px;
+  }
 `;
 const SecondB = styled.div`
-  width: 110px;
+  width: 14.2%;
   height: 165px;
 
   position: absolute;
@@ -174,9 +245,13 @@ const SecondB = styled.div`
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+    top: 28px;
+  }
 `;
 const SecondA = styled.div`
-  width: 120px;
+  width: 15.5%;
   height: 150px;
 
   position: absolute;
@@ -187,13 +262,19 @@ const SecondA = styled.div`
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
+  transform: scale(calc(100vw / 1200)); /* 動態根據視窗寬度縮放 */
+  transform-origin: top left; /* 設定縮放原點，確保位置不偏移 */
+  object-fit: cover; /* 確保背景圖縮放時保持比例 */
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
+  }
+  @media (max-width: 575px) {
+    height: 100%;
   }
 `;
 
 const ThirdA = styled.div`
-  width: 117px;
+  width: 15.1%;
   height: 151px;
 
   position: absolute;
@@ -207,10 +288,13 @@ const ThirdA = styled.div`
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+  }
 `;
 
 const ThirdB = styled.div`
-  width: 124px;
+  width: 16%;
   height: 176px;
 
   position: absolute;
@@ -224,9 +308,13 @@ const ThirdB = styled.div`
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+    top: 32px;
+  }
 `;
 const ThirdC = styled.div`
-  width: 96px;
+  width: 12.4%;
   height: 185px;
 
   position: absolute;
@@ -240,9 +328,13 @@ const ThirdC = styled.div`
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+    top: 48px;
+  }
 `;
 const ThirdD = styled.div`
-  width: 117px;
+  width: 15.1%;
   height: 176px;
 
   position: absolute;
@@ -256,9 +348,13 @@ const ThirdD = styled.div`
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+    top: 52px;
+  }
 `;
 const ThirdE = styled.div`
-  width: 96px;
+  width: 12.4%;
   height: 185px;
 
   position: absolute;
@@ -272,9 +368,13 @@ const ThirdE = styled.div`
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+    top: 48px;
+  }
 `;
 const ThirdF = styled.div`
-  width: 125px;
+  width: 16.1%;
   height: 176px;
 
   position: absolute;
@@ -288,10 +388,14 @@ const ThirdF = styled.div`
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
   }
+  @media (max-width: 575px) {
+    height: 100%;
+    top: 32px;
+  }
 `;
 
 const ThirdG = styled.div`
-  width: 117px;
+  width: 15.1%;
   height: 150px;
 
   position: absolute;
@@ -305,6 +409,9 @@ const ThirdG = styled.div`
 
   &:hover {
     background-color: #ffdd00; /* hover 狀態變色 */
+  }
+  @media (max-width: 575px) {
+    height: 100%;
   }
 `;
 const Text = styled.p`

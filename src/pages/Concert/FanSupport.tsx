@@ -1,10 +1,18 @@
 import styled from "styled-components";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import api from "../../utils/api";
 import { useEffect, useReducer, useState, useContext } from "react";
 import photo from "../../images/avatar.jpg";
 import FanPost from "./FanPost";
 import { AuthContext } from "../../utils/AuthContextProvider";
+import { Concerts } from "../ConcertList";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import AddIcon from "@mui/icons-material/Add";
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { Profile } from "../../utils/AuthContextProvider";
 
 const Mask = styled.div<{ postClick: boolean }>`
   display: ${(props) => (props.postClick ? "block" : "none")};
@@ -23,6 +31,9 @@ const Content = styled.div<{ changePage: string }>`
   display: ${(props) => (props.changePage === "fanSupport" ? "block" : "none")};
   width: 75%;
   margin: 0 auto;
+  @media (max-width: 768px) {
+    width: 90%;
+  }
 `;
 const FeatureBox = styled.div`
   display: flex;
@@ -30,8 +41,14 @@ const FeatureBox = styled.div`
   margin-bottom: 20px;
   margin-left: auto;
 `;
-const SortBtn = styled.button``;
-const CreateBtn = styled.button``;
+const SortBtn = styled.button`
+  display: flex;
+  align-items: center;
+`;
+const CreateBtn = styled.button`
+  display: flex;
+  align-items: center;
+`;
 const PostList = styled.ul``;
 const PostItem = styled.li`
   position: relative;
@@ -55,13 +72,21 @@ const MoreContainer = styled.div`
   position: relative;
   margin-left: auto;
 `;
-const MoreBtn = styled.button``;
+const MoreBtn = styled.button`
+  padding: 0;
+  color: #fff;
+  background: none;
+  border: none;
+`;
 const FeatureBtnContainer = styled.div<{ open: boolean }>`
   position: absolute;
   display: ${(props) => (props.open ? "flex" : "none")};
   flex-direction: column;
   background: #fff;
   box-shadow: 0px 3px 10px #67676730;
+  right: 0;
+  width: 100px;
+  border-radius: 10px;
 `;
 const FeatureBtn = styled.button`
   background: none;
@@ -77,18 +102,39 @@ const HeadShot = styled.img`
   height: 40px;
   border-radius: 50px;
   margin-right: 10px;
+  @media (max-width: 575px) {
+    width: 35px;
+    height: 35px;
+  }
 `;
 const UserName = styled.p`
-  font-size: 24px;
+  font-size: 1.2rem;
+  @media (max-width: 575px) {
+    font-size: 1rem;
+  }
 `;
 const ImportInfo = styled.div`
   display: grid;
   grid-template-columns: auto auto;
+  column-gap: 20px;
+  row-gap: 5px;
   width: 40%;
   margin-bottom: 10px;
+  color: #9c9c9c;
+  font-weight: 700;
+  @media (max-width: 992px) {
+    width: 50%;
+  }
+  @media (max-width: 768px) {
+    width: 60%;
+  }
+  @media (max-width: 575px) {
+    font-size: 1rem;
+    width: 90%;
+  }
 `;
 const ImportInfoContent = styled.p`
-  font-size: 18px;
+  font-size: 1rem;
 `;
 
 const InfoContent = styled.div`
@@ -176,31 +222,28 @@ const reducer = (state: State, action: Action): State => {
 
 interface Props {
   changePage: string;
+  concert: Concerts;
 }
 
-function FansSupport({ changePage }: Props) {
+function FansSupport({ changePage, concert }: Props) {
   // const queryParams = new URLSearchParams(window.location.search);
   // const concertId = queryParams.get("concert") || "";
   const [state, dispatch] = useReducer(reducer, initial);
-  const location = useLocation();
-  const { concert } = location.state || {};
+
   const [isMoreClick, setIsMoreClick] = useState<string>("");
   const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadViewPosts = async () => {
       const unsubscribesPost: (() => void)[] = [];
       let posts: MerchPost[] = [];
 
-      // 監聽貼文變更
-
       const unsubscribePost = api.getMerchPost(concert.id, (updatedPosts: MerchPost[]) => {
         posts = JSON.parse(JSON.stringify(updatedPosts));
 
         const fetchUserNames = async () => {
           const userNamesPromises = posts.map(async (post) => {
-            console.log(post);
-
             if (post.userUID) {
               const userName = await api.getUser(post.userUID);
 
@@ -208,10 +251,7 @@ function FansSupport({ changePage }: Props) {
             }
             return null;
           });
-
           const userNames = await Promise.all(userNamesPromises);
-          console.log(userNames);
-
           return userNames;
         };
 
@@ -232,7 +272,7 @@ function FansSupport({ changePage }: Props) {
     };
 
     loadViewPosts();
-  }, [concert.id]);
+  }, []);
 
   const deleteMerchPost = async (id: string) => {
     if (id) {
@@ -265,19 +305,46 @@ function FansSupport({ changePage }: Props) {
   };
 
   const handlePostClick = () => {
-    if (authContext?.loginState === null) {
+    console.log(authContext?.loginState);
+
+    if (authContext?.loginState === null || authContext?.loginState === undefined) {
       alert("請先登入");
+      navigate("/login");
       return;
     }
     dispatch({ type: "toggleIsPostClick", payload: { isPostClick: true } });
+  };
+
+  const handleKeep = async (id: string) => {
+    console.log(id);
+
+    if (authContext?.user.keepIds?.includes(id)) {
+      authContext.setUser((prev) => {
+        api.updateUser(authContext?.user.id, { UID: prev.UID, avatar: prev.avatar, userName: prev.userName, keepIds: prev.keepIds?.filter((item) => item !== id) });
+        return { ...prev, keepIds: prev.keepIds?.filter((item) => item !== id) };
+      });
+      console.log(authContext.user);
+    } else if (authContext?.user.keepIds === undefined || authContext?.user.keepIds?.includes(id) === false) {
+      authContext?.setUser((prev: Profile) => {
+        const updatedKeepIds = prev.keepIds ? [...prev.keepIds, id] : [id];
+        api.setKeepPost(authContext?.loginState as string, id);
+        return { ...prev, keepIds: updatedKeepIds };
+      });
+    }
   };
   return (
     <>
       <Mask postClick={state.isPostClick} />
       <Content changePage={changePage}>
         <FeatureBox>
-          <SortBtn onClick={() => handleSort()}>{state.sort === "createdTime" ? "依發放時間排序" : "依貼文發布時間排序"}</SortBtn>
-          <CreateBtn onClick={() => handlePostClick()}>發佈資訊</CreateBtn>
+          <SortBtn onClick={() => handleSort()}>
+            <FilterListIcon />
+            {state.sort === "createdTime" ? "依發放時間排序" : "依貼文發布時間排序"}
+          </SortBtn>
+          <CreateBtn onClick={() => handlePostClick()}>
+            <AddIcon />
+            發佈資訊
+          </CreateBtn>
         </FeatureBox>
         <FanPost concert={concert} dispatch={dispatch} state={state} />
         <PostList>
@@ -287,8 +354,13 @@ function FansSupport({ changePage }: Props) {
                 <PostHeader>
                   <HeadShot src={photo} />
                   <UserName>{item.userName}</UserName>
+                  <MoreBtn onClick={() => handleKeep(item.id)}>
+                    {Array.isArray(authContext?.user.keepIds) && authContext.user.keepIds.includes(item.id as string) ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+                  </MoreBtn>
                   <MoreContainer>
-                    <MoreBtn onClick={() => setIsMoreClick(item.id ? item.id : "")}>更多</MoreBtn>
+                    <MoreBtn onClick={() => setIsMoreClick((prev) => (prev === item.id ? "" : (item.id as string)))}>
+                      <MoreVertIcon />
+                    </MoreBtn>
                     <FeatureBtnContainer open={isMoreClick === item.id}>
                       <FeatureBtn onClick={() => dispatch({ type: "toggleIsEditMode", payload: { isEditMode: item, isPostClick: true } })}>編輯</FeatureBtn>
                       <FeatureBtn onClick={() => deleteMerchPost(item.id ? item.id : "")}>刪除</FeatureBtn>
