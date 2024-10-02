@@ -4,7 +4,7 @@ import { getFirestore, addDoc, collection, query, where, getDocs, doc, serverTim
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDIhZaGrGf8t_OH6i-GLiXlqmoUdXcHE4g",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "look-for-18287.firebaseapp.com",
   projectId: "look-for-18287",
   storageBucket: "look-for-18287.appspot.com",

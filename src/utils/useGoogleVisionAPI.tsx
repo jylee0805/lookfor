@@ -6,7 +6,7 @@ const useGoogleVisionAPI = () => {
   const [labels, setLabels] = useState("");
   const [error, setError] = useState("");
   const handleAnalyzeImage = async (imageUrl: string) => {
-    const apiKey = "AIzaSyAi4nS5Hhy7zfL_hwGg68brN-T8FOeRlrU"; // 請替換為你的 API 金鑰
+    const apiKey = import.meta.env.VITE_GOOGLE_CLOUD_API_KEY; // 請替換為你的 API 金鑰
     const endpoint = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
 
     const requestBody = {
