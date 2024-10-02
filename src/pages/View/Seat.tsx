@@ -2,12 +2,13 @@ import styled from "styled-components";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { PostState, Comment, Action } from "./index";
 import api from "../../utils/api";
-import Pagination from "@mui/material/Pagination";
 import { IoSend } from "react-icons/io5";
 import { MdOutlineMoreVert } from "react-icons/md";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../utils/AuthContextProvider";
-
+import defaultSeat from "../../images/defaultSeat.png";
+import selectSeat from "../../images/selectSeat.png";
+import dataSeat from "../../images/dataSeat.png";
 const StyleMore = styled(MdOutlineMoreVert)`
   font-size: 24px;
   @media (max-width: 575px) {
@@ -113,7 +114,27 @@ const Seats = styled.div`
   overflow-x: scroll;
   text-align: center;
 `;
-const SeatBtn = styled.button<{ selected: boolean }>``;
+const SeatBtn = styled.button<{ selected: boolean; haveData: boolean }>`
+  padding: 0;
+  width: 60px;
+  height: 60px;
+  margin-right: 10px;
+  background-image: ${(props) => (props.selected ? `url(${selectSeat})` : props.haveData ? `url(${dataSeat})` : `url(${defaultSeat})`)};
+  background-repeat: no-repeat;
+  background-color: transparent;
+  background-position: center;
+  background-size: 85px;
+  margin-bottom: 5px;
+  position: relative;
+`;
+const SeatBtnText = styled.span`
+  position: absolute;
+  display: block;
+  width: 60px;
+  top: 12px;
+  right: 0;
+  font-weight: 700;
+`;
 const ImgBox = styled.div`
   width: 50%;
   text-align: center;
@@ -236,16 +257,18 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
   const { register: registerEditComment, setValue, handleSubmit: handlerEditComment } = useForm<CommentEdit>();
 
   const [isMoreClick, setIsMoreClick] = useState<string>("");
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
+  const [allViewPost, setAllViewPost] = useState<number[] | undefined>([]);
   const authContext = useContext(AuthContext);
-
   useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    const getAllView = async () => {
+      const allView = await api.getAllViewPost(state.section, state.row + 1);
+      console.log(allView);
 
+      setAllViewPost(allView);
+    };
+    getAllView();
+    console.log(state);
+  }, [state.row]);
   const createSubmitHandler = (postId: string, commentId: string): SubmitHandler<CommentEdit> => {
     const onSubmitEditComment: SubmitHandler<CommentEdit> = async (data) => {
       await api.updateComment(postId, commentId, data.comment);
@@ -278,11 +301,7 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
     dispatch({ type: "setPostMode", payload: { isPostEditMode: post } });
     dispatch({ type: "togglePostClick" });
   };
-  const handlerChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    console.log(value);
 
-    dispatch({ type: "selectSeat", payload: { seat: value - 1 } });
-  };
   const handlerSeat = (value: number) => {
     console.log(value);
 
@@ -295,37 +314,16 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
           <SeatBtn
             key={index}
             selected={state.seat === index}
+            haveData={allViewPost?.includes(index + 1) ?? false}
             onClick={() => {
               handlerSeat(index);
             }}
           >
-            {index + 1}
+            <SeatBtnText>{index + 1}</SeatBtnText>
           </SeatBtn>
         ))}
       </Seats>
-      <Pagination
-        count={state.rowSeats[state.row]}
-        siblingCount={1}
-        boundaryCount={windowWidth >= 992 ? 5 : windowWidth >= 768 ? 4 : windowWidth >= 575 ? 2 : 2}
-        size={windowWidth >= 575 ? "large" : "small"}
-        onChange={handlerChange}
-        sx={{
-          "& .MuiPagination-ul": {
-            justifyContent: "center",
-          },
-          "& .MuiPaginationItem-root": {
-            color: "#fff", // 修改文字顏色
-            // 修改背景顏色
-            "&:hover": {
-              backgroundColor: "#ccc", // 滑鼠懸停時變色
-            },
-          },
-          "& .css-1v2f1lm-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected": {
-            background: "#fff",
-            color: "#000", // 被選中時的文字顏色
-          },
-        }}
-      />
+
       <Title> 視角分享</Title>
       {state.viewPosts && state.viewPosts.length !== 0 ? (
         state.viewPosts.map((post: PostState, index) => (

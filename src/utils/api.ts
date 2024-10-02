@@ -324,6 +324,22 @@ const api = {
     return unsubscribe;
   },
 
+  async getAllViewPost(section: string, row: number) {
+    try {
+      const q = query(collection(db, "viewPosts"), where("section", "==", section), where("row", "==", row));
+
+      const querySnapshot = await getDocs(q);
+      const allView: number[] = [];
+      querySnapshot.forEach((doc) => {
+        allView.push(doc.data().seat);
+      });
+      console.log(querySnapshot);
+
+      return allView;
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  },
   async deleteViewPost(id: string) {
     try {
       const postDoc = doc(db, "viewPosts", id);
