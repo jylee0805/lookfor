@@ -1,10 +1,11 @@
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import api from "../../utils/api";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import concertImg from "../../images/concert.jpg";
 
-const CustomizedContainer = styled.div`
+const Container = styled.div`
   width: 85%;
   margin: 60px auto;
   @media (max-width: 992px) {
@@ -41,14 +42,10 @@ const ListItem = styled.li`
   }
 `;
 
-const More = styled.button`
+const StyleLink = styled(Link)`
   display: block;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 30px;
-  border-radius: 50px;
-  border: 1px solid #d2d2d2;
 `;
+
 const Detail = styled.div`
   margin: 15px 30px 20px;
 `;
@@ -84,10 +81,10 @@ export interface Concerts {
   concertId: string;
   firstDay?: string;
   id: string;
+  poster?: string;
 }
 
 function ConcertList() {
-  const navigate = useNavigate();
   const [concertData, setConcertData] = useState<Concerts[]>([]);
 
   const stringToTime = (data: Concerts[]) => {
@@ -119,26 +116,28 @@ function ConcertList() {
   }, []);
 
   return (
-    <CustomizedContainer maxWidth="lg">
+    <Container>
       <Title>演唱會資訊</Title>
 
       <AllList>
         {concertData &&
           concertData.map((concert, index) => (
-            <ListItem key={index} onClick={() => navigate(`/concert?concert=${concert.id}`, { state: { concert } })}>
-              <ImageBox>
-                <Image src={concert.images} />
-              </ImageBox>
-              <Detail>
-                <DetailName>{concert.concertName}</DetailName>
-                {concert.date && Array.from({ length: concert.date.length }).map((_, index) => <DetailItem key={index}>{concert.date[index]}</DetailItem>)}
+            <ListItem key={index}>
+              <StyleLink to={`/concert?concert=${concert.id}`}>
+                <ImageBox>
+                  <Image src={concert.poster ? concert.poster : concertImg} />
+                </ImageBox>
+                <Detail>
+                  <DetailName>{concert.concertName}</DetailName>
+                  {concert.date && Array.from({ length: concert.date.length }).map((_, index) => <DetailItem key={index}>{concert.date[index]}</DetailItem>)}
 
-                <DetailPlace>{concert.place}</DetailPlace>
-              </Detail>
+                  <DetailPlace>{concert.place}</DetailPlace>
+                </Detail>
+              </StyleLink>
             </ListItem>
           ))}
       </AllList>
-    </CustomizedContainer>
+    </Container>
   );
 }
 

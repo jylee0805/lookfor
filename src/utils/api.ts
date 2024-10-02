@@ -26,13 +26,15 @@ import {
   updateDoc,
   getDoc,
   arrayUnion,
+  documentId,
 } from "../utils/firebase";
 import { PostState, Comment } from "../pages/View";
 import { Concerts } from "../pages/ConcertList";
 import { Detail } from "../pages/Concert";
-import { MerchPost } from "../pages/Concert/FanSupport";
+import { MerchPost } from "../pages/FansSupport";
 import { Place, PlaceAvailable } from "../pages/TransportationDriving";
 import Profile from "../pages/Profile";
+import { Notify } from "../components/Header";
 
 interface Data {
   content: string;
@@ -43,6 +45,16 @@ interface Data {
   section: string;
 }
 
+interface ParkData {
+  name: string;
+  summary: string;
+  tw97x: string;
+  tw97y: string;
+  payex: string;
+  serviceTime: string;
+  address: string;
+  id: string;
+}
 const api = {
   async findUser(name: string) {
     const q = query(collection(db, "users"), where("userName", "==", name));
@@ -57,6 +69,52 @@ const api = {
     const list: Profile = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Profile;
     return list;
   },
+
+  async setNotify(postId: string, concertId: string, state: string) {
+    const stateText = state === "0" ? "未發放" : state === "1" ? "發放中" : "發放完畢";
+    const q = query(collection(db, "users"), where("keepIds", "array-contains", postId));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (doc) => {
+      console.log(doc.data());
+      const notifyRef = collection(db, "users", doc.id, "notify");
+      await addDoc(notifyRef, {
+        title: "收藏的文章狀態已更新",
+        message: `${stateText}`,
+        createdTime: serverTimestamp(),
+        isRead: false,
+        postId: postId,
+        concertId: concertId,
+      });
+    });
+  },
+
+  async getNotify(userId: string, onUpdate: (notify: Notify[]) => void) {
+    const id = await this.getUser(userId);
+
+    const q = query(collection(db, `users/${id.id}/notify`));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const notifyList: Notify[] = [];
+      querySnapshot.forEach((doc) => {
+        notifyList.push({ ...doc.data(), id: doc.id } as Notify);
+      });
+      console.log(notifyList);
+
+      onUpdate(notifyList);
+    });
+    return unsubscribe;
+  },
+
+  async deleteNotify(id: string, notifyId: string) {
+    try {
+      const notifyDoc = doc(db, "users", id, "notify", notifyId);
+      await deleteDoc(notifyDoc);
+      console.log("Document deleted with ID: ", id);
+    } catch (e) {
+      console.error("Error deleting document: ", e);
+    }
+  },
+
   async updateUser(id: string, update: object) {
     try {
       const postDoc = doc(db, "users", id);
@@ -147,6 +205,7 @@ const api = {
     await addDoc(collection(db, "users"), {
       userName: name,
       UID: uid,
+      avatar: "https://firebasestorage.googleapis.com/v0/b/look-for-18287.appspot.com/o/images%2Fprofile.png?alt=media&token=e5653560-c959-4f42-a741-a30794521275",
     });
     return;
   },
@@ -309,7 +368,6 @@ const api = {
       querySnapshot.forEach((doc) => {
         updatedComments.push({ id: doc.id, ...doc.data() });
       });
-      console.log(updatedComments);
 
       onUpdate(updatedComments);
     });
@@ -359,17 +417,10 @@ const api = {
     return data;
   },
   async getConcert(id: string) {
-    console.log(id);
-
     const q = doc(db, "concerts", `${id}`);
     const querySnapshot = await getDoc(q);
     console.log(querySnapshot.data());
-    // querySnapshot.forEach((doc) => {
-    //   const concertData = { ...doc.data(), id: doc.id };
-    //   data.push(concertData as Concerts);
-    // });
-
-    return querySnapshot.data();
+    return { ...querySnapshot.data(), id: querySnapshot.id };
   },
   async getConcertDetail(concert: string) {
     const q = query(collection(db, `concerts/${concert}/details`));
@@ -404,6 +455,19 @@ const api = {
     });
     return unsubscribe;
   },
+  async getKeepMerchPost(idArray: string[]) {
+    const q = query(collection(db, "merchPost"), where(documentId(), "in", idArray));
+    const querySnapshot = await getDocs(q);
+    const list: MerchPost[] = [];
+
+    for (const doc of querySnapshot.docs) {
+      const concertName = await this.getConcert(doc.data().concertId);
+
+      list.push({ ...doc.data(), id: doc.id, concertName: concertName?.concertName } as MerchPost);
+    }
+
+    return list;
+  },
   async updateMerchPost(id: string, merch: object) {
     try {
       const postDoc = doc(db, "merchPost", id);
@@ -429,12 +493,12 @@ const api = {
 
       if (parkInfo.ok) {
         const data = await parkInfo.json();
-        const need = data.data.park.filter((item) => {
+        const need = data.data.park.filter((item: ParkData) => {
           if (parseFloat(item.tw97x) > min[0] && parseFloat(item.tw97x) < max[0] && parseFloat(item.tw97y) > min[1] && parseFloat(item.tw97y) < max[1]) {
             return item;
           }
         });
-        const result = need.map((item) => {
+        const result = need.map((item: ParkData) => {
           return { lng: item.tw97x, lat: item.tw97y, name: item.name, parkNum: item.summary, fee: item.payex, openTime: item.serviceTime, address: item.address, placeId: item.id };
         });
 

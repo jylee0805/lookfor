@@ -13,6 +13,17 @@
   <body>
     <div id="root"></div>
 
+    <script src="//s3-ap-northeast-1.amazonaws.com/justfont-user-script/jf-65462.js"></script>
+    <script type="text/javascript">
+      // 等待 DOM 完全加載
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window._jf && typeof window._jf.flush === "function") {
+          window._jf.flush(); // 呼叫字型刷新
+          console.log("字型已刷新");
+        }
+      });
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

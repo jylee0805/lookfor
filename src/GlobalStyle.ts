@@ -187,7 +187,7 @@ body {
       -45vw -30vh 0 25vw #181818,
       -90vw 20vh 0 20vw #ff5213,
       -10vw -10vh 0 25vw #ff3714,20vw 80vh 0 100vw #000000;
-    filter: blur(10rem);
+    filter: blur(12rem);
   }
 }
 a {

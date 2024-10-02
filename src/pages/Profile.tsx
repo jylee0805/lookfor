@@ -3,8 +3,8 @@ import styled from "styled-components";
 import api from "../utils/api";
 import { AuthContext } from "../utils/AuthContextProvider";
 import { PostState } from "../pages/View";
-import { MerchPost } from "./Concert/FanSupport";
-import { useNavigate } from "react-router-dom";
+import { MerchPost } from "../pages/FansSupport";
+import { Link, useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   padding: 60px 60px;
@@ -26,7 +26,9 @@ const ProfileContainer = styled.div`
 `;
 const HeadShot = styled.img`
   width: 120px;
+  height: 120px;
   margin-bottom: 10px;
+  object-fit: cover;
   border-radius: 50%;
 `;
 const UserName = styled.p`
@@ -98,7 +100,9 @@ const PostItem = styled.li`
   border-radius: 10px;
   color: #000;
 `;
-
+const StyleLink = styled(Link)`
+  color: #000;
+`;
 const PostTitle = styled.p`
   font-weight: 700;
   margin-bottom: 8px;
@@ -118,6 +122,14 @@ const EditName = styled.input`
   background: none;
   color: #fff;
   font-size: 1.1rem;
+  text-align: center;
+`;
+const Hint = styled.p`
+  padding: 10px 15px;
+  color: #fff;
+  font-size: 1.5rem;
+  text-align: center;
+  line-height: 2;
 `;
 
 interface Profile {
@@ -199,12 +211,16 @@ function Profile() {
           const concert = await api.getConcert(item.concertId);
           concertName.push(concert?.concertName);
         }
-        console.log(user, viewPosts, merchPosts, concertName);
 
         dispatch({ type: "setData", payload: { profile: user as Profile, viewPosts: viewPosts, supportPosts: merchPosts, concertNames: concertName, editUserName: user.userName } });
       }
     };
     getData();
+    console.log(state.merchPosts);
+
+    if (authContext?.loginState === undefined || authContext?.loginState === null) {
+      navigate("/");
+    }
   }, [authContext?.loginState]);
 
   const handleProfile = async () => {
@@ -237,9 +253,6 @@ function Profile() {
   };
   const handleViewPostClick = () => {};
 
-  const handleMerchPostClick = (id: string) => {
-    navigate(`/concert?concert=${id}`);
-  };
   return (
     <Container>
       <ProfileContainer>
@@ -256,35 +269,49 @@ function Profile() {
         <EditBtn onClick={() => handleProfile()}>{state.isEditProfile ? "儲存" : "編輯"}</EditBtn>
       </ProfileContainer>
       <Title>我的視角文章</Title>
-      <PostContainer>
-        {state.viewPosts.map((item) => (
-          <PostItem key={item.id} onClick={() => handleViewPostClick()}>
-            <PostTextContainer>
-              <PostTitle>{`${item.section}區${item.row}排${item.seat}號`}</PostTitle>
-              <PostText>{item.note}</PostText>
-              <PostText>{item.content}</PostText>
-            </PostTextContainer>
-            <PostImgBox>
-              <PostImg src={item.image} />
-            </PostImgBox>
-          </PostItem>
-        ))}
-      </PostContainer>
+      {state.viewPosts.length !== 0 ? (
+        <PostContainer>
+          {state.viewPosts.map((item) => (
+            <PostItem key={item.id} onClick={() => handleViewPostClick()}>
+              <StyleLink to={`/view`}>
+                <PostTextContainer>
+                  <PostTitle>{`${item.section}區${item.row}排${item.seat}號`}</PostTitle>
+                  <PostText>{item.note}</PostText>
+                  <PostText>{item.content}</PostText>
+                </PostTextContainer>
+                <PostImgBox>
+                  <PostImg src={item.image} />
+                </PostImgBox>
+              </StyleLink>
+            </PostItem>
+          ))}
+        </PostContainer>
+      ) : (
+        <Hint>你還沒有發佈過視角文章喔</Hint>
+      )}
+
       <Title>我的應援發放公告</Title>
-      <PostContainer>
-        {state.merchPosts.map((item, index) => (
-          <PostItem key={item.id} onClick={() => handleMerchPostClick(item.concertId)}>
-            <SupportPostTextContainer>
-              <PostTitle>{state.concertNames[index]}</PostTitle>
-              <PostText>{`${item.passDay} ${item.passTime}`}</PostText>
-              <PostText>{item.passPlace}</PostText>
-            </SupportPostTextContainer>
-            <SupportPostImgBox>
-              <PostImg src={item.image[0]} />
-            </SupportPostImgBox>
-          </PostItem>
-        ))}
-      </PostContainer>
+      {state.merchPosts.length !== 0 ? (
+        <PostContainer>
+          {state.merchPosts.map((item, index) => (
+            <PostItem key={item.id}>
+              <StyleLink to={`/fanssupport?concert=${item.concertId}#${item.id}`}>
+                <SupportPostTextContainer>
+                  <PostTitle>{state.concertNames[index]}</PostTitle>
+                  <PostText>{item.passDay}</PostText>
+                  <PostText>{item.passTime}</PostText>
+                  <PostText>{item.passState}</PostText>
+                </SupportPostTextContainer>
+                <SupportPostImgBox>
+                  <PostImg src={item.image[0]} />
+                </SupportPostImgBox>
+              </StyleLink>
+            </PostItem>
+          ))}
+        </PostContainer>
+      ) : (
+        <Hint>你還沒有發佈過視角文章喔</Hint>
+      )}
     </Container>
   );
 }

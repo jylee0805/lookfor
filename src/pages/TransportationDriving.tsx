@@ -1,46 +1,15 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
 import { useLoadScript, GoogleMap, MarkerF } from "@react-google-maps/api";
 import { useState } from "react";
 import pin from "../images/pin.png";
-import selectPin from "../images/google-maps.png";
+import selectPin from "../images/selectPin.png";
 import api from "../utils/api";
 import proj4 from "proj4";
 import VenueHeader from "../components/VenueHeader";
+import CustomMarkerLabel from "../components/CustomLabel";
 
 const Container = styled.div``;
 
-const BtnBox = styled.div`
-  display: flex;
-  justify-content: center;
-  box-shadow: 2px 2px 6px #5a5a5a50;
-  border-radius: 50px;
-  max-width: fit-content;
-  margin: 0 auto;
-  padding: 0px 20px;
-
-  border: 2px solid transparent;
-  background-clip: padding-box, border-box;
-  background-origin: padding-box, border-box;
-  background-image: linear-gradient(to right, #222, #222), linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
-`;
-const StyleLink = styled(Link)`
-  display: inline-block;
-  font-weight: 600;
-  font-size: 1.5rem;
-  letter-spacing: 4px;
-  color: #fff;
-  padding: 10px 30px;
-  @media (max-width: 575px) {
-    font-size: 1.2rem;
-  }
-  &:hover {
-    background: linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
-    background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-`;
 const Main = styled.main`
   width: 80%;
   margin: 0 auto;
@@ -232,11 +201,8 @@ function TransportationDriving() {
   return (
     <Container>
       <VenueHeader />
+
       <Main>
-        <BtnBox>
-          <StyleLink to="/transportation-public">大眾運輸</StyleLink>
-          <StyleLink to="/transportation-driving">自行開車</StyleLink>
-        </BtnBox>
         <Content>
           <SubTitle>自行開車</SubTitle>
           <Detail>
@@ -260,15 +226,22 @@ function TransportationDriving() {
                       key={index}
                       position={{ lat: place.lat as number, lng: place.lng as number }}
                       onClick={() => handleMarkerClick(place)}
-                      icon={place.name === selectedMarker?.name ? selectPin : pin}
-                      label={{
-                        text: place.availablecar === undefined ? " " : place.availablecar === -9 ? "0" : place.availablecar.toString(),
-                        color: "#000000",
-                        fontWeight: "700",
-                        fontSize: "18px",
+                      icon={{
+                        url: place.name === selectedMarker?.name ? selectPin : pin,
+                        scaledSize: new window.google.maps.Size(45, 50),
                       }}
-                      // label={place.availablecar === undefined ? "" : place.availablecar === -9 ? "0" : place.availablecar.toString()}
-                    />
+                      // label={{
+                      //   text: place.availablecar === undefined ? " " : place.availablecar === -9 ? "0" : place.availablecar.toString(),
+                      //   color: "#000000",
+                      //   fontWeight: "700",
+                      //   fontSize: "18px",
+                      // }}
+                    >
+                      <CustomMarkerLabel
+                        position={{ lat: place.lat as number, lng: place.lng as number }}
+                        text={place.availablecar === undefined ? " " : place.availablecar === -9 ? "0" : place.availablecar.toString()}
+                      />
+                    </MarkerF>
                   ))}
               </GoogleMap>
             </Map>

@@ -1,13 +1,19 @@
 import styled from "styled-components";
-import avatar from "../../images/avatar.jpg";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { PostState, Comment, Action } from "./index";
 import api from "../../utils/api";
 import Pagination from "@mui/material/Pagination";
-import SendIcon from "@mui/icons-material/Send";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useEffect, useState } from "react";
+import { IoSend } from "react-icons/io5";
+import { MdOutlineMoreVert } from "react-icons/md";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../utils/AuthContextProvider";
 
+const StyleMore = styled(MdOutlineMoreVert)`
+  font-size: 24px;
+  @media (max-width: 575px) {
+    font-size: 20px;
+  }
+`;
 const SeatSection = styled.div<{ rowSelect: boolean }>`
   grid-column: span 2;
   margin-top: 80px;
@@ -23,33 +29,12 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
     padding: 0 20px;
   }
 `;
-const Seats = styled.div`
-  width: 70%;
-  display: flex;
-  column-gap: 10px;
-  justify-content: flex-start;
-  overflow-x: scroll;
-  margin: 0 auto;
-`;
 const Title = styled.h4`
   font-size: 1.96rem;
   font-weight: 600;
   margin: 25px 0;
   @media (max-width: 575px) {
-    font-size: 1.5px;
-  }
-`;
-const SeatBtn = styled.button<{ selected: boolean }>`
-  padding: 0;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid ${(props) => (props.selected ? "#328c48" : "transparent")};
-  @media (max-width: 992px) {
-    width: 30px;
-    height: 30px;
+    font-size: 1.2rem;
   }
 `;
 const Card = styled.div`
@@ -66,6 +51,9 @@ const Card = styled.div`
     row-gap: 20px;
     padding: 25px;
     height: auto;
+  }
+  @media (max-width: 575px) {
+    padding: 15px;
   }
 `;
 const UserBox = styled.div`
@@ -86,11 +74,13 @@ const CommentHeader = styled.div`
   margin-bottom: 5px;
 `;
 
-const FeatureBox = styled.div`
+const FeatureBox = styled.div<{ show: boolean }>`
   margin-left: auto;
   position: relative;
+  display: ${(props) => (props.show ? "block" : "none")};
 `;
-const FeatureList = styled.ul`
+const FeatureList = styled.ul<{ open: boolean }>`
+  display: ${(props) => (props.open ? "block" : "none")};
   position: absolute;
   background: #fff;
   width: 70px;
@@ -106,6 +96,9 @@ const FeatureBtn = styled.button`
   background: none;
   border: none;
 `;
+const MoreBtn = styled(FeatureBtn)`
+  margin-right: 10px;
+`;
 const FeatureInnerBtn = styled(FeatureBtn)`
   display: block;
   margin: 0 auto;
@@ -113,7 +106,11 @@ const FeatureInnerBtn = styled(FeatureBtn)`
 
   color: #000;
 `;
-
+const Seats = styled.div`
+  white-space: nowrap;
+  overflow-x: scroll;
+`;
+const SeatBtn = styled.button``;
 const ImgBox = styled.div`
   width: 50%;
   text-align: center;
@@ -144,6 +141,10 @@ const Avatar = styled.img`
   border-radius: 20px;
   width: 40px;
   height: 40px;
+  @media (max-width: 575px) {
+    width: 30px;
+    height: 30px;
+  }
 `;
 const CommentSection = styled.div`
   height: 80%;
@@ -171,6 +172,11 @@ const CommentAvatar = styled.img`
   width: 30px;
   height: 30px;
   border-radius: 20px;
+  object-fit: cover;
+  @media (max-width: 575px) {
+    width: 25px;
+    height: 25px;
+  }
 `;
 const CommentUserName = styled.p``;
 const CommentText = styled.p``;
@@ -226,7 +232,10 @@ interface CommentEdit {
 function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Props) {
   const { register: registerEditComment, setValue, handleSubmit: handlerEditComment } = useForm<CommentEdit>();
 
+  const [isMoreClick, setIsMoreClick] = useState<string>("");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  const authContext = useContext(AuthContext);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -242,11 +251,8 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
 
       const update = state.viewPosts.map((item) => {
         if (item.id == postId) {
-          console.log("1");
-
           const updatedComments = item.comment?.map((comment) => {
             if (comment.id == commentId) {
-              console.log("2");
               return { ...comment, content: data.comment };
             }
             return comment;
@@ -270,12 +276,14 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
     dispatch({ type: "togglePostClick" });
   };
   const handlerChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    console.log(value);
+
     dispatch({ type: "selectSeat", payload: { seat: value - 1 } });
   };
 
   return (
     <SeatSection rowSelect={state.isSelectRow}>
-      {/* <Seats>
+      <Seats>
         {Array.from({ length: state.rowSeats[state.row] }).map((_, index) => (
           <SeatBtn
             key={index}
@@ -287,12 +295,12 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
             {index + 1}
           </SeatBtn>
         ))}
-      </Seats>{" "} */}
+      </Seats>
       <Pagination
         count={state.rowSeats[state.row]}
         siblingCount={1}
-        boundaryCount={windowWidth >= 992 ? 5 : windowWidth >= 768 ? 4 : windowWidth >= 575 ? 2 : 0}
-        size={windowWidth >= 575 ? "large" : "medium"}
+        boundaryCount={windowWidth >= 992 ? 5 : windowWidth >= 768 ? 4 : windowWidth >= 575 ? 2 : 2}
+        size={windowWidth >= 575 ? "large" : "small"}
         onChange={handlerChange}
         sx={{
           "& .MuiPagination-ul": {
@@ -306,7 +314,6 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
             },
           },
           "& .css-1v2f1lm-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected": {
-            // backgroundImage: "linear-gradient(239deg, #ffe53b 0%, #ff5001 74%)",
             background: "#fff",
             color: "#000", // 被選中時的文字顏色
           },
@@ -323,15 +330,15 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
             <ContentBox>
               <PostHeader>
                 <UserBox>
-                  <Avatar src={avatar} />
+                  <Avatar src={post.avatar} />
                   <UserName>{post.userName}</UserName>
                 </UserBox>
 
-                <FeatureBox>
-                  <FeatureBtn>
-                    <MoreVertIcon />
+                <FeatureBox show={authContext?.loginState === post.userUID}>
+                  <FeatureBtn onClick={() => setIsMoreClick((prev) => (prev === post.id ? "" : (post.id as string)))}>
+                    <StyleMore />
                   </FeatureBtn>
-                  <FeatureList>
+                  <FeatureList open={isMoreClick === post.id}>
                     <FeatureItem>
                       <FeatureInnerBtn onClick={() => handlerEditPost(post)}>編輯</FeatureInnerBtn>
                     </FeatureItem>
@@ -351,14 +358,14 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
                     <CommentBox key={index}>
                       <CommentHeader>
                         <UserBox>
-                          <CommentAvatar src={avatar} />
+                          <CommentAvatar src={comment.avatar} />
                           <CommentUserName>{comment.userName}</CommentUserName>
                         </UserBox>
-                        <FeatureBox>
-                          <FeatureBtn>
-                            <MoreVertIcon />
-                          </FeatureBtn>
-                          <FeatureList>
+                        <FeatureBox show={authContext?.loginState === comment.userUID}>
+                          <MoreBtn onClick={() => setIsMoreClick((prev) => (prev === comment.id ? "" : (comment.id as string)))}>
+                            <StyleMore />
+                          </MoreBtn>
+                          <FeatureList open={isMoreClick === comment.id}>
                             <FeatureItem>
                               <FeatureInnerBtn onClick={() => handleComment(comment.id, comment.content as string)}>編輯</FeatureInnerBtn>
                             </FeatureItem>
@@ -381,12 +388,16 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
                     </CommentBox>
                   ))}
               </CommentSection>
-              <TypeIn>
-                <Type type="text" placeholder="留言..." value={state.comment[post.id]} onChange={(e) => dispatch({ type: "setComment", payload: { id: post.id, commentText: e.target.value } })} />
-                <Send onClick={() => handlerComment(post.id)}>
-                  <SendIcon />
-                </Send>
-              </TypeIn>
+              {authContext?.loginState !== undefined ? (
+                <TypeIn>
+                  <Type type="text" placeholder="留言..." value={state.comment[post.id]} onChange={(e) => dispatch({ type: "setComment", payload: { id: post.id, commentText: e.target.value } })} />
+                  <Send onClick={() => handlerComment(post.id)}>
+                    <IoSend />
+                  </Send>
+                </TypeIn>
+              ) : (
+                ""
+              )}
             </ContentBox>
           </Card>
         ))

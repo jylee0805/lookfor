@@ -7,11 +7,18 @@ import loading from "../../images/loading.gif";
 import { useEffect, useContext } from "react";
 import { PostState } from "./index";
 import { AuthContext } from "../../utils/AuthContextProvider";
+import { MdOutlineClose } from "react-icons/md";
+
+const StyleClose = styled(MdOutlineClose)`
+  font-size: 24px;
+  margin-right: 4px;
+`;
 
 const PostContainer = styled.div<{ show: boolean }>`
   position: fixed;
   width: 60%;
   background: #ffffff;
+  color: #000;
   z-index: 10;
   padding: 20px 30px;
   display: ${(props) => (props.show ? "block" : "none")};
@@ -110,14 +117,28 @@ const Submit = styled(Btn)<{ load: boolean }>`
 `;
 const SelectPhotoBtn = styled.label`
   text-align: center;
+  background: #d2d2d2;
+  padding: 5px 15px;
+  border-radius: 8px;
 `;
 const FileBtn = styled.input`
   visibility: hidden;
   width: 0;
 `;
-const ImagePreview = styled.img`
+const ImagePreviewBox = styled.div<{ show: boolean }>`
+  display: ${(props) => (props.show ? "block" : "none")};
   width: 250px;
+  position: relative;
 `;
+const ImagePreviewDelete = styled.button`
+  position: absolute;
+  background: none;
+  padding: 0;
+  right: 5px;
+  top: 5px;
+  color: #fff;
+`;
+const ImagePreview = styled.img``;
 const Loading = styled.img`
   width: 30px;
 `;
@@ -323,6 +344,15 @@ function Post({ state, dispatch, sendImage }: Props) {
     document.body.style.overflow = "scroll";
   };
 
+  const handleDeletePreview = () => {
+    if (state.selectPhoto) {
+      dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
+    } else if (state.isPostEditMode.image) {
+      const update = JSON.parse(JSON.stringify(state.isPostEditMode));
+      update.image = "";
+      dispatch({ type: "setPostMode", payload: { isPostEditMode: update } });
+    }
+  };
   return (
     <PostContainer show={state.isPostClick}>
       <PostTitle>{state.isPostEditMode.section ? "更新視角" : "發布視角"}</PostTitle>
@@ -378,8 +408,13 @@ function Post({ state, dispatch, sendImage }: Props) {
         <Input type="text" defaultValue="" {...register("note")} placeholder="會被欄杆擋住、冷氣很冷..." />
         <Content defaultValue="" {...register("content")} placeholder="演唱會心得或是視角感受分享..."></Content>
       </FormContainer>
-      {state.selectPhoto && <ImagePreview src={state.localPhotoUrl} />}
-      {state.isPostEditMode.image && <ImagePreview src={state.isPostEditMode.image} />}
+      <ImagePreviewBox show={!!state.selectPhoto || !!state.isPostEditMode.image}>
+        <ImagePreviewDelete onClick={() => handleDeletePreview()}>
+          <StyleClose />
+        </ImagePreviewDelete>
+        {state.selectPhoto && <ImagePreview src={state.localPhotoUrl} />}
+        {state.isPostEditMode.image && <ImagePreview src={state.isPostEditMode.image} />}
+      </ImagePreviewBox>
 
       <BtnBox>
         <SelectPhotoBtn>

@@ -1,18 +1,94 @@
 import styled from "styled-components";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
-import { useEffect, useReducer, useState, useContext } from "react";
-import photo from "../../images/avatar.jpg";
+import { useEffect, useReducer, useState, useContext, useRef } from "react";
 import FanPost from "./FanPost";
 import { AuthContext } from "../../utils/AuthContextProvider";
-import { Concerts } from "../ConcertList";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import AddIcon from "@mui/icons-material/Add";
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { FaSort } from "react-icons/fa";
+import { MdOutlineAdd } from "react-icons/md";
+import { MdOutlineBookmarkBorder } from "react-icons/md";
+import { MdOutlineBookmark } from "react-icons/md";
+import { MdOutlineMoreVert } from "react-icons/md";
 import { Profile } from "../../utils/AuthContextProvider";
+import { Concerts } from "../ConcertList";
+
+const StyleSort = styled(FaSort)`
+  font-size: 24px;
+  margin-right: 4px;
+  @media (max-width: 575px) {
+    font-size: 20px;
+  }
+`;
+const StyleAdd = styled(MdOutlineAdd)`
+  font-size: 24px;
+  margin-right: 4px;
+  @media (max-width: 575px) {
+    font-size: 20px;
+  }
+`;
+const StyleKeep = styled(MdOutlineBookmarkBorder)`
+  font-size: 24px;
+  margin-right: 4px;
+`;
+const StyleKeepFill = styled(MdOutlineBookmark)`
+  font-size: 24px;
+  margin-right: 4px;
+`;
+const StyleMore = styled(MdOutlineMoreVert)`
+  font-size: 24px;
+  margin-right: 4px;
+`;
+const Container = styled.div`
+  width: 80%;
+  margin: 60px auto;
+  @media (max-width: 992px) {
+    width: 90%;
+  }
+`;
+const ConcertName = styled.h3`
+  font-size: 2.2rem;
+  margin-bottom: 40px;
+  font-weight: 700;
+  text-align: center;
+  @media (max-width: 992px) {
+    font-size: 1.96rem;
+  }
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
+  }
+`;
+const BtnBox = styled.div`
+  border-radius: 50px;
+  box-shadow: 0 4px 4px #00000025;
+  padding: 6px 30px;
+  width: 360px;
+  text-align: center;
+  margin: 0 auto 30px;
+
+  border: 2px solid transparent;
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+  background-image: linear-gradient(to right, #222, #222), linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
+  @media (max-width: 575px) {
+    width: 320px;
+    padding: 6px 10px;
+  }
+`;
+const PageBtn = styled(Link)`
+  background: none;
+  border: none;
+  display: inline-block;
+  padding: 5px 0px;
+  width: 50%;
+  font-weight: 700;
+  color: #fff;
+  &:hover {
+    background: linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
+    background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+`;
 
 const Mask = styled.div<{ postClick: boolean }>`
   display: ${(props) => (props.postClick ? "block" : "none")};
@@ -25,10 +101,10 @@ const Mask = styled.div<{ postClick: boolean }>`
   right: 0;
   left: 0;
   z-index: 1;
+  backdrop-filter: blur(10px);
 `;
 
-const Content = styled.div<{ changePage: string }>`
-  display: ${(props) => (props.changePage === "fanSupport" ? "block" : "none")};
+const Content = styled.div`
   width: 75%;
   margin: 0 auto;
   @media (max-width: 768px) {
@@ -41,14 +117,14 @@ const FeatureBox = styled.div`
   margin-bottom: 20px;
   margin-left: auto;
 `;
-const SortBtn = styled.button`
+const ActionBtn = styled.button`
   display: flex;
   align-items: center;
+  background: none;
+  color: #fff;
+  border: none;
 `;
-const CreateBtn = styled.button`
-  display: flex;
-  align-items: center;
-`;
+
 const PostList = styled.ul``;
 const PostItem = styled.li`
   position: relative;
@@ -70,13 +146,18 @@ const PostHeader = styled.div`
 `;
 const MoreContainer = styled.div`
   position: relative;
-  margin-left: auto;
+  margin-left: 10px;
 `;
 const MoreBtn = styled.button`
   padding: 0;
   color: #fff;
   background: none;
   border: none;
+  display: flex;
+  align-items: center;
+`;
+const KeepBtn = styled(MoreBtn)`
+  margin-left: auto;
 `;
 const FeatureBtnContainer = styled.div<{ open: boolean }>`
   position: absolute;
@@ -102,6 +183,7 @@ const HeadShot = styled.img`
   height: 40px;
   border-radius: 50px;
   margin-right: 10px;
+  object-fit: cover;
   @media (max-width: 575px) {
     width: 35px;
     height: 35px;
@@ -115,26 +197,26 @@ const UserName = styled.p`
 `;
 const ImportInfo = styled.div`
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: 100px auto;
   column-gap: 20px;
   row-gap: 5px;
-  width: 40%;
+  width: 80%;
   margin-bottom: 10px;
-  color: #9c9c9c;
+  color: #ffffff;
   font-weight: 700;
   @media (max-width: 992px) {
-    width: 50%;
+    width: 90%;
   }
   @media (max-width: 768px) {
-    width: 60%;
+    width: 100%;
   }
   @media (max-width: 575px) {
     font-size: 1rem;
-    width: 90%;
+    width: 100%;
   }
 `;
 const ImportInfoContent = styled.p`
-  font-size: 1rem;
+  font-size: 1.1rem;
 `;
 
 const InfoContent = styled.div`
@@ -158,7 +240,9 @@ export interface MerchPost {
   image: string[];
   createdTime: { seconds: number; nanoseconds: number };
   userName?: string;
+  concertName?: string;
   id?: string;
+  avatar?: string;
 }
 
 export interface State {
@@ -220,44 +304,43 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-interface Props {
-  changePage: string;
-  concert: Concerts;
-}
-
-function FansSupport({ changePage, concert }: Props) {
-  // const queryParams = new URLSearchParams(window.location.search);
-  // const concertId = queryParams.get("concert") || "";
+function FansSupport() {
+  const queryParams = new URLSearchParams(window.location.search);
+  const concertId = queryParams.get("concert") || "";
   const [state, dispatch] = useReducer(reducer, initial);
-
+  const [concert, setConcert] = useState<Concerts | null>(null);
   const [isMoreClick, setIsMoreClick] = useState<string>("");
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
-
+  useEffect(() => {}, []);
   useEffect(() => {
     const loadViewPosts = async () => {
       const unsubscribesPost: (() => void)[] = [];
       let posts: MerchPost[] = [];
+      const concertRes = await api.getConcert(concertId);
+      console.log(concertRes);
 
-      const unsubscribePost = api.getMerchPost(concert.id, (updatedPosts: MerchPost[]) => {
+      setConcert(concertRes as Concerts);
+      const unsubscribePost = api.getMerchPost(concertId, (updatedPosts: MerchPost[]) => {
         posts = JSON.parse(JSON.stringify(updatedPosts));
 
         const fetchUserNames = async () => {
-          const userNamesPromises = posts.map(async (post) => {
+          const usersPromises = posts.map(async (post) => {
             if (post.userUID) {
-              const userName = await api.getUser(post.userUID);
+              const user = await api.getUser(post.userUID);
 
-              return userName.userName;
+              return { userName: user.userName, avatar: user.avatar };
             }
             return null;
           });
-          const userNames = await Promise.all(userNamesPromises);
-          return userNames;
+          const users = await Promise.all(usersPromises);
+          return users;
         };
 
         fetchUserNames().then((userNames) => {
           posts.forEach((post, index) => {
-            post.userName = userNames[index];
+            post.userName = userNames[index]?.userName;
+            post.avatar = userNames[index]?.avatar;
           });
           dispatch({ type: "setPostData", payload: { postData: posts } });
         });
@@ -273,6 +356,36 @@ function FansSupport({ changePage, concert }: Props) {
 
     loadViewPosts();
   }, []);
+
+  const location = useLocation();
+  const targetRef = useRef<(HTMLLIElement | null)[]>([]);
+  useEffect(() => {
+    console.log(location.hash && targetRef.current);
+
+    const handleScroll = () => {
+      const targetId = location.hash.slice(1);
+      const targetIndex = state.postData.findIndex((post) => post.id === targetId);
+      console.log(targetIndex);
+
+      if (targetIndex >= 0 && targetRef.current[targetIndex]) {
+        targetRef.current[targetIndex]?.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+
+    // 在初始哈希值檢查後進行滾動
+    if (location.hash) {
+      handleScroll();
+    }
+
+    const timeoutId = setTimeout(() => {
+      if (location.hash) {
+        handleScroll();
+      }
+    }, 1000);
+
+    // 清理計時器
+    return () => clearTimeout(timeoutId);
+  }, [location, state.postData]);
 
   const deleteMerchPost = async (id: string) => {
     if (id) {
@@ -316,8 +429,10 @@ function FansSupport({ changePage, concert }: Props) {
   };
 
   const handleKeep = async (id: string) => {
-    console.log(id);
-
+    if (authContext?.loginState === undefined) {
+      alert("請登入");
+      return;
+    }
     if (authContext?.user.keepIds?.includes(id)) {
       authContext.setUser((prev) => {
         api.updateUser(authContext?.user.id, { UID: prev.UID, avatar: prev.avatar, userName: prev.userName, keepIds: prev.keepIds?.filter((item) => item !== id) });
@@ -333,39 +448,46 @@ function FansSupport({ changePage, concert }: Props) {
     }
   };
   return (
-    <>
+    <Container>
+      <ConcertName>{concert?.concertName}</ConcertName>
+      <BtnBox>
+        <PageBtn to={`/concert?concert=${concertId}`}>演唱會資訊</PageBtn>
+        <PageBtn to={`/fanssupport?concert=${concertId}`}>應援物發放資訊</PageBtn>
+      </BtnBox>
       <Mask postClick={state.isPostClick} />
-      <Content changePage={changePage}>
+      <Content>
         <FeatureBox>
-          <SortBtn onClick={() => handleSort()}>
-            <FilterListIcon />
+          <ActionBtn onClick={() => handleSort()}>
+            <StyleSort />
             {state.sort === "createdTime" ? "依發放時間排序" : "依貼文發布時間排序"}
-          </SortBtn>
-          <CreateBtn onClick={() => handlePostClick()}>
-            <AddIcon />
+          </ActionBtn>
+          <ActionBtn onClick={() => handlePostClick()}>
+            <StyleAdd />
             發佈資訊
-          </CreateBtn>
+          </ActionBtn>
         </FeatureBox>
-        <FanPost concert={concert} dispatch={dispatch} state={state} />
+        <FanPost concert={concert as Concerts} dispatch={dispatch} state={state} />
         <PostList>
           {state.postData &&
             state.postData.map((item, index) => (
-              <PostItem key={index}>
+              <PostItem key={item.id} id={item.id} ref={(el) => (targetRef.current[index] = el)}>
                 <PostHeader>
-                  <HeadShot src={photo} />
+                  <HeadShot src={item.avatar} />
                   <UserName>{item.userName}</UserName>
-                  <MoreBtn onClick={() => handleKeep(item.id)}>
-                    {Array.isArray(authContext?.user.keepIds) && authContext.user.keepIds.includes(item.id as string) ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-                  </MoreBtn>
-                  <MoreContainer>
-                    <MoreBtn onClick={() => setIsMoreClick((prev) => (prev === item.id ? "" : (item.id as string)))}>
-                      <MoreVertIcon />
-                    </MoreBtn>
-                    <FeatureBtnContainer open={isMoreClick === item.id}>
-                      <FeatureBtn onClick={() => dispatch({ type: "toggleIsEditMode", payload: { isEditMode: item, isPostClick: true } })}>編輯</FeatureBtn>
-                      <FeatureBtn onClick={() => deleteMerchPost(item.id ? item.id : "")}>刪除</FeatureBtn>
-                    </FeatureBtnContainer>
-                  </MoreContainer>
+                  <KeepBtn onClick={() => handleKeep(item.id as string)}>
+                    {Array.isArray(authContext?.user.keepIds) && authContext.user.keepIds.includes(item.id as string) ? <StyleKeepFill /> : <StyleKeep />}
+                  </KeepBtn>
+                  {authContext?.loginState === item.userUID && (
+                    <MoreContainer>
+                      <MoreBtn onClick={() => setIsMoreClick((prev) => (prev === item.id ? "" : (item.id as string)))}>
+                        <StyleMore />
+                      </MoreBtn>
+                      <FeatureBtnContainer open={isMoreClick === item.id}>
+                        <FeatureBtn onClick={() => dispatch({ type: "toggleIsEditMode", payload: { isEditMode: item, isPostClick: true } })}>編輯</FeatureBtn>
+                        <FeatureBtn onClick={() => deleteMerchPost(item.id ? item.id : "")}>刪除</FeatureBtn>
+                      </FeatureBtnContainer>
+                    </MoreContainer>
+                  )}
                 </PostHeader>
                 <ImportInfo>
                   <ImportInfoContent>時間</ImportInfoContent>
@@ -377,18 +499,17 @@ function FansSupport({ changePage, concert }: Props) {
                   <ImportInfoContent>領取資格</ImportInfoContent>
                   <ImportInfoContent>{item.qualify}</ImportInfoContent>
                 </ImportInfo>
-                <InfoContent>{item.content}</InfoContent>
+                <InfoContent dangerouslySetInnerHTML={{ __html: item.content.replace(/\n/g, "<br />") }}></InfoContent>
                 <ImageContainer>
                   {item.image.map((item) => (
                     <Image src={item} />
                   ))}
-                  {/* <Image src={photo} /> */}
                 </ImageContainer>
               </PostItem>
             ))}
         </PostList>
       </Content>
-    </>
+    </Container>
   );
 }
 

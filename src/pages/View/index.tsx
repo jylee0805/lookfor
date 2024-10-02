@@ -2,7 +2,6 @@ import styled from "styled-components";
 import Sections from "./Sections";
 import Rows from "./Rows";
 import Seat from "./Seat";
-import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { useEffect, useReducer, useContext } from "react";
 import Post from "./Post";
@@ -10,7 +9,13 @@ import { AuthContext } from "../../utils/AuthContextProvider";
 import { ComponentContext } from "../../utils/ComponentContextProvider";
 import VenueHeader from "../../components/VenueHeader";
 import LoginDialog from "../../components/LoginDialog";
+import { MdOutlineAdd } from "react-icons/md";
 
+const StyleAdd = styled(MdOutlineAdd)`
+  font-size: 24px;
+  margin-left: 12px;
+  margin-right: 4px;
+`;
 const Container = styled.div`
   width: 100%;
   max-width: 100vw; /* 確保容器寬度不超出螢幕 */
@@ -30,19 +35,26 @@ const Mask = styled.div<{ postClick: boolean }>`
 `;
 
 const Main = styled.main`
-  max-width: 100%;
+  max-width: 80%;
+  margin: 0 auto;
   width: 100%;
   display: grid;
-  grid-template-columns: 65% 1fr;
-
+  grid-template-columns: 60% 1fr;
+  @media (max-width: 1280px) {
+    max-width: 100%;
+    width: 100%;
+    grid-template-columns: 65% 1fr;
+  }
   @media (max-width: 992px) {
     grid-template-columns: 1fr;
   }
 `;
-const PostVieBtn = styled.button`
+const PostViewBtn = styled.button`
   grid-column: span 2;
-  display: block;
-  margin: 0 auto 32px;
+  display: flex;
+  align-items: center;
+  margin: 0 auto 40px auto;
+
   font-size: 1.5rem;
   font-weight: 600;
   padding: 0;
@@ -50,6 +62,10 @@ const PostVieBtn = styled.button`
   color: white;
   border: 2px solid #fff;
 
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+    margin: 40px auto 30px auto;
+  }
   &:hover {
     border: 2px solid transparent;
     background-clip: padding-box, border-box;
@@ -64,13 +80,13 @@ const PostVieBtn = styled.button`
 
 const PostVieBtnText = styled.span`
   display: block;
-  padding: 8px 20px;
-  &:hover {
+  padding: 8px 20px 8px 0;
+  /* &:hover {
     background: linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
     background-clip: text;
     background-clip: text;
     color: transparent;
-  }
+  } */
 `;
 export interface Comment {
   content?: string;
@@ -78,6 +94,7 @@ export interface Comment {
   createdTime?: string;
   id: string;
   userName?: string;
+  avatar?: string;
 }
 export interface PostState {
   image?: string;
@@ -92,6 +109,7 @@ export interface PostState {
   section?: string;
   userUID?: string;
   userName?: string;
+  avatar?: string;
 }
 
 interface Seats {
@@ -213,25 +231,24 @@ function View() {
   const authContext = useContext(AuthContext);
 
   const componentContext = useContext(ComponentContext);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const loadViewPosts = async () => {
       const unsubscribesPost: (() => void)[] = [];
       const unsubscribes: (() => void)[] = [];
       let posts: PostState[] = [];
-      let comments: Comment[] = [];
+
       // 監聽貼文變更
 
-      const unsubscribePost = api.getViewPosts(state.section, state.row + 1, state.seat + 1, (updatedPosts: PostState[]) => {
+      const unsubscribePost = api.getViewPosts(state.section, state.row + 1, state.seat + 1, async (updatedPosts: PostState[]) => {
         posts = JSON.parse(JSON.stringify(updatedPosts));
 
         const fetchUserNames = async () => {
           const userNamesPromises = posts.map(async (post) => {
             if (post.userUID) {
-              const userName = await api.getUser(post.userUID);
+              const user = await api.getUser(post.userUID);
 
-              return userName.userName;
+              return { userName: user.userName, avatar: user.avatar };
             }
             return null;
           });
@@ -241,43 +258,47 @@ function View() {
         };
         fetchUserNames().then((userNames) => {
           posts.forEach((post, index) => {
-            post.userName = userNames[index];
+            post.userName = userNames[index]?.userName;
+            post.avatar = userNames[index]?.avatar;
           });
         });
-        console.log("我有更新到這");
+        await Promise.all(
+          posts.map(async (post) => {
+            const unsubscribe = api.getViewComments(post.id, (updatedComments: Comment[]) => {
+              console.log(updatedComments);
+              const comments = JSON.parse(JSON.stringify(updatedComments));
+              console.log(comments);
 
-        posts.forEach(async (post) => {
-          const unsubscribe = api.getViewComments(post.id, (updatedComments: Comment[]) => {
-            console.log(updatedComments);
-            comments = JSON.parse(JSON.stringify(updatedComments));
-            console.log(comments);
+              const fetchUserNames = async () => {
+                const userNamesPromises = comments.map(async (comment: Comment) => {
+                  if (comment.userUID) {
+                    const user = await api.getUser(comment.userUID);
 
-            const fetchUserNames = async () => {
-              console.log("我有更新到這123");
-              const userNamesPromises = comments.map(async (comment) => {
-                if (comment.userUID) {
-                  const userName = await api.getUser(comment.userUID);
+                    return { userName: user.userName, avatar: user.avatar };
+                  }
+                  return null;
+                });
 
-                  return userName.userName;
-                }
-                return null;
-              });
+                const userNames = await Promise.all(userNamesPromises);
+                return userNames;
+              };
 
-              const userNames = await Promise.all(userNamesPromises);
-
-              return userNames;
-            };
-            fetchUserNames().then((userNames) => {
-              comments.forEach((comment, index) => {
-                comment.userName = userNames[index];
+              fetchUserNames().then((userNames) => {
+                comments.forEach((comment: Comment, index: number) => {
+                  if (userNames[index]) {
+                    comment.userName = userNames[index]?.userName || comment.userName;
+                    comment.avatar = userNames[index]?.avatar || comment.avatar;
+                    console.log(`Updated comment: ${index}`, comment); // 確認每個 comment 的更新
+                  }
+                });
+                post.comment = comments;
+                dispatch({ type: "setViewPosts", payload: { viewPosts: [...posts] } });
               });
             });
 
-            post.comment = comments;
-          });
-
-          unsubscribes.push(await unsubscribe);
-        });
+            unsubscribes.push(await unsubscribe);
+          })
+        );
 
         console.log(posts);
         dispatch({ type: "setViewPosts", payload: { viewPosts: posts } });
@@ -358,9 +379,10 @@ function View() {
       <LoginDialog />
       <VenueHeader />
       <Main>
-        <PostVieBtn onClick={() => handlePostClick()}>
+        <PostViewBtn onClick={() => handlePostClick()}>
+          <StyleAdd />
           <PostVieBtnText>發佈視角</PostVieBtnText>
-        </PostVieBtn>
+        </PostViewBtn>
         <Post state={state} dispatch={dispatch} sendImage={sendImage} />
         <Sections handlerSection={handlerSection} />
         <Rows state={state} dispatch={dispatch} />

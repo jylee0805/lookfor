@@ -23,6 +23,7 @@ const Title = styled.p`
   font-size: 1.5rem;
   font-weight: 700;
   margin-top: 20px;
+  color: #000;
 `;
 const BtnBox = styled.div`
   margin-top: 20px;
@@ -44,7 +45,7 @@ const CancelBtn = styled.button`
   color: #090909;
 `;
 
-function VenueHeader() {
+function LoginDialog() {
   const navigate = useNavigate();
   const componentContext = useContext(ComponentContext);
   const handleBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -73,4 +74,4 @@ function VenueHeader() {
   );
 }
 
-export default VenueHeader;
+export default LoginDialog;

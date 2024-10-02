@@ -4,7 +4,7 @@ import { TimePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { Concerts } from "../ConcertList";
 import api from "../../utils/api";
-import { State, Action, MerchPost } from "../Concert/FanSupport";
+import { State, Action, MerchPost } from "./index";
 import { useEffect } from "react";
 
 const Container = styled.div<{ isPostClick: boolean }>`
@@ -13,7 +13,8 @@ const Container = styled.div<{ isPostClick: boolean }>`
   display: ${(props) => (props.isPostClick ? "block" : "none")};
   position: fixed;
   background: #ffffff;
-  z-index: 2;
+  color: #000;
+  z-index: 10;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -27,8 +28,11 @@ const Title = styled.h3`
   text-align: center;
   font-weight: 700;
   margin-bottom: 15px;
+  color: #000;
 `;
-const Label = styled.p``;
+const Label = styled.p`
+  color: #000;
+`;
 const InputContainer = styled.div`
   display: grid;
   grid-template-columns: auto 1fr auto 1fr;
@@ -151,7 +155,7 @@ function FanPost({ concert, state, dispatch }: Props) {
     }
   }, [state.isEditMode]);
 
-  const day = concert.date.map((item) => {
+  const day = concert?.date.map((item) => {
     if (item) {
       const dayOnly = item.split(" ")[0] + " " + item.split(" ")[1];
       return dayOnly;
@@ -164,7 +168,7 @@ function FanPost({ concert, state, dispatch }: Props) {
     try {
       if (state.selectPhotos) {
         urls = await Promise.all(
-          state.selectPhotos.map(async (item) => {
+          state.selectPhotos.map(async (item: File) => {
             const url = await api.uploadImage(item);
             return url;
           })
@@ -202,9 +206,12 @@ function FanPost({ concert, state, dispatch }: Props) {
       userUID: UID,
     };
     if (state.isEditMode.id) {
+      if (state.isEditMode.passState !== data.status) {
+        api.setNotify(state.isEditMode.id, concert.id, data.status);
+      }
       await api.updateMerchPost(state.isEditMode.id, allData);
     } else {
-      console.log(allData);
+      console.log(concert.id);
 
       await api.setMerchPost(allData);
     }
@@ -215,8 +222,6 @@ function FanPost({ concert, state, dispatch }: Props) {
     // dispatch({ type: "toggleIsPostClick", payload: { isPostClick: false } });
   };
   const handlerCancel = () => {
-    console.log(concert.date);
-
     dispatch({ type: "toggleIsPostClick", payload: { isPostClick: false } });
     dispatch({ type: "setLocalPhotoUrl", payload: { localPhotoUrl: [], selectPhotos: [] } });
     dispatch({ type: "toggleIsEditMode", payload: { isEditMode: {} as MerchPost, isPostClick: false } });
@@ -240,7 +245,7 @@ function FanPost({ concert, state, dispatch }: Props) {
         <Label>日期</Label>
         <Select {...register("day", { required: true })}>
           <option value="">請選擇日期</option>
-          {concert.date && day.map((item) => <option value={item}>{item}</option>)}
+          {concert?.date && day.map((item) => <option value={item}>{item}</option>)}
         </Select>
         <Label>時間</Label>
         <Controller
@@ -265,8 +270,8 @@ function FanPost({ concert, state, dispatch }: Props) {
         <QualifyInput type="text" {...register("qualify", { required: true })} />
         <MoreContent {...register("more", { required: true })}></MoreContent>
       </InputContainer>
-      {state.localPhotoUrl && state.localPhotoUrl.map((item) => <Image src={item} />)}
-      {state.isEditMode.image && state.isEditMode.image.map((item) => <Image src={item} />)}
+      {state.localPhotoUrl && state.localPhotoUrl.map((item: string) => <Image src={item} />)}
+      {state.isEditMode.image && state.isEditMode.image.map((item: string) => <Image src={item} />)}
       <BtnBox>
         <SelectPhotoBtn>
           選擇照片

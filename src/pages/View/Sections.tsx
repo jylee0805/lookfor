@@ -21,8 +21,10 @@ const SelectSection = styled.div`
   max-width: 780px;
   padding: 0 30px;
   padding-right: 0;
+  font-weight: 700;
+
   @media (max-width: 992px) {
-    padding: 0;
+    padding: 0 30px;
     width: 768px;
     margin: 0 auto;
   }
@@ -32,6 +34,7 @@ const SelectSection = styled.div`
   @media (max-width: 575px) {
     width: 360px;
     padding: 0;
+    font-size: 1rem;
   }
 `;
 const Title = styled.h4`
@@ -39,10 +42,15 @@ const Title = styled.h4`
   font-weight: 600;
   color: #fff;
   margin-bottom: 25px;
+  @media (max-width: 575px) {
+    font-size: 1.5rem;
+    margin-left: 20px;
+  }
 `;
 const Vip = styled.div`
   position: relative;
   height: 160px;
+  color: #000;
   @media (max-width: 768px) {
     height: 120px;
   }
@@ -59,6 +67,7 @@ const Vip = styled.div`
 const Second = styled.div`
   position: relative;
   height: 180px;
+  color: #000;
   @media (max-width: 768px) {
     height: 140px;
   }
@@ -69,6 +78,7 @@ const Second = styled.div`
 const Third = styled.div`
   height: 300px;
   position: relative;
+  color: #000;
   @media (max-width: 768px) {
     height: 200px;
   }
@@ -83,13 +93,13 @@ const VipA = styled.div`
   position: absolute;
   top: 0;
   left: 15%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #f1b3ff; /* 初始顏色 */
   mask-image: url("${VIPAPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   &:hover {
-    background-color: #ffdd00; /* hover 狀態變色 */
+    background-color: #ca70de; /* hover 狀態變色 */
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -101,13 +111,13 @@ const VipB = styled.div`
   position: absolute;
   top: 0;
   left: 38%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #f1b3ff; /* 初始顏色 */
   mask-image: url("${VIPBPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   &:hover {
-    background-color: #ffdd00; /* hover 狀態變色 */
+    background-color: #ca70de; /* hover 狀態變色 */
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -119,13 +129,13 @@ const VipC = styled.div`
   position: absolute;
   top: 0;
   left: 63%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #f1b3ff; /* 初始顏色 */
   mask-image: url("${VIPCPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   &:hover {
-    background-color: #ffdd00; /* hover 狀態變色 */
+    background-color: #ca70de; /* hover 狀態變色 */
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -138,14 +148,14 @@ const SecondG = styled.div`
   position: absolute;
   top: -5px;
   left: 81.5%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #ffb3b3; /* 初始顏色 */
   mask-image: url("${SecondGPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
 
   &:hover {
-    background-color: #ffdd00; /* hover 狀態變色 */
+    background-color: #f57f7f; /* hover 狀態變色 */
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -157,13 +167,13 @@ const SecondF = styled.div`
   position: absolute;
   top: 47px;
   left: 71%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #ffb3b3; /* 初始顏色 */
   mask-image: url("${SecondFPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   &:hover {
-    background-color: #ffdd00; /* hover 狀態變色 */
+    background-color: #f57f7f; /* hover 狀態變色 */
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -177,13 +187,13 @@ const SecondE = styled.div`
   position: absolute;
   top: 74px;
   left: 59.5%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #ffb3b3; /* 初始顏色 */
   mask-image: url("${SecondEPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   &:hover {
-    background-color: #ffdd00; /* hover 狀態變色 */
+    background-color: #f57f7f; /* hover 狀態變色 */
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -197,13 +207,13 @@ const SecondD = styled.div`
   position: absolute;
   top: 82px;
   left: 42%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #ffb3b3; /* 初始顏色 */
   mask-image: url("${SecondDPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   &:hover {
-    background-color: #ffdd00; /* hover 狀態變色 */
+    background-color: #f57f7f; /* hover 狀態變色 */
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -217,13 +227,13 @@ const SecondC = styled.div`
   position: absolute;
   top: 72px;
   left: 26.5%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #ffb3b3; /* 初始顏色 */
   mask-image: url("${SecondCPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   &:hover {
-    background-color: #ffdd00; /* hover 狀態變色 */
+    background-color: #f57f7f; /* hover 狀態變色 */
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -237,13 +247,13 @@ const SecondB = styled.div`
   position: absolute;
   top: 48px;
   left: 13.5%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #ffb3b3; /* 初始顏色 */
   mask-image: url("${SecondBPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   &:hover {
-    background-color: #ffdd00; /* hover 狀態變色 */
+    background-color: #f57f7f; /* hover 狀態變色 */
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -257,7 +267,7 @@ const SecondA = styled.div`
   position: absolute;
   top: 0;
   left: 2%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #ffb3b3; /* 初始顏色 */
   mask-image: url("${SecondAPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
@@ -266,7 +276,7 @@ const SecondA = styled.div`
   transform-origin: top left; /* 設定縮放原點，確保位置不偏移 */
   object-fit: cover; /* 確保背景圖縮放時保持比例 */
   &:hover {
-    background-color: #ffdd00; /* hover 狀態變色 */
+    background-color: #f57f7f; /* hover 狀態變色 */
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -280,13 +290,13 @@ const ThirdA = styled.div`
   position: absolute;
   top: 0;
   left: 4.5%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #fff1b3; /* 初始顏色 */
   mask-image: url("${ThirdAPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   &:hover {
-    background-color: #ffdd00; /* hover 狀態變色 */
+    background-color: #fff1b3; /* hover 狀態變色 */
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -300,7 +310,7 @@ const ThirdB = styled.div`
   position: absolute;
   top: 50px;
   left: 15%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #fff1b3; /* 初始顏色 */
   mask-image: url("${ThirdBPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
@@ -320,7 +330,7 @@ const ThirdC = styled.div`
   position: absolute;
   top: 80px;
   left: 28%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #fff1b3; /* 初始顏色 */
   mask-image: url("${ThirdCPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
@@ -340,7 +350,7 @@ const ThirdD = styled.div`
   position: absolute;
   top: 95px;
   left: 42.5%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #fff1b3; /* 初始顏色 */
   mask-image: url("${ThirdDPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
@@ -360,7 +370,7 @@ const ThirdE = styled.div`
   position: absolute;
   top: 80px;
   left: 60%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #fff1b3; /* 初始顏色 */
   mask-image: url("${ThirdEPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
@@ -380,7 +390,7 @@ const ThirdF = styled.div`
   position: absolute;
   top: 50px;
   left: 69%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #fff1b3; /* 初始顏色 */
   mask-image: url("${ThirdFPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
@@ -401,7 +411,7 @@ const ThirdG = styled.div`
   position: absolute;
   top: 0;
   left: 80.5%;
-  background-color: #d2d2d2; /* 初始顏色 */
+  background-color: #fff1b3; /* 初始顏色 */
   mask-image: url("${ThirdGPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
@@ -461,59 +471,59 @@ function Sections({ handlerSection }: Props) {
       </Third> */}
       <Vip>
         <VipA data-section="VIPA">
-          <Text>VIPA</Text>
+          <Text data-section="VIPA">VIPA</Text>
         </VipA>
         <VipB data-section="VIPB">
-          <Text>VIPB</Text>
+          <Text data-section="VIPB">VIPB</Text>
         </VipB>
         <VipC data-section="VIPC">
-          <Text>VIPC</Text>
+          <Text data-section="VIPC">VIPC</Text>
         </VipC>
       </Vip>
       <Second>
         <SecondA data-section="2A">
-          <Text>2A</Text>
+          <Text data-section="2A">2A</Text>
         </SecondA>
         <SecondB data-section="2B">
-          <Text>2B</Text>
+          <Text data-section="2B">2B</Text>
         </SecondB>
         <SecondC data-section="2C">
-          <Text>2C</Text>
+          <Text data-section="2C">2C</Text>
         </SecondC>
         <SecondD data-section="2D">
-          <Text>2D</Text>
+          <Text data-section="2D">2D</Text>
         </SecondD>
         <SecondE data-section="2E">
-          <Text>2E</Text>
+          <Text data-section="2E">2E</Text>
         </SecondE>
         <SecondF data-section="2F">
-          <Text>2F</Text>
+          <Text data-section="2F">2F</Text>
         </SecondF>
         <SecondG data-section="2G">
-          <Text>2G</Text>
+          <Text data-section="2G">2G</Text>
         </SecondG>
       </Second>
       <Third>
         <ThirdA data-section="3A">
-          <Text>3A</Text>
+          <Text data-section="3A">3A</Text>
         </ThirdA>
         <ThirdB data-section="3B">
-          <Text>3B</Text>
+          <Text data-section="3B">3B</Text>
         </ThirdB>
         <ThirdC data-section="3C">
-          <Text>3C</Text>
+          <Text data-section="3C">3C</Text>
         </ThirdC>
         <ThirdD data-section="3D">
-          <Text>3D</Text>
+          <Text data-section="3D">3D</Text>
         </ThirdD>
         <ThirdE data-section="3E">
-          <Text>3E</Text>
+          <Text data-section="3E">3E</Text>
         </ThirdE>
         <ThirdF data-section="3F">
-          <Text>3F</Text>
+          <Text data-section="3F">3F</Text>
         </ThirdF>
         <ThirdG data-section="3G">
-          <Text>3G</Text>
+          <Text data-section="3G">3G</Text>
         </ThirdG>
       </Third>
     </SelectSection>
