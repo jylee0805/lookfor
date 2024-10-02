@@ -21,6 +21,7 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
   margin-bottom: 80px;
   display: ${(props) => (props.rowSelect ? "block" : "none")};
   color: #fff;
+  overflow-x: hidden;
   @media (max-width: 992px) {
     grid-column: span 1;
     padding: 0 60px;
@@ -107,10 +108,12 @@ const FeatureInnerBtn = styled(FeatureBtn)`
   color: #000;
 `;
 const Seats = styled.div`
+  width: 100%;
   white-space: nowrap;
   overflow-x: scroll;
+  text-align: center;
 `;
-const SeatBtn = styled.button``;
+const SeatBtn = styled.button<{ selected: boolean }>``;
 const ImgBox = styled.div`
   width: 50%;
   text-align: center;
@@ -280,7 +283,11 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
 
     dispatch({ type: "selectSeat", payload: { seat: value - 1 } });
   };
+  const handlerSeat = (value: number) => {
+    console.log(value);
 
+    dispatch({ type: "selectSeat", payload: { seat: value } });
+  };
   return (
     <SeatSection rowSelect={state.isSelectRow}>
       <Seats>

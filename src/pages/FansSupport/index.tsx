@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import api from "../../utils/api";
 import { useEffect, useReducer, useState, useContext, useRef } from "react";
 import FanPost from "./FanPost";
@@ -11,6 +11,8 @@ import { MdOutlineBookmark } from "react-icons/md";
 import { MdOutlineMoreVert } from "react-icons/md";
 import { Profile } from "../../utils/AuthContextProvider";
 import { Concerts } from "../ConcertList";
+import { ComponentContext } from "../../utils/ComponentContextProvider";
+import LoginDialog from "../../components/LoginDialog";
 
 const StyleSort = styled(FaSort)`
   font-size: 24px;
@@ -311,8 +313,8 @@ function FansSupport() {
   const [concert, setConcert] = useState<Concerts | null>(null);
   const [isMoreClick, setIsMoreClick] = useState<string>("");
   const authContext = useContext(AuthContext);
-  const navigate = useNavigate();
-  useEffect(() => {}, []);
+  const componentContext = useContext(ComponentContext);
+
   useEffect(() => {
     const loadViewPosts = async () => {
       const unsubscribesPost: (() => void)[] = [];
@@ -421,8 +423,8 @@ function FansSupport() {
     console.log(authContext?.loginState);
 
     if (authContext?.loginState === null || authContext?.loginState === undefined) {
-      alert("請先登入");
-      navigate("/login");
+      componentContext?.setIsDialogOpen(true);
+      document.body.style.overflow = "hidden";
       return;
     }
     dispatch({ type: "toggleIsPostClick", payload: { isPostClick: true } });
@@ -430,7 +432,8 @@ function FansSupport() {
 
   const handleKeep = async (id: string) => {
     if (authContext?.loginState === undefined) {
-      alert("請登入");
+      componentContext?.setIsDialogOpen(true);
+      document.body.style.overflow = "hidden";
       return;
     }
     if (authContext?.user.keepIds?.includes(id)) {
@@ -449,6 +452,7 @@ function FansSupport() {
   };
   return (
     <Container>
+      <LoginDialog />
       <ConcertName>{concert?.concertName}</ConcertName>
       <BtnBox>
         <PageBtn to={`/concert?concert=${concertId}`}>演唱會資訊</PageBtn>

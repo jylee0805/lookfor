@@ -76,7 +76,11 @@ function SignUp({ isLogin, setIsLogin }: Props) {
       return;
     }
     if (response instanceof Object) {
-      await api.setUser(data.name, response.user.uid);
+      await api.setUser(
+        data.name,
+        response.user.uid,
+        "https://firebasestorage.googleapis.com/v0/b/look-for-18287.appspot.com/o/images%2Fprofile.png?alt=media&token=e5653560-c959-4f42-a741-a30794521275"
+      );
       setIsLogin(true);
       alert("註冊成功");
     }

@@ -62,6 +62,12 @@ const api = {
 
     return querySnapshot.docs;
   },
+  async findUserUid(uid: string) {
+    const q = query(collection(db, "users"), where("UID", "==", uid));
+    const querySnapshot = await getDocs(q);
+
+    return querySnapshot.docs;
+  },
   async getUser(id: string) {
     const q = query(collection(db, "users"), where("UID", "==", id));
 
@@ -155,10 +161,15 @@ const api = {
   async userLogInGoogle() {
     try {
       const result = await signInWithPopup(auth, provider);
-      console.log(result);
 
       const user = result.user;
-      return { user };
+
+      const data = await this.findUserUid(user.uid);
+      if (data.length === 0) {
+        this.setUser(user.displayName as string, user.uid, user.photoURL as string);
+      }
+
+      return user.uid;
     } catch (error) {
       if (error instanceof FirebaseError) {
         const errorCode = error.code;
@@ -201,11 +212,12 @@ const api = {
 
     return downloadURL;
   },
-  async setUser(name: string, uid: string) {
+  async setUser(name: string, uid: string, avatar: string) {
     await addDoc(collection(db, "users"), {
       userName: name,
       UID: uid,
-      avatar: "https://firebasestorage.googleapis.com/v0/b/look-for-18287.appspot.com/o/images%2Fprofile.png?alt=media&token=e5653560-c959-4f42-a741-a30794521275",
+      avatar: avatar,
+      //
     });
     return;
   },
