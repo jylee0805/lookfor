@@ -149,7 +149,7 @@ export interface PlaceAvailable {
 }
 function TransportationDriving() {
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "AIzaSyA3EzkV4hLZiO3UWwyXgtWQxZHRc85JmHs",
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_KEY,
     libraries: ["places"],
   });
   const [places, setPlaces] = useState<Place[]>([]);
