@@ -7,6 +7,7 @@ import { IoSend } from "react-icons/io5";
 import { MdOutlineMoreVert } from "react-icons/md";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../utils/AuthContextProvider";
+import defaultSeat from "../../images/defaultSeat.png";
 
 const StyleMore = styled(MdOutlineMoreVert)`
   font-size: 24px;
@@ -103,14 +104,25 @@ const FeatureInnerBtn = styled(FeatureBtn)`
   display: block;
   margin: 0 auto;
   padding: 10px 18px;
-
   color: #000;
 `;
 const Seats = styled.div`
   white-space: nowrap;
   overflow-x: scroll;
+  text-align: center;
 `;
-const SeatBtn = styled.button``;
+const SeatBtn = styled.button`
+  padding: 0;
+  width: 45px;
+  height: 45px;
+  margin-right: 8px;
+  background-image: url("${defaultSeat}");
+  background-repeat: no-repeat;
+  background-color: transparent;
+  background-position: center;
+  background-size: 72px;
+  margin-bottom: 5px;
+`;
 const ImgBox = styled.div`
   width: 50%;
   text-align: center;
