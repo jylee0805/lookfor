@@ -10,6 +10,7 @@ import { ComponentContext } from "../../utils/ComponentContextProvider";
 import VenueHeader from "../../components/VenueHeader";
 import LoginDialog from "../../components/LoginDialog";
 import { MdOutlineAdd } from "react-icons/md";
+import { useLocation } from "react-router-dom";
 
 const StyleAdd = styled(MdOutlineAdd)`
   font-size: 24px;
@@ -157,7 +158,8 @@ export type Action =
   | { type: "setLoading" }
   | { type: "toggleCommentMode"; payload: { isCommentEditMode: string } }
   | { type: "setPostMode"; payload: { isPostEditMode: PostState } }
-  | { type: "setAllSectionPost"; payload: { allSectionPost: AllPost[] } };
+  | { type: "setAllSectionPost"; payload: { allSectionPost: AllPost[] } }
+  | { type: "setUserPost"; payload: { section: string; row: number; seat: number } };
 
 const initial: State = {
   allSeats: [],
@@ -232,6 +234,9 @@ const reducer = (state: State, action: Action): State => {
     case "setAllSectionPost": {
       return { ...state, allSectionPost: action.payload.allSectionPost };
     }
+    case "setUserPost": {
+      return { ...state, section: action.payload.section, row: action.payload.row, seat: action.payload.seat, isSelectSection: true, isSelectRow: true };
+    }
     default:
       return state;
   }
@@ -241,6 +246,9 @@ function View() {
   const authContext = useContext(AuthContext);
 
   const componentContext = useContext(ComponentContext);
+
+  const location = useLocation();
+  const { section, row, seat } = location.state || {};
 
   useEffect(() => {
     const loadViewPosts = async () => {
@@ -329,7 +337,7 @@ function View() {
   useEffect(() => {
     const getAllSeats = async () => {
       const allSection = (await api.getSections()) as Seats[];
-
+      console.log(allSection);
       dispatch({ type: "getAllSeats", payload: { allSeats: allSection } });
     };
     getAllSeats();
@@ -351,11 +359,24 @@ function View() {
     dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.map((post) => ({ ...post, comment: post.comment?.filter((comment) => comment.id !== id) })) } });
   };
 
+  useEffect(() => {
+    const getSeat = async () => {
+      const rows = await api.getRows(section);
+      const sectionAry: number[] = Array.isArray(rows) ? rows : [];
+      dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, section: section, isSelectRow: false } });
+      dispatch({ type: "selectRow", payload: { row: row - 1, isSelectRow: true } });
+      dispatch({ type: "selectSeat", payload: { seat: seat - 1 } });
+    };
+    if (location.state) {
+      getSeat();
+    }
+  }, []);
   const handlerSection = async (section: string) => {
     const rows = await api.getRows(section);
     const sectionAry: number[] = Array.isArray(rows) ? rows : [];
 
     dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, section: section, isSelectRow: false } });
+    dispatch({ type: "selectRow", payload: { row: 0, isSelectRow: true } });
   };
 
   const handlerComment = async (id: string) => {

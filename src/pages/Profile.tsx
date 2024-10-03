@@ -235,12 +235,12 @@ function Profile() {
         profile.avatar = url;
       }
       const update = {
-        avatar: state.selectPhoto ? url : state.profile.avatar,
+        avatar: state.selectPhoto ? (url as string) : (state.profile.avatar as string),
         userName: state.editUserName,
         UID: state.profile.UID,
       };
       await api.updateUser(state.profile.id as string, update);
-
+      authContext?.setUser((prev) => ({ ...prev, ...update }));
       dispatch({ type: "setProfile", payload: { profile } });
       dispatch({ type: "toggleIsEditProfile" });
     }
@@ -251,7 +251,11 @@ function Profile() {
       dispatch({ type: "setPhoto", payload: { selectPhoto: target.files[0], localPhotoUrl: URL.createObjectURL(target.files[0]) } });
     }
   };
-  const handleViewPostClick = () => {};
+  const handleViewPostClick = (section: string, row: number, seat: number) => {
+    navigate("/view", {
+      state: { section, row, seat },
+    });
+  };
 
   return (
     <Container>
@@ -272,7 +276,7 @@ function Profile() {
       {state.viewPosts.length !== 0 ? (
         <PostContainer>
           {state.viewPosts.map((item) => (
-            <PostItem key={item.id} onClick={() => handleViewPostClick()}>
+            <PostItem key={item.id} onClick={() => handleViewPostClick(item.section as string, item.row as number, item.seat as number)}>
               <StyleLink to={`/view`}>
                 <PostTextContainer>
                   <PostTitle>{`${item.section}區${item.row}排${item.seat}號`}</PostTitle>

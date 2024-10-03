@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import SignUp from "./SignUp";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import LogIn from "./Login";
 import api from "../../utils/api";
 import { useNavigate } from "react-router-dom";

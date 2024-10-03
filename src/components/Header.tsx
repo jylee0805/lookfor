@@ -8,6 +8,7 @@ import { AuthContext } from "../utils/AuthContextProvider";
 import { MdMenu } from "react-icons/md";
 import { MdOutlineClose } from "react-icons/md";
 import { IoMdNotifications } from "react-icons/io";
+import Profile from "../pages/Profile";
 
 const StyleClose = styled(MdOutlineClose)`
   font-size: 24px;
@@ -341,6 +342,7 @@ function Header() {
   const handlerLogout = async () => {
     const loginState = await api.userLogOut();
     authContext?.setLoginState(loginState as string);
+    authContext?.setUser({} as Profile);
     dispatch({ type: "toggleIsPersonalClick" });
   };
 
