@@ -35,6 +35,7 @@ import { MerchPost } from "../pages/FansSupport";
 import { Place, PlaceAvailable } from "../pages/TransportationDriving";
 import Profile from "../pages/Profile";
 import { Notify } from "../components/Header";
+import { AllPost } from "../pages/View";
 
 interface Data {
   content: string;
@@ -324,14 +325,14 @@ const api = {
     return unsubscribe;
   },
 
-  async getAllViewPost(section: string, row: number) {
+  async getAllViewPost(section: string) {
     try {
-      const q = query(collection(db, "viewPosts"), where("section", "==", section), where("row", "==", row));
+      const q = query(collection(db, "viewPosts"), where("section", "==", section));
 
       const querySnapshot = await getDocs(q);
-      const allView: number[] = [];
+      const allView: AllPost[] = [];
       querySnapshot.forEach((doc) => {
-        allView.push(doc.data().seat);
+        allView.push({ row: doc.data().row, seat: doc.data().seat });
       });
       console.log(querySnapshot);
 

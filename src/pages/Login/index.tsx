@@ -8,6 +8,7 @@ import { AuthContext } from "../../utils/AuthContextProvider";
 
 const Container = styled.div`
   padding: 40px 5%;
+  color: #000;
 `;
 const Card = styled.div`
   width: 480px;

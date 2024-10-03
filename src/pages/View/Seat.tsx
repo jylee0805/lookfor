@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { PostState, Comment, Action } from "./index";
+import { PostState, Comment, Action, AllPost } from "./index";
 import api from "../../utils/api";
 import { IoSend } from "react-icons/io5";
 import { MdOutlineMoreVert } from "react-icons/md";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../utils/AuthContextProvider";
 import defaultSeat from "../../images/defaultSeat.png";
 import selectSeat from "../../images/selectSeat.png";
@@ -242,6 +242,7 @@ interface Props {
     viewComments: Comment[];
     comment: { [key: string]: string };
     isCommentEditMode: string;
+    allSectionPost: AllPost[] | undefined;
   };
   dispatch: React.Dispatch<Action>;
   handlerComment: (id: string) => void;
@@ -255,20 +256,9 @@ interface CommentEdit {
 
 function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Props) {
   const { register: registerEditComment, setValue, handleSubmit: handlerEditComment } = useForm<CommentEdit>();
-
   const [isMoreClick, setIsMoreClick] = useState<string>("");
-  const [allViewPost, setAllViewPost] = useState<number[] | undefined>([]);
   const authContext = useContext(AuthContext);
-  useEffect(() => {
-    const getAllView = async () => {
-      const allView = await api.getAllViewPost(state.section, state.row + 1);
-      console.log(allView);
 
-      setAllViewPost(allView);
-    };
-    getAllView();
-    console.log(state);
-  }, [state.row]);
   const createSubmitHandler = (postId: string, commentId: string): SubmitHandler<CommentEdit> => {
     const onSubmitEditComment: SubmitHandler<CommentEdit> = async (data) => {
       await api.updateComment(postId, commentId, data.comment);
@@ -314,7 +304,7 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
           <SeatBtn
             key={index}
             selected={state.seat === index}
-            haveData={allViewPost?.includes(index + 1) ?? false}
+            haveData={state.allSectionPost?.some((item) => item.row === state.row + 1 && item.seat === index + 1) ?? false}
             onClick={() => {
               handlerSeat(index);
             }}

@@ -1,5 +1,7 @@
 import styled from "styled-components";
-import { Action } from ".";
+import { Action, AllPost } from ".";
+import api from "../../utils/api";
+import { useEffect } from "react";
 
 const RowSection = styled.div<{ isSelectSection: boolean; col: boolean }>`
   display: ${(props) => (props.isSelectSection ? "grid" : "none")};
@@ -34,11 +36,13 @@ const Title = styled.h4`
     font-size: 1.2rem;
   }
 `;
-const RowBtn = styled.button<{ col: boolean }>`
+const RowBtn = styled.button<{ col: boolean; haveData: boolean }>`
   display: block;
   width: 100%;
   margin-bottom: 10px;
   border: none;
+
+  background: ${(props) => (props.haveData ? "#f9ffa7" : "fff")};
   grid-column: ${(props) => (props.col ? "span 1" : "span 3")};
   &:hover {
     background: #ebebeb;
@@ -51,11 +55,21 @@ interface Props {
     row: number;
     seat: number;
     isSelectSection: boolean;
+    allSectionPost: AllPost[] | undefined;
   };
   dispatch: React.Dispatch<Action>;
 }
 
 function Rows({ state, dispatch }: Props) {
+  useEffect(() => {
+    const getAllView = async () => {
+      const allView = await api.getAllViewPost(state.section);
+      console.log(allView);
+      dispatch({ type: "setAllSectionPost", payload: { allSectionPost: allView as AllPost[] } });
+    };
+    getAllView();
+    console.log(state);
+  }, [state.section]);
   return (
     <RowSection isSelectSection={state.isSelectSection} col={state.rowSeats.length > 10}>
       <Title>{state.section}區</Title>
@@ -63,6 +77,7 @@ function Rows({ state, dispatch }: Props) {
         <RowBtn
           key={index}
           col={state.rowSeats.length > 10}
+          haveData={state.allSectionPost?.some((item) => item.row === index + 1) ?? false}
           onClick={() => {
             dispatch({ type: "selectRow", payload: { row: index, isSelectRow: true } });
             // dispatch({ type: "isSelectRow", payload: { isSelectRow: true } });

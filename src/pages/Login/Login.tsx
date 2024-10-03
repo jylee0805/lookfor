@@ -30,7 +30,10 @@ const Input = styled.input`
 const LoginBtn = styled(Input)`
   margin-top: 20px;
 `;
-
+const Error = styled.span`
+  margin-top: -20px;
+  color: #ff6262;
+`;
 interface Props {
   isLogin: boolean;
 }
@@ -47,31 +50,77 @@ function LogIn({ isLogin }: Props) {
   const {
     register,
     handleSubmit,
+    setFocus,
     formState: { errors },
+    setError,
+    getValues,
+    clearErrors,
   } = useForm<FormInputs>();
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     const response = await api.userLogIn(data.email, data.password);
     console.log(response);
     if (response === "Firebase: Error (auth/invalid-credential).") {
-      alert("帳號或密碼有誤");
+      setError("password", {
+        type: "manual",
+        message: "帳號或密碼有誤",
+      });
       return;
     } else if (response === "Firebase: Error (auth/invalid-email).") {
-      alert("無效的 mail");
+      setError("email", {
+        type: "manual",
+        message: "無效的 mail",
+      });
       return;
     }
 
-    authContext?.setLoginState(response.uid as string);
+    if (typeof response !== "string" && response.uid) {
+      authContext?.setLoginState(response.uid);
+    }
     navigate("/");
+  };
+
+  const handlerKeyDown = (e: React.KeyboardEvent, nextFieldName: keyof FormInputs | null) => {
+    const currentValue = getValues();
+    console.log(e.currentTarget);
+
+    if (e.keyCode === 13) {
+      if (nextFieldName) {
+        const regex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+        if (!regex.test(currentValue.email)) {
+          setError("email", {
+            type: "manual",
+            message: "請輸入正確的電子郵件",
+          });
+          return; // Exit if validation fails
+        }
+        clearErrors();
+        setFocus(nextFieldName);
+      } else {
+        handleSubmit(onSubmit)(e);
+      }
+    }
   };
 
   return (
     <LoginBox isLogin={isLogin}>
-      <Input type="email" placeholder="請輸入電子信箱" defaultValue="" {...register("email", { required: "請輸入電子信箱" })} />
-      {errors.email && <span>{errors.email.message}</span>}
-      <Input type="password" placeholder="請輸入密碼" defaultValue="" {...register("password", { required: "請輸入密碼" })} />
+      <Input
+        type="email"
+        placeholder="請輸入電子信箱"
+        defaultValue=""
+        {...register("email", {
+          required: "請輸入電子信箱",
+          pattern: {
+            value: /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/,
+            message: "請輸入正確的電子郵件",
+          },
+        })}
+        onKeyDown={(e) => handlerKeyDown(e, "password")}
+      />
+      {errors.email && <Error>{errors.email.message}</Error>}
+      <Input type="password" placeholder="請輸入密碼" defaultValue="" {...register("password", { required: "請輸入密碼" })} onKeyDown={(e) => handlerKeyDown(e, null)} />
+      {errors.password && <Error>{errors.password.message}</Error>}
       <LoginBtn type="button" value="登入" onClick={handleSubmit(onSubmit)} />
-      {errors.password && <span>{errors.password.message}</span>}
     </LoginBox>
   );
 }

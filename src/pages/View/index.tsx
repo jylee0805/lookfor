@@ -135,6 +135,11 @@ interface State {
   isLoading: boolean;
   isCommentEditMode: string;
   isPostEditMode: PostState;
+  allSectionPost: AllPost[] | undefined;
+}
+export interface AllPost {
+  row: number;
+  seat: number;
 }
 
 export type Action =
@@ -151,7 +156,8 @@ export type Action =
   | { type: "isSelectSection" }
   | { type: "setLoading" }
   | { type: "toggleCommentMode"; payload: { isCommentEditMode: string } }
-  | { type: "setPostMode"; payload: { isPostEditMode: PostState } };
+  | { type: "setPostMode"; payload: { isPostEditMode: PostState } }
+  | { type: "setAllSectionPost"; payload: { allSectionPost: AllPost[] } };
 
 const initial: State = {
   allSeats: [],
@@ -171,6 +177,7 @@ const initial: State = {
   isLoading: false,
   isCommentEditMode: "",
   isPostEditMode: { id: "" },
+  allSectionPost: [],
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -221,6 +228,9 @@ const reducer = (state: State, action: Action): State => {
     }
     case "setPostMode": {
       return { ...state, isPostEditMode: action.payload.isPostEditMode };
+    }
+    case "setAllSectionPost": {
+      return { ...state, allSectionPost: action.payload.allSectionPost };
     }
     default:
       return state;
