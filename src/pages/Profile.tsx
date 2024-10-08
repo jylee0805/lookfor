@@ -1,14 +1,15 @@
-import { useContext, useEffect, useReducer } from "react";
+import { useContext, useEffect, useReducer, useState } from "react";
 import styled from "styled-components";
 import api from "../utils/api";
 import { AuthContext } from "../utils/AuthContextProvider";
 import { PostState } from "../pages/View";
 import { MerchPost } from "../pages/FansSupport";
 import { Link, useNavigate } from "react-router-dom";
+import Loading from "../components/Loading";
 
 const Container = styled.div`
   padding: 60px 60px;
-  @media (max-width: 768px) {
+  @media (max-width: 992px) {
     padding: 60px 40px;
   }
   @media (max-width: 575px) {
@@ -39,13 +40,12 @@ const UserName = styled.p`
 const EditBtn = styled.button``;
 const PostContainer = styled.ul`
   display: flex;
-  overflow: scroll;
+  overflow-x: auto;
   column-gap: 20px;
-  overflow-y: hidden;
   padding: 20px 0;
   margin-bottom: 25px;
   &::-webkit-scrollbar {
-    height: 10px;
+    height: 8px;
   }
   &::-webkit-scrollbar-track {
     background-color: #fff3e7;
@@ -53,7 +53,7 @@ const PostContainer = styled.ul`
   }
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: #ff9e5a;
+    background-color: #3f3f3f;
   }
 `;
 
@@ -62,7 +62,7 @@ const PostImg = styled.img`
   border-radius: 8px;
 `;
 const PostImgBox = styled.div`
-  width: 180px;
+  width: 100%;
   height: 150px;
   text-align: center;
   margin-top: 20px;
@@ -102,6 +102,8 @@ const PostItem = styled.li`
 `;
 const StyleLink = styled(Link)`
   color: #000;
+  display: block;
+  min-width: 240px;
 `;
 const PostTitle = styled.p`
   font-weight: 700;
@@ -199,17 +201,26 @@ function Profile() {
   const [state, dispatch] = useReducer(reducer, initial);
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
-
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    // 假设在一开始或某个资源加载完成后我们设置 loaded 状态
+    setTimeout(() => {
+      setLoaded(true);
+      document.body.style.overflowY = "auto";
+    }, 2000);
+  }, []);
   useEffect(() => {
     const getData = async () => {
       if (authContext) {
-        const concertName = [];
+        const concertName: string[] = [];
         const user = await api.getUser(authContext.loginState as string);
         const viewPosts = await api.getUserViewPosts(authContext?.loginState as string);
         const merchPosts = await api.getUserMerchPosts(authContext?.loginState as string);
         for (const item of merchPosts) {
           const concert = await api.getConcert(item.concertId);
+
           concertName.push(concert?.concertName);
+          console.log(concert);
         }
 
         dispatch({ type: "setData", payload: { profile: user as Profile, viewPosts: viewPosts, supportPosts: merchPosts, concertNames: concertName, editUserName: user.userName } });
@@ -259,6 +270,7 @@ function Profile() {
 
   return (
     <Container>
+      {!loaded && <Loading />}
       <ProfileContainer>
         <HeadShot src={state.localPhotoUrl === "" ? state.profile.avatar : state.localPhotoUrl} />
         {state.isEditProfile ? (
@@ -291,7 +303,7 @@ function Profile() {
           ))}
         </PostContainer>
       ) : (
-        <Hint>你還沒有發佈過視角文章喔</Hint>
+        <Hint>尚未發布視角文章</Hint>
       )}
 
       <Title>我的應援發放公告</Title>
@@ -314,7 +326,7 @@ function Profile() {
           ))}
         </PostContainer>
       ) : (
-        <Hint>你還沒有發佈過視角文章喔</Hint>
+        <Hint>尚未發布應援物資訊</Hint>
       )}
     </Container>
   );

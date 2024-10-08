@@ -52,8 +52,8 @@ function LoginDialog() {
     const target = e.target as HTMLButtonElement;
     if (target.value === "cancel") {
       componentContext?.setIsDialogOpen(false);
-      document.body.style.overflow = "scroll";
     } else {
+      componentContext?.setIsDialogOpen(false);
       navigate("/login");
     }
   };

@@ -1,14 +1,17 @@
 import styled from "styled-components";
 import { useLoadScript, GoogleMap, MarkerF } from "@react-google-maps/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import pin from "../images/pin.png";
 import selectPin from "../images/selectPin.png";
 import api from "../utils/api";
 import proj4 from "proj4";
 import VenueHeader from "../components/VenueHeader";
 import CustomMarkerLabel from "../components/CustomLabel";
+import Loading from "../components/Loading";
 
-const Container = styled.div``;
+const Container = styled.div`
+  padding: 0 30px;
+`;
 
 const Main = styled.main`
   width: 80%;
@@ -34,17 +37,17 @@ const SubTitle = styled.h4`
   letter-spacing: 10px;
   padding: 0 50px;
   display: flex;
-  margin: auto;
+  justify-content: center;
   @media (max-width: 992px) {
     padding: 0;
   }
   @media (max-width: 575px) {
-    font-size: 1.5rem;
   }
 `;
 const ParkSubTitle = styled(SubTitle)`
   grid-column: span 2;
   margin: 0;
+  justify-content: flex-start;
   @media (max-width: 992px) {
     grid-column: span 1;
   }
@@ -60,7 +63,7 @@ const Away = styled.p`
   }
 `;
 const Detail = styled.div`
-  padding: 50px 0 20px;
+  padding: 0px 0 20px;
   @media (max-width: 992px) {
     grid-template-columns: auto;
     padding: 0;
@@ -114,16 +117,20 @@ const PlaceContent = styled.div`
 `;
 const PlaceTitle = styled.p`
   font-size: 1.2rem;
-
   font-weight: 700;
   margin-bottom: 10px;
 `;
 const PlaceName = styled.p`
+  font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 10px;
 `;
 const PlaceText = styled.p`
   line-height: 1.8;
+`;
+const GoogleLink = styled.a`
+  color: #fff;
+  text-decoration: underline;
 `;
 
 export interface Place {
@@ -163,7 +170,9 @@ function TransportationDriving() {
   const wgs84Max = [121.60305597786436, 25.056169036644455];
   const tw97Max = proj4(wgs84, tw97, wgs84Max);
   const tw97Min = proj4(wgs84, tw97, wgs84Min);
-
+  useEffect(() => {
+    document.body.style.overflowY = "auto";
+  }, []);
   const onLoad = async () => {
     try {
       const res = await api.getParkInfo(tw97Max, tw97Min); // 直接在 onLoad 中呼叫 getParkInfo
@@ -192,16 +201,17 @@ function TransportationDriving() {
       console.error("Error loading park info:", error);
     }
   };
+
   const handleMarkerClick = (place: Place) => {
     setSelectedMarker(place);
     console.log(place);
   };
-  if (!isLoaded) return <div>Loading...</div>;
+  if (!isLoaded) return <Loading />;
 
   return (
     <Container>
       <VenueHeader />
-
+      {/* {!loaded && <Loading />} */}
       <Main>
         <Content>
           <SubTitle>自行開車</SubTitle>
@@ -228,7 +238,7 @@ function TransportationDriving() {
                       onClick={() => handleMarkerClick(place)}
                       icon={{
                         url: place.name === selectedMarker?.name ? selectPin : pin,
-                        scaledSize: new window.google.maps.Size(45, 50),
+                        scaledSize: new window.google.maps.Size(65, 65),
                       }}
                       // label={{
                       //   text: place.availablecar === undefined ? " " : place.availablecar === -9 ? "0" : place.availablecar.toString(),
@@ -250,12 +260,14 @@ function TransportationDriving() {
               {selectedMarker && (
                 <PlaceContent>
                   <PlaceName>{selectedMarker.name}</PlaceName>
+                  {selectedMarker.availablecar && <PlaceName>目前剩餘車位：{selectedMarker.availablecar === -9 ? "0" : selectedMarker.availablecar}</PlaceName>}
+
                   <PlaceText>開放時間：{selectedMarker.openTime}</PlaceText>
                   <PlaceText>停車位：{selectedMarker.parkNum}</PlaceText>
                   <PlaceText>費用：{selectedMarker.fee}</PlaceText>
-                  <a href={`https://www.google.com/maps/dir/?api=1&origin=臺北流行音樂中心&destination=${selectedMarker.lat},${selectedMarker.lng}`} target="blank">
+                  <GoogleLink href={`https://www.google.com/maps/dir/?api=1&origin=臺北流行音樂中心&destination=${selectedMarker.lat},${selectedMarker.lng}`} target="blank">
                     在 Google 上查看
-                  </a>
+                  </GoogleLink>
                 </PlaceContent>
               )}
             </Place>

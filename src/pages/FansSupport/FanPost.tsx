@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 const Container = styled.div<{ isPostClick: boolean }>`
   width: 60%;
-  padding: 20px 30px;
+  padding: 20px 50px;
   display: ${(props) => (props.isPostClick ? "block" : "none")};
   position: fixed;
   background: #ffffff;
@@ -126,6 +126,7 @@ export interface FormInputs {
   qualify: string;
   more: string;
   image: object;
+  item: string;
 }
 interface Props {
   concert: Concerts;
@@ -143,19 +144,21 @@ function FanPost({ concert, state, dispatch }: Props) {
   useEffect(() => {
     if (state.isEditMode.passDay) {
       const values = {
+        item: state.isEditMode.item,
         day: state.isEditMode.passDay,
         time: dayjs(state.isEditMode.passTime, "HH:mm"),
         status: state.isEditMode.passState,
         place: state.isEditMode.passPlace,
         qualify: state.isEditMode.qualify,
         more: state.isEditMode.content,
+
         // image: state.isEditMode.image,
       };
       reset(values);
     }
   }, [state.isEditMode]);
 
-  const day = concert?.date.map((item) => {
+  const day = concert?.date?.map((item) => {
     if (item) {
       const dayOnly = item.split(" ")[0] + " " + item.split(" ")[1];
       return dayOnly;
@@ -196,6 +199,7 @@ function FanPost({ concert, state, dispatch }: Props) {
 
     const allData = {
       concertId: concert.id,
+      item: data.item,
       content: data.more,
       qualify: data.qualify,
       passPlace: data.place,
@@ -207,7 +211,7 @@ function FanPost({ concert, state, dispatch }: Props) {
     };
     if (state.isEditMode.id) {
       if (state.isEditMode.passState !== data.status) {
-        api.setNotify(state.isEditMode.id, concert.id, data.status);
+        api.setNotify(state.isEditMode.id, concert.id, data.status, state.isEditMode.item);
       }
       await api.updateMerchPost(state.isEditMode.id, allData);
     } else {
@@ -242,6 +246,8 @@ function FanPost({ concert, state, dispatch }: Props) {
     <Container isPostClick={state.isPostClick}>
       <Title>建立資訊</Title>
       <InputContainer>
+        <Label>應援物品</Label>
+        <QualifyInput type="text" {...register("item", { required: true })} />
         <Label>日期</Label>
         <Select {...register("day", { required: true })}>
           <option value="">請選擇日期</option>

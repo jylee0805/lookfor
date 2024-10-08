@@ -17,22 +17,20 @@ const Input = styled.input`
   padding: 10px 20px;
   display: block;
   width: 100%;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.5;
   @media (max-width: 575px) {
-    font-size: 14px;
   }
 `;
 const Label = styled.label`
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.5;
-  color: #000;
+  color: #fff;
   @media (max-width: 575px) {
-    font-size: 14px;
   }
 `;
 const Require = styled.span`
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.5;
   color: #dc3131;
 `;

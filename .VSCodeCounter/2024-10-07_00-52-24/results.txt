@@ -1,0 +1,110 @@
+Date : 2024-10-07 00:52:24
+Directory : d:\WEB\lookfor
+Total : 65 files,  12436 codes, 93 comments, 523 blanks, all 13052 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| TypeScript JSX     |         30 |      5,828 |         79 |        385 |      6,292 |
+| JSON               |          7 |      5,646 |          4 |          9 |      5,659 |
+| TypeScript         |          5 |        744 |         10 |         83 |        837 |
+| CSS                |          1 |         61 |          0 |          8 |         69 |
+| XML                |         18 |         54 |          0 |         18 |         72 |
+| Markdown           |          1 |         40 |          0 |         11 |         51 |
+| HTML               |          1 |         27 |          0 |          6 |         33 |
+| JavaScript         |          1 |         27 |          0 |          2 |         29 |
+| JSON with Comments |          1 |          9 |          0 |          1 |         10 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                  | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                     |         65 |     12,436 |         93 |        523 |     13,052 |
+| . (Files)                                             |         12 |      5,758 |          5 |         30 |      5,793 |
+| src                                                   |         53 |      6,678 |         88 |        493 |      7,259 |
+| src (Files)                                           |          5 |        336 |          3 |         28 |        367 |
+| src\components                                        |          6 |        838 |         31 |         46 |        915 |
+| src\images                                            |         18 |         54 |          0 |         18 |         72 |
+| src\pages                                             |         18 |      4,782 |         47 |        301 |      5,130 |
+| src\pages (Files)                                     |          6 |        959 |         21 |         56 |      1,036 |
+| src\pages\Concert                                     |          1 |        184 |          8 |         14 |        206 |
+| src\pages\ConcertList                                 |          1 |        245 |          1 |         27 |        273 |
+| src\pages\FansSupport                                 |          2 |        803 |          6 |         53 |        862 |
+| src\pages\Login                                       |          3 |        444 |          0 |         34 |        478 |
+| src\pages\View                                        |          5 |      2,147 |         11 |        117 |      2,275 |
+| src\utils                                             |          6 |        668 |          7 |        100 |        775 |
++-------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                              | language           | code       | comment    | blank      | total      |
++-------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| d:\WEB\lookfor\README.md                              | Markdown           |         40 |          0 |         11 |         51 |
+| d:\WEB\lookfor\eslint.config.js                       | JavaScript         |         27 |          0 |          2 |         29 |
+| d:\WEB\lookfor\firebase.json                          | JSON               |         12 |          0 |          1 |         13 |
+| d:\WEB\lookfor\index.html                             | HTML               |         27 |          0 |          6 |         33 |
+| d:\WEB\lookfor\package-lock.json                      | JSON               |      5,537 |          0 |          1 |      5,538 |
+| d:\WEB\lookfor\package.json                           | JSON               |         57 |          0 |          1 |         58 |
+| d:\WEB\lookfor\src\App.tsx                            | TypeScript JSX     |         40 |          1 |          6 |         47 |
+| d:\WEB\lookfor\src\GlobalStyle.ts                     | TypeScript         |        199 |          1 |         10 |        210 |
+| d:\WEB\lookfor\src\components\ConcertHeader.tsx       | TypeScript JSX     |          0 |          0 |          1 |          1 |
+| d:\WEB\lookfor\src\components\CustomLabel.tsx         | TypeScript JSX     |         31 |          0 |          3 |         34 |
+| d:\WEB\lookfor\src\components\Header.tsx              | TypeScript JSX     |        457 |          5 |         26 |        488 |
+| d:\WEB\lookfor\src\components\Loading.tsx             | TypeScript JSX     |        105 |          0 |          4 |        109 |
+| d:\WEB\lookfor\src\components\LoginDialog.tsx         | TypeScript JSX     |         74 |          0 |          4 |         78 |
+| d:\WEB\lookfor\src\components\VenueHeader.tsx         | TypeScript JSX     |        171 |         26 |          8 |        205 |
+| d:\WEB\lookfor\src\images\Vector 7-1.svg              | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 7-2.svg              | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 7.svg                | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 8.svg                | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-1.svg              | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-10.svg             | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-11.svg             | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-12.svg             | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-13.svg             | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-2.svg              | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-3.svg              | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-4.svg              | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-5.svg              | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-6.svg              | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-7.svg              | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-8.svg              | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9-9.svg              | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\images\Vector 9.svg                | XML                |          3 |          0 |          1 |          4 |
+| d:\WEB\lookfor\src\index.css                          | CSS                |         61 |          0 |          8 |         69 |
+| d:\WEB\lookfor\src\main.tsx                           | TypeScript JSX     |         36 |          0 |          3 |         39 |
+| d:\WEB\lookfor\src\pages\Background.tsx               | TypeScript JSX     |         61 |          0 |          4 |         65 |
+| d:\WEB\lookfor\src\pages\ConcertList\index.tsx        | TypeScript JSX     |        245 |          1 |         27 |        273 |
+| d:\WEB\lookfor\src\pages\Concert\index.tsx            | TypeScript JSX     |        184 |          8 |         14 |        206 |
+| d:\WEB\lookfor\src\pages\FansSupport\FanPost.tsx      | TypeScript JSX     |        272 |          3 |         19 |        294 |
+| d:\WEB\lookfor\src\pages\FansSupport\index.tsx        | TypeScript JSX     |        531 |          3 |         34 |        568 |
+| d:\WEB\lookfor\src\pages\Home.tsx                     | TypeScript JSX     |         78 |          4 |          7 |         89 |
+| d:\WEB\lookfor\src\pages\Keep.tsx                     | TypeScript JSX     |        139 |          0 |          8 |        147 |
+| d:\WEB\lookfor\src\pages\Login\Login.tsx              | TypeScript JSX     |        153 |          0 |         16 |        169 |
+| d:\WEB\lookfor\src\pages\Login\SignUp.tsx             | TypeScript JSX     |        223 |          0 |         13 |        236 |
+| d:\WEB\lookfor\src\pages\Login\index.tsx              | TypeScript JSX     |         68 |          0 |          5 |         73 |
+| d:\WEB\lookfor\src\pages\Profile.tsx                  | TypeScript JSX     |        317 |          1 |         14 |        332 |
+| d:\WEB\lookfor\src\pages\TransportationDriving.tsx    | TypeScript JSX     |        250 |         16 |         18 |        284 |
+| d:\WEB\lookfor\src\pages\TransportationPublic.tsx     | TypeScript JSX     |        114 |          0 |          5 |        119 |
+| d:\WEB\lookfor\src\pages\View\Post.tsx                | TypeScript JSX     |        426 |          0 |         34 |        460 |
+| d:\WEB\lookfor\src\pages\View\Rows.tsx                | TypeScript JSX     |        105 |          7 |          7 |        119 |
+| d:\WEB\lookfor\src\pages\View\Seat.tsx                | TypeScript JSX     |        545 |          0 |         20 |        565 |
+| d:\WEB\lookfor\src\pages\View\Sections.tsx            | TypeScript JSX     |        664 |          0 |         11 |        675 |
+| d:\WEB\lookfor\src\pages\View\index.tsx               | TypeScript JSX     |        407 |          4 |         45 |        456 |
+| d:\WEB\lookfor\src\utils\AuthContextProvider.tsx      | TypeScript JSX     |         39 |          0 |          9 |         48 |
+| d:\WEB\lookfor\src\utils\ComponentContextProvider.tsx | TypeScript JSX     |         16 |          0 |          3 |         19 |
+| d:\WEB\lookfor\src\utils\ConcertContextProvider.tsx   | TypeScript JSX     |         24 |          0 |         10 |         34 |
+| d:\WEB\lookfor\src\utils\api.ts                       | TypeScript         |        487 |          7 |         67 |        561 |
+| d:\WEB\lookfor\src\utils\firebase.ts                  | TypeScript         |         49 |          0 |          4 |         53 |
+| d:\WEB\lookfor\src\utils\useGoogleVisionAPI.tsx       | TypeScript JSX     |         53 |          0 |          7 |         60 |
+| d:\WEB\lookfor\src\vite-env.d.ts                      | TypeScript         |          0 |          1 |          1 |          2 |
+| d:\WEB\lookfor\tsconfig.app.json                      | JSON               |         20 |          2 |          3 |         25 |
+| d:\WEB\lookfor\tsconfig.app.tsbuildinfo               | JSON               |          1 |          0 |          0 |          1 |
+| d:\WEB\lookfor\tsconfig.json                          | JSON with Comments |          9 |          0 |          1 |         10 |
+| d:\WEB\lookfor\tsconfig.node.json                     | JSON               |         18 |          2 |          3 |         23 |
+| d:\WEB\lookfor\tsconfig.node.tsbuildinfo              | JSON               |          1 |          0 |          0 |          1 |
+| d:\WEB\lookfor\vite.config.ts                         | TypeScript         |          9 |          1 |          1 |         11 |
+| Total                                                 |                    |     12,436 |         93 |        523 |     13,052 |
++-------------------------------------------------------+--------------------+------------+------------+------------+------------+

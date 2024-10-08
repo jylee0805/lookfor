@@ -77,7 +77,7 @@ const api = {
     return list;
   },
 
-  async setNotify(postId: string, concertId: string, state: string) {
+  async setNotify(postId: string, concertId: string, state: string, item: string) {
     const stateText = state === "0" ? "未發放" : state === "1" ? "發放中" : "發放完畢";
     const q = query(collection(db, "users"), where("keepIds", "array-contains", postId));
     const querySnapshot = await getDocs(q);
@@ -85,7 +85,7 @@ const api = {
       console.log(doc.data());
       const notifyRef = collection(db, "users", doc.id, "notify");
       await addDoc(notifyRef, {
-        title: "收藏的文章狀態已更新",
+        title: `${item}的發放狀態已更新`,
         message: `${stateText}`,
         createdTime: serverTimestamp(),
         isRead: false,
@@ -325,14 +325,15 @@ const api = {
     return unsubscribe;
   },
 
-  async getAllViewPost(section: string) {
+  async getAllSectionViewPost() {
     try {
-      const q = query(collection(db, "viewPosts"), where("section", "==", section));
+      const q = query(collection(db, "viewPosts"));
 
       const querySnapshot = await getDocs(q);
+      console.log(querySnapshot);
       const allView: AllPost[] = [];
       querySnapshot.forEach((doc) => {
-        allView.push({ row: doc.data().row, seat: doc.data().seat });
+        allView.push({ section: doc.data().section, row: doc.data().row, seat: doc.data().seat, img: doc.data().image });
       });
       console.log(querySnapshot);
 
@@ -448,8 +449,9 @@ const api = {
   async getConcert(id: string) {
     const q = doc(db, "concerts", `${id}`);
     const querySnapshot = await getDoc(q);
-    console.log(querySnapshot.data());
-    return { ...querySnapshot.data(), id: querySnapshot.id };
+    const data = { ...querySnapshot.data(), id: querySnapshot.id } as Concerts;
+    console.log(data);
+    return data;
   },
   async getConcertDetail(concert: string) {
     const q = query(collection(db, `concerts/${concert}/details`));

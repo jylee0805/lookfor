@@ -1,12 +1,24 @@
 import { createGlobalStyle } from "styled-components";
-import chfont from "./utils/ChenYuluoyan-Thin-Monospaced.ttf";
+
+import swei600 from "./utils/SweiGothicCJKtc-Medium.ttf";
+
+import swei700 from "./utils/SweiGothicCJKtc-Bold.ttf";
+
 const GlobalStyle = createGlobalStyle`
 
 
 @font-face {
-  font-family: "chyu";
-  src: url("${chfont}") format("TrueType");
+  font-family: "swei";
+  src: url("${swei700}") format("TrueType");
+  font-weight: 700;
 }
+@font-face {
+  font-family: "swei";
+  src: url("${swei600}") format("TrueType");
+ 
+}
+
+
 
 html,
 body,
@@ -149,10 +161,18 @@ img {
     --secondary-color: #fff;
 }
 html{
+  font-family: "swei",sans-serif;
   font-size: 16px;
-  
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+  @media (max-width: 575px) {
+    font-size: 12px;
+
+  }
 }
 body {
+ 
   &::-webkit-scrollbar {
     width: 10px;
   }
@@ -193,6 +213,17 @@ body {
 a {
   text-decoration: none;
 }
-
+.react-loading-skeleton {
+  line-height:inherit; 
+}
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2rem;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
 `;
 export default GlobalStyle;

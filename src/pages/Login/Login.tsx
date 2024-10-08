@@ -20,10 +20,9 @@ const Input = styled.input`
   padding: 10px 20px;
   display: block;
   width: 100%;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.5;
   @media (max-width: 575px) {
-    font-size: 14px;
   }
 `;
 
@@ -34,6 +33,33 @@ const Error = styled.span`
   margin-top: -20px;
   color: #ff6262;
 `;
+
+const OrBox = styled.div`
+  display: flex;
+  align-items: center;
+`;
+const Or = styled.p`
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #ffffff;
+  margin: 0 8px;
+  @media (max-width: 575px) {
+  }
+`;
+const Line = styled.div`
+  height: 1px;
+  width: 100%;
+  background: #d2d2d2;
+  flex-grow: 1;
+`;
+const GoogleBtn = styled.button`
+  display: block;
+  width: 100%;
+  background: #ffffff;
+  @media (max-width: 575px) {
+  }
+`;
+
 interface Props {
   isLogin: boolean;
 }
@@ -101,7 +127,14 @@ function LogIn({ isLogin }: Props) {
       }
     }
   };
+  const handlerGoogleLogin = async () => {
+    const response = await api.userLogInGoogle();
 
+    if (response) {
+      authContext?.setLoginState(response as string);
+      navigate("/");
+    }
+  };
   return (
     <LoginBox isLogin={isLogin}>
       <Input
@@ -121,6 +154,13 @@ function LogIn({ isLogin }: Props) {
       <Input type="password" placeholder="請輸入密碼" defaultValue="" {...register("password", { required: "請輸入密碼" })} onKeyDown={(e) => handlerKeyDown(e, null)} />
       {errors.password && <Error>{errors.password.message}</Error>}
       <LoginBtn type="button" value="登入" onClick={handleSubmit(onSubmit)} />
+
+      <OrBox>
+        <Line />
+        <Or>or</Or>
+        <Line />
+      </OrBox>
+      <GoogleBtn onClick={handlerGoogleLogin}>Login with Google</GoogleBtn>
     </LoginBox>
   );
 }

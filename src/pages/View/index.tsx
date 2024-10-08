@@ -9,17 +9,16 @@ import { AuthContext } from "../../utils/AuthContextProvider";
 import { ComponentContext } from "../../utils/ComponentContextProvider";
 import VenueHeader from "../../components/VenueHeader";
 import LoginDialog from "../../components/LoginDialog";
-import { MdOutlineAdd } from "react-icons/md";
 import { useLocation } from "react-router-dom";
+import Loading from "../../components/Loading";
+import leftEyes from "../../images/leftEyes.png";
+import rightEyes from "../../images/rightEyes.png";
 
-const StyleAdd = styled(MdOutlineAdd)`
-  font-size: 24px;
-  margin-left: 12px;
-  margin-right: 4px;
-`;
 const Container = styled.div`
   width: 100%;
   max-width: 100vw; /* 確保容器寬度不超出螢幕 */
+  position: relative;
+  padding: 0 30px;
 `;
 const Mask = styled.div<{ postClick: boolean }>`
   display: ${(props) => (props.postClick ? "block" : "none")};
@@ -31,63 +30,82 @@ const Mask = styled.div<{ postClick: boolean }>`
   bottom: 0;
   right: 0;
   left: 0;
-  z-index: 1;
+  z-index: 15;
   backdrop-filter: blur(10px);
 `;
 
 const Main = styled.main`
-  max-width: 80%;
+  max-width: 75%;
   margin: 0 auto;
   width: 100%;
-  display: grid;
-  grid-template-columns: 60% 1fr;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  /* display: grid;
+  grid-template-columns: 65% 1fr; */
+
   @media (max-width: 1280px) {
     max-width: 100%;
     width: 100%;
-    grid-template-columns: 65% 1fr;
   }
   @media (max-width: 992px) {
     grid-template-columns: 1fr;
   }
 `;
-const PostViewBtn = styled.button`
-  grid-column: span 2;
+
+const SectionHeader = styled.div`
+  width: 100%;
+  max-width: 100vw; /* 確保容器寬度不超出螢幕 */
+  position: relative;
   display: flex;
-  align-items: center;
-  margin: 0 auto 40px auto;
-
-  font-size: 1.5rem;
-  font-weight: 600;
-  padding: 0;
-  background: transparent;
-  color: white;
-  border: 2px solid #fff;
-
-  @media (max-width: 768px) {
-    font-size: 1.2rem;
-    margin: 40px auto 30px auto;
-  }
-  &:hover {
-    border: 2px solid transparent;
-    background-clip: padding-box, border-box;
-    background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, #222, #222), linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
-  }
-
-  @media (max-width: 992px) {
-    grid-column: span 1;
+  justify-content: space-between;
+  padding: 0 30px;
+  @media (max-width: 575px) {
+    padding: 0;
   }
 `;
 
+const PostViewBtn = styled.button`
+  display: flex;
+  align-items: center;
+  height: 45px;
+  width: 160px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 0 15px;
+  background: #fff8d6;
+  color: #000;
+  background-image: url("${leftEyes}");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: 90% 0;
+
+  &:hover {
+    background-image: url("${rightEyes}");
+  }
+  @media (max-width: 768px) {
+    padding: 0 12px;
+    height: 40px;
+    width: 140px;
+  }
+  @media (max-width: 575px) {
+    padding: 0 10px;
+    height: 28px;
+    width: 110px;
+  }
+`;
+const Title = styled.h4`
+  font-size: 1.96rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 25px;
+  @media (max-width: 575px) {
+    font-size: 1.5rem;
+  }
+`;
 const PostVieBtnText = styled.span`
   display: block;
   padding: 8px 20px 8px 0;
-  /* &:hover {
-    background: linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
-    background-clip: text;
-    background-clip: text;
-    color: transparent;
-  } */
 `;
 export interface Comment {
   content?: string;
@@ -118,7 +136,7 @@ interface Seats {
   row: number[];
 }
 
-interface State {
+export interface State {
   allSeats: Seats[];
   rowSeats: number[];
   section: string;
@@ -137,10 +155,14 @@ interface State {
   isCommentEditMode: string;
   isPostEditMode: PostState;
   allSectionPost: AllPost[] | undefined;
+  allRowPost: AllPost[] | undefined;
+  color: string;
 }
 export interface AllPost {
   row: number;
   seat: number;
+  section: string;
+  img: string;
 }
 
 export type Action =
@@ -150,16 +172,19 @@ export type Action =
   | { type: "selectSeat"; payload: { seat: number } }
   | { type: "setViewPosts"; payload: { viewPosts: PostState[] } }
   | { type: "setViewComments"; payload: { viewComments: Comment[]; id: string } }
-  | { type: "togglePostClick" }
+  | { type: "togglePostClick"; payload: { isPostClick: boolean } }
   | { type: "setSelectPhoto"; payload: { selectPhoto: File | null; localPhotoUrl: string } }
   | { type: "setUploadPhotoUrl"; payload: { uploadPhotoUrl: string } }
   | { type: "setComment"; payload: { commentText: string; id: string } }
   | { type: "isSelectSection" }
+  | { type: "isSelectRow" }
   | { type: "setLoading" }
   | { type: "toggleCommentMode"; payload: { isCommentEditMode: string } }
   | { type: "setPostMode"; payload: { isPostEditMode: PostState } }
   | { type: "setAllSectionPost"; payload: { allSectionPost: AllPost[] } }
-  | { type: "setUserPost"; payload: { section: string; row: number; seat: number } };
+  | { type: "setAllRowPost"; payload: { allRowPost: AllPost[] } }
+  | { type: "setUserPost"; payload: { section: string; row: number; seat: number } }
+  | { type: "setColor"; payload: { color: string } };
 
 const initial: State = {
   allSeats: [],
@@ -180,6 +205,8 @@ const initial: State = {
   isCommentEditMode: "",
   isPostEditMode: { id: "" },
   allSectionPost: [],
+  allRowPost: [],
+  color: "",
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -213,8 +240,10 @@ const reducer = (state: State, action: Action): State => {
     }
     case "isSelectSection":
       return { ...state, isSelectSection: true };
+    case "isSelectRow":
+      return { ...state, isSelectRow: false };
     case "togglePostClick":
-      return { ...state, isPostClick: !state.isPostClick };
+      return { ...state, isPostClick: action.payload.isPostClick };
     case "setSelectPhoto":
       return { ...state, selectPhoto: action.payload.selectPhoto, localPhotoUrl: action.payload.localPhotoUrl };
     case "setUploadPhotoUrl":
@@ -234,8 +263,14 @@ const reducer = (state: State, action: Action): State => {
     case "setAllSectionPost": {
       return { ...state, allSectionPost: action.payload.allSectionPost };
     }
+    case "setAllRowPost": {
+      return { ...state, allRowPost: action.payload.allRowPost };
+    }
     case "setUserPost": {
       return { ...state, section: action.payload.section, row: action.payload.row, seat: action.payload.seat, isSelectSection: true, isSelectRow: true };
+    }
+    case "setColor": {
+      return { ...state, color: action.payload.color };
     }
     default:
       return state;
@@ -319,6 +354,7 @@ function View() {
         );
 
         console.log(posts);
+
         dispatch({ type: "setViewPosts", payload: { viewPosts: posts } });
       });
 
@@ -335,17 +371,43 @@ function View() {
   }, [state.section, state.row, state.seat]);
 
   useEffect(() => {
-    const getAllSeats = async () => {
-      const allSection = (await api.getSections()) as Seats[];
-      console.log(allSection);
-      dispatch({ type: "getAllSeats", payload: { allSeats: allSection } });
+    const getSeat = async () => {
+      const rows = await api.getRows(section);
+      const sectionAry: number[] = Array.isArray(rows) ? rows : [];
+      dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, section: section, isSelectRow: false } });
+      dispatch({ type: "selectRow", payload: { row: row - 1, isSelectRow: true } });
+      dispatch({ type: "selectSeat", payload: { seat: seat - 1 } });
     };
-    getAllSeats();
-
+    const timer = setTimeout(() => {
+      document.body.style.overflowY = "auto";
+      componentContext?.setIsViewLoad(true);
+    }, 4000);
+    if (location.state) {
+      getSeat();
+    }
+    // 清除定时器，避免内存泄漏
     return () => {
-      getAllSeats();
+      clearTimeout(timer);
     };
   }, []);
+
+  useEffect(() => {
+    const getAllSeats = async () => {
+      try {
+        const allSection = (await api.getSections()) as Seats[];
+        console.log(allSection);
+        dispatch({ type: "getAllSeats", payload: { allSeats: allSection } });
+
+        const allView = await api.getAllSectionViewPost();
+        console.log(allView);
+        dispatch({ type: "setAllSectionPost", payload: { allSectionPost: allView as AllPost[] } });
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
+
+    getAllSeats();
+  }, [state.viewPosts]);
 
   const deletePost = async (id: string) => {
     await api.deleteViewPost(id);
@@ -359,24 +421,15 @@ function View() {
     dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts.map((post) => ({ ...post, comment: post.comment?.filter((comment) => comment.id !== id) })) } });
   };
 
-  useEffect(() => {
-    const getSeat = async () => {
-      const rows = await api.getRows(section);
-      const sectionAry: number[] = Array.isArray(rows) ? rows : [];
-      dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, section: section, isSelectRow: false } });
-      dispatch({ type: "selectRow", payload: { row: row - 1, isSelectRow: true } });
-      dispatch({ type: "selectSeat", payload: { seat: seat - 1 } });
-    };
-    if (location.state) {
-      getSeat();
-    }
-  }, []);
   const handlerSection = async (section: string) => {
     const rows = await api.getRows(section);
     const sectionAry: number[] = Array.isArray(rows) ? rows : [];
 
-    dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, section: section, isSelectRow: false } });
-    dispatch({ type: "selectRow", payload: { row: 0, isSelectRow: true } });
+    if (section === state.section) {
+      dispatch({ type: "selectSection", payload: { rowSeats: [], section: "", isSelectRow: false } });
+    } else {
+      dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, section: section, isSelectRow: false } });
+    }
   };
 
   const handlerComment = async (id: string) => {
@@ -396,26 +449,30 @@ function View() {
   const handlePostClick = () => {
     if (authContext?.loginState === null || authContext?.loginState === undefined) {
       componentContext?.setIsDialogOpen(true);
-      document.body.style.overflow = "hidden";
       return;
     }
 
-    dispatch({ type: "togglePostClick" });
-    document.body.style.overflow = "hidden";
+    dispatch({ type: "togglePostClick", payload: { isPostClick: true } });
+    document.body.style.overflowY = "hidden";
   };
 
   return (
     <Container>
-      <Mask postClick={state.isPostClick} />
+      <Mask postClick={(state.isPostClick || componentContext?.isDialogOpen) ?? false} />
       <LoginDialog />
+
+      {!componentContext?.isViewLoad && <Loading />}
       <VenueHeader />
+
       <Main>
-        <PostViewBtn onClick={() => handlePostClick()}>
-          <StyleAdd />
-          <PostVieBtnText>發佈視角</PostVieBtnText>
-        </PostViewBtn>
         <Post state={state} dispatch={dispatch} sendImage={sendImage} />
-        <Sections handlerSection={handlerSection} />
+        <SectionHeader>
+          <Title>區域選擇</Title>
+          <PostViewBtn onClick={() => handlePostClick()}>
+            <PostVieBtnText>發佈視角</PostVieBtnText>
+          </PostViewBtn>
+        </SectionHeader>
+        <Sections handlerSection={handlerSection} state={state} />
         <Rows state={state} dispatch={dispatch} />
         <Seat state={state} handlerComment={handlerComment} dispatch={dispatch} deletePost={deletePost} deleteComment={deleteComment} />
       </Main>

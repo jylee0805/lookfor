@@ -17,9 +17,10 @@ const StyleClose = styled(MdOutlineClose)`
 const PostContainer = styled.div<{ show: boolean }>`
   position: fixed;
   width: 60%;
+  max-height: 80%;
   background: #ffffff;
   color: #000;
-  z-index: 10;
+  z-index: 20;
   padding: 20px 30px;
   display: ${(props) => (props.show ? "block" : "none")};
   left: 50%;
@@ -27,6 +28,20 @@ const PostContainer = styled.div<{ show: boolean }>`
   transform: translate(-50%, -50%);
   border-radius: 15px;
   box-shadow: 3px 3px 3px #6c6c6c;
+  overflow-y: scroll;
+  clip-path: inset(0 round 15px);
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: #fff3e7;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #6d6d6d;
+  }
+
   @media (max-width: 992px) {
     width: 80%;
   }
@@ -39,6 +54,7 @@ const FormContainer = styled.div`
   grid-template-columns: auto 1fr;
   gap: 15px;
   margin-bottom: 15px;
+  z-index: 20;
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 0px;
@@ -47,6 +63,7 @@ const FormContainer = styled.div`
 const FormRow = styled.div`
   display: flex;
   align-items: center;
+  z-index: 20;
   @media (max-width: 768px) {
     margin-bottom: 10px;
     margin-left: 5px;
@@ -60,10 +77,11 @@ const FormRow = styled.div`
   }
 `;
 const PostTitle = styled.h3`
-  font-size: 24px;
+  font-size: 1.5rem;
   text-align: center;
   font-weight: 700;
   margin-bottom: 15px;
+  z-index: 20;
 `;
 const Label = styled.p`
   margin: 0 15px 0 5px;
@@ -142,6 +160,11 @@ const ImagePreview = styled.img``;
 const Loading = styled.img`
   width: 30px;
 `;
+const Error = styled.span`
+  font-weight: 600;
+  color: #ff6262;
+  margin-left: 15px;
+`;
 interface Seats {
   sectionName: string;
   row: number[];
@@ -185,7 +208,7 @@ function Post({ state, dispatch, sendImage }: Props) {
     reset,
     watch,
     getValues,
-
+    setError,
     formState: { errors },
   } = useForm<FormInputs>();
 
@@ -216,10 +239,7 @@ function Post({ state, dispatch, sendImage }: Props) {
 
     if (state.isPostEditMode.image) {
       const formValues = getValues();
-      console.log("我在這");
-
       await handleAnalyzeImage(state.isPostEditMode.image);
-      console.log("這裡");
 
       dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: state.isPostEditMode.image } });
       await api.updateViewPost(state.isPostEditMode.id, formValues, state.uploadPhotoUrl);
@@ -250,10 +270,10 @@ function Post({ state, dispatch, sendImage }: Props) {
         content: "",
       });
 
-      dispatch({ type: "togglePostClick" });
+      dispatch({ type: "togglePostClick", payload: { isPostClick: false } });
       dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
-      alert("發布成功");
-      document.body.style.overflow = "scroll";
+      console.log("etetet");
+      document.body.style.overflow = "auto";
     } else if (state.selectPhoto) {
       console.log(state.selectPhoto);
       url = await api.uploadImage(state.selectPhoto);
@@ -268,8 +288,12 @@ function Post({ state, dispatch, sendImage }: Props) {
 
     const handlerPost = async () => {
       const formValues = getValues();
-      if (labels.includes("Person")) {
-        alert("請確認圖片不包含人物");
+      if (labels.includes("Person") && labels.includes("Clothing") && labels.includes("Pants")) {
+        setError("image", {
+          type: "manual",
+          message: "請確認圖片不包含人物",
+        });
+
         dispatch({ type: "setLoading" });
         return;
       } else if (labels === "") {
@@ -279,8 +303,6 @@ function Post({ state, dispatch, sendImage }: Props) {
           console.log(formValues);
 
           if (state.isPostEditMode.id !== "") {
-            console.log("我在更新");
-
             await api.updateViewPost(state.isPostEditMode.id, formValues, state.uploadPhotoUrl);
 
             const update = state.viewPosts.map((post) => {
@@ -296,14 +318,20 @@ function Post({ state, dispatch, sendImage }: Props) {
                   section: formValues.section,
                 };
               }
+              return post;
             });
             dispatch({ type: "setViewPosts", payload: { viewPosts: update as PostState[] } });
           } else {
-            console.log("我在上傳");
-
             await api.setViewPost(formValues, state.uploadPhotoUrl, authContext?.loginState as string);
           }
         }
+
+        const rows = await api.getRows(formValues.section);
+        const sectionAry: number[] = Array.isArray(rows) ? rows : [];
+        dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, section: formValues.section, isSelectRow: false } });
+        dispatch({ type: "selectRow", payload: { row: parseInt(formValues.row) - 1, isSelectRow: true } });
+        dispatch({ type: "selectSeat", payload: { seat: parseInt(formValues.seat) - 1 } });
+
         dispatch({ type: "setLoading" });
         reset({
           section: "",
@@ -315,10 +343,10 @@ function Post({ state, dispatch, sendImage }: Props) {
           image: undefined,
         });
 
-        dispatch({ type: "togglePostClick" });
+        dispatch({ type: "togglePostClick", payload: { isPostClick: false } });
         dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
-        alert("發布成功");
-        document.body.style.overflow = "scroll";
+
+        document.body.style.overflow = "auto";
       }
     };
     if (!ignore) {
@@ -339,9 +367,10 @@ function Post({ state, dispatch, sendImage }: Props) {
       note: "",
       content: "",
     });
-    dispatch({ type: "togglePostClick" });
+    dispatch({ type: "togglePostClick", payload: { isPostClick: false } });
     dispatch({ type: "setPostMode", payload: { isPostEditMode: { id: "" } } });
-    document.body.style.overflow = "scroll";
+    dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
+    document.body.style.overflow = "auto";
   };
 
   const handleDeletePreview = () => {
@@ -421,7 +450,7 @@ function Post({ state, dispatch, sendImage }: Props) {
           選擇照片
           <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" {...register("image", { required: state.isPostEditMode.image ? false : "請選擇照片" })} onChange={sendImage} />
         </SelectPhotoBtn>
-        {errors.image && <p>{errors.image.message}</p>}
+        {errors.image && <Error>{errors.image.message}</Error>}
         <Btn onClick={() => handlerCancel()}>取消</Btn>
         <Submit onClick={handleSubmit(onSubmit)} load={state.isLoading}>
           送出

@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import lookfor from "../images/LOOKFOR.png";
 import api from "../utils/api";
 import { useEffect, useState, useContext, useReducer } from "react";
 import { auth, onAuthStateChanged } from "../utils/firebase";
@@ -40,9 +39,20 @@ const LogoBox = styled(Link)`
   display: block;
   width: 150px;
   z-index: 5;
+  font-size: 3rem;
+  font-weight: 700;
+  font-family: lihsianti;
+  color: #fff;
+  height: 70px;
+  text-align: left;
+  margin-top: -10px;
+  &:hover {
+    color: #fff;
+  }
+  @media (max-width: 575px) {
+    margin-top: -5px;
+  }
 `;
-const Logo = styled.img``;
-
 const NavBtn = styled.button`
   display: none;
   background: none;
@@ -171,8 +181,7 @@ const NavItem = styled.li`
     padding: 0;
   }
 `;
-const NavNotifyItem = styled(NavItem)<{ show: boolean }>`
-  display: ${(props) => (props.show ? "none" : "block")};
+const NavNotifyItem = styled(NavItem)`
   @media (max-width: 575px) {
     display: none;
   }
@@ -188,7 +197,7 @@ const NavCloseItem = styled(NavItem)`
 
 const StyleLink = styled(Link)`
   font-size: 1.2rem;
-  font-weight: 700;
+
   padding: 20px 24px;
   color: #ffffff;
   @media (max-width: 768px) {
@@ -205,13 +214,13 @@ const StyleLink = styled(Link)`
   &:hover {
     background: linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
     background-clip: text;
-    background-clip: text;
     color: transparent;
   }
 `;
 const LogOutBtn = styled.button`
   background: none;
   padding: 0;
+  font-weight: 700;
   @media (max-width: 575px) {
     display: block;
     padding: 10px 42px;
@@ -271,14 +280,18 @@ interface State {
 }
 export interface Notify {
   message: string;
-  createdTime: object;
+  createdTime: { seconds: number };
   isRead: boolean;
   title: string;
   id?: string;
   postId: string;
   concertId: string;
 }
-type Action = { type: "toggleIsPersonalClick" } | { type: "toggleIsMenuOpen" } | { type: "setNotifyData"; payload: { notifyData: Notify[] } } | { type: "toggleIsNotifyOpen" };
+type Action =
+  | { type: "toggleIsPersonalClick" }
+  | { type: "toggleIsMenuOpen"; payload: { isMenuOpen: boolean } }
+  | { type: "setNotifyData"; payload: { notifyData: Notify[] } }
+  | { type: "toggleIsNotifyOpen" };
 
 const initial: State = {
   notifyData: [],
@@ -292,7 +305,7 @@ const reducer = (state: State, action: Action): State => {
     case "toggleIsPersonalClick":
       return { ...state, isPersonalClick: !state.isPersonalClick, isNotifyOpen: false, isMenuOpen: false };
     case "toggleIsMenuOpen":
-      return { ...state, isMenuOpen: !state.isMenuOpen, isNotifyOpen: false };
+      return { ...state, isMenuOpen: action.payload.isMenuOpen, isNotifyOpen: false };
     case "toggleIsNotifyOpen":
       return { ...state, isNotifyOpen: !state.isNotifyOpen, isPersonalClick: false };
     case "setNotifyData":
@@ -303,9 +316,42 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
+declare global {
+  interface Window {
+    _jf?: {
+      flush: () => void;
+    };
+  }
+}
+
 function Header() {
   const authContext = useContext(AuthContext);
   const [state, dispatch] = useReducer(reducer, initial);
+
+  useEffect(() => {
+    const checkIfPageIsLoaded = () => {
+      if (document.readyState === "complete") {
+        // 頁面完全加載後刷新字型
+        if (window._jf && typeof window._jf.flush === "function") {
+          window._jf.flush();
+          console.log("字型已刷新");
+        }
+      }
+    };
+
+    // 如果頁面已經載入完成，立即執行
+    if (document.readyState === "complete") {
+      checkIfPageIsLoaded();
+    } else {
+      // 監聽頁面完全加載的事件
+      window.addEventListener("load", checkIfPageIsLoaded);
+    }
+
+    // 清除副作用
+    return () => {
+      window.removeEventListener("load", checkIfPageIsLoaded);
+    };
+  }, []);
 
   if (authContext) {
     console.log(authContext.loginState);
@@ -320,7 +366,7 @@ function Header() {
         setIsLogin(false);
       }
     });
-    dispatch({ type: "toggleIsMenuOpen" });
+    dispatch({ type: "toggleIsMenuOpen", payload: { isMenuOpen: false } });
     const loadViewPosts = async () => {
       const unsubscribeNotify: (() => void)[] = [];
 
@@ -353,9 +399,7 @@ function Header() {
 
   return (
     <Container>
-      <LogoBox to="/">
-        <Logo src={lookfor} />
-      </LogoBox>
+      <LogoBox to="/">LookFor</LogoBox>
       <NavBox>
         <NotifyBox show={authContext?.loginState === undefined}>
           <NotifyBtn onClick={() => dispatch({ type: "toggleIsNotifyOpen" })} num={state.notifyData.length > 0}>
@@ -377,45 +421,48 @@ function Header() {
             )}
           </NotifyList>
         </NotifyBox>
-        <NavBtn onClick={() => dispatch({ type: "toggleIsMenuOpen" })}>
+        <NavBtn onClick={() => dispatch({ type: "toggleIsMenuOpen", payload: { isMenuOpen: true } })}>
           <StyleMenu />
         </NavBtn>
         <Nav isMenuOpen={state.isMenuOpen}>
           <NavCloseItem>
-            <NavCloseBtn onClick={() => dispatch({ type: "toggleIsMenuOpen" })}>
+            <NavCloseBtn onClick={() => dispatch({ type: "toggleIsMenuOpen", payload: { isMenuOpen: false } })}>
               <StyleClose />
             </NavCloseBtn>
           </NavCloseItem>
           <NavItem>
-            <StyleLink to="/view" onClick={() => dispatch({ type: "toggleIsMenuOpen" })}>
-              場地
+            <StyleLink to="/view" onClick={() => dispatch({ type: "toggleIsMenuOpen", payload: { isMenuOpen: false } })}>
+              北流視角
             </StyleLink>
           </NavItem>
           <NavItem>
-            <StyleLink to="/concertlist" onClick={() => dispatch({ type: "toggleIsMenuOpen" })}>
+            <StyleLink to="/concertlist" onClick={() => dispatch({ type: "toggleIsMenuOpen", payload: { isMenuOpen: false } })}>
               演唱會資訊
             </StyleLink>
           </NavItem>
-          <NavNotifyItem show={authContext?.loginState === undefined}>
-            <NotifyBtn onClick={() => dispatch({ type: "toggleIsNotifyOpen" })} num={state.notifyData.length > 0}>
-              <StyleNotify />
-            </NotifyBtn>
-            <NotifyList isNotifyOpen={state.isNotifyOpen}>
-              {state.notifyData.length > 0 ? (
-                state.notifyData.map((item) => (
-                  <Link to={`/fanssupport?concert=${item.concertId}#${item.postId}`} onClick={() => handleNotify(item.id as string)}>
-                    <NotifyItem key={item.id}>
-                      <NotifyTitle>{item.title}</NotifyTitle>
-                      <NotifyContent>{item.message}</NotifyContent>
-                      <NotifyTime>{new Date(item.createdTime.seconds * 1000).toLocaleString()}</NotifyTime>
-                    </NotifyItem>
-                  </Link>
-                ))
-              ) : (
-                <NotifyItem>目前沒有新通知</NotifyItem>
-              )}
-            </NotifyList>
-          </NavNotifyItem>
+          {authContext?.loginState && (
+            <NavNotifyItem>
+              <NotifyBtn onClick={() => dispatch({ type: "toggleIsNotifyOpen" })} num={state.notifyData.length > 0}>
+                <StyleNotify />
+              </NotifyBtn>
+              <NotifyList isNotifyOpen={state.isNotifyOpen}>
+                {state.notifyData.length > 0 ? (
+                  state.notifyData.map((item) => (
+                    <Link to={`/fanssupport?concert=${item.concertId}#${item.postId}`} onClick={() => handleNotify(item.id as string)}>
+                      <NotifyItem key={item.id}>
+                        <NotifyTitle>{item.title}</NotifyTitle>
+                        <NotifyContent>{item.message}</NotifyContent>
+                        <NotifyTime>{new Date(item.createdTime.seconds * 1000).toLocaleString()}</NotifyTime>
+                      </NotifyItem>
+                    </Link>
+                  ))
+                ) : (
+                  <NotifyItem>目前沒有新通知</NotifyItem>
+                )}
+              </NotifyList>
+            </NavNotifyItem>
+          )}
+
           <NavItem>
             {isLogin ? (
               <>
