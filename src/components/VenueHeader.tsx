@@ -2,47 +2,53 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 
+const Container = styled.div`
+  width: 100%;
+  max-width: 100vw; /* 確保容器寬度不超出螢幕 */
+  max-height: 800px;
+  margin-bottom: 60px;
+  @media (max-width: 992px) {
+    margin-bottom: 20px;
+  }
+  @media (max-width: 575px) {
+    margin-bottom: 30px;
+  }
+`;
+
 const Banner = styled.div`
   text-align: center;
-  padding: 180px 0 220px;
+  padding: 10vh 0 20vh;
 `;
 const VenueTitle = styled.h2`
   font-size: 6rem;
   line-height: 1.5;
   letter-spacing: 1rem;
   text-align: center;
-  font-weight: 700;
+
   font-family: lihsianti;
   color: #fff;
   @media (max-width: 992px) {
-    font-size: 5rem;
-    letter-spacing: 0.8rem;
-  }
-  @media (max-width: 768px) {
-    font-size: 4.5rem;
+    font-size: 5.5rem;
     letter-spacing: 0.1rem;
   }
   @media (max-width: 575px) {
-    font-size: 3rem;
+    font-size: 4rem;
   }
 `;
 const VenueSubTitle = styled.h3`
   font-family: lihsianti;
-  font-size: 5.5rem;
+  font-size: 5rem;
   line-height: 1.5;
   letter-spacing: 5px;
   text-align: center;
-  font-weight: 700;
 
   color: #fff;
   @media (max-width: 992px) {
-    font-size: 4rem;
+    font-size: 3.6rem;
   }
-  @media (max-width: 768px) {
-    font-size: 3rem;
-  }
+
   @media (max-width: 575px) {
-    font-size: 2rem;
+    font-size: 2.8rem;
     letter-spacing: 0.2rem;
   }
 `;
@@ -50,15 +56,11 @@ const Nav = styled.ul`
   display: flex;
   justify-content: center;
   box-shadow: 2px 2px 6px #5a5a5a50;
+  border: 2px solid #fff;
   border-radius: 50px;
   max-width: fit-content;
   margin: 0 auto 60px;
   padding: 0px 20px;
-
-  border: 2px solid transparent;
-  background-clip: padding-box, border-box;
-  background-origin: padding-box, border-box;
-  background-image: linear-gradient(to right, #222, #222), linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
 
   @media (max-width: 768px) {
     margin-bottom: 30px;
@@ -74,23 +76,28 @@ const StyleLink = styled(Link)`
   font-size: 1.5rem;
   letter-spacing: 4px;
   color: #fff;
-  padding: 8px 150px;
+  padding: 8px 90px;
+
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  background-image: linear-gradient(to right, #ffe53b, #ff5001 50%, #fff 50%);
+  background-size: 200% 100%;
+  background-position: 100%;
+  transition: all 0.8s ease-in-out;
   &:hover {
-    background: linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
-    background-clip: text;
-    background-clip: text;
-    color: transparent;
+    background-position: 0%;
   }
 
   @media (max-width: 992px) {
-    padding: 8px 90px;
+    padding: 8px 50px;
   }
   @media (max-width: 768px) {
-    padding: 8px 60px;
+    padding: 8px 30px;
     font-size: 1.1rem;
   }
   @media (max-width: 575px) {
-    padding: 8px 20px;
+    padding: 8px 10px;
     font-size: 1rem;
   }
 `;
@@ -120,17 +127,7 @@ const NavItem = styled.li`
     display: block;
   }
 `;
-const TransitionItem = styled.li`
-  text-align: center;
-`;
-const TransitionLink = styled(StyleLink)`
-  padding: 8px 20px;
-  display: block;
-  margin: 0 auto;
-  &:hover {
-    color: #000;
-  }
-`;
+
 function VenueHeader() {
   useEffect(() => {
     const checkIfPageIsLoaded = () => {
@@ -158,7 +155,7 @@ function VenueHeader() {
   }, []);
 
   return (
-    <>
+    <Container>
       <Banner>
         <VenueTitle> 臺北流行音樂中心</VenueTitle>
         <VenueSubTitle>TAIPEI MUSIC CENTER</VenueSubTitle>
@@ -168,6 +165,12 @@ function VenueHeader() {
           <StyleLink to="/view">視角分享</StyleLink>
         </NavItem>
         <NavItem>
+          <StyleLink to="/transportation-public">大眾運輸</StyleLink>
+        </NavItem>
+        <NavItem>
+          <StyleLink to="/transportation-driving">自行開車</StyleLink>
+        </NavItem>
+        {/* <NavItem>
           <StyleLink to="/transportation-public">交通資訊</StyleLink>
           <TransitionList>
             <TransitionItem>
@@ -177,9 +180,9 @@ function VenueHeader() {
               <TransitionLink to="/transportation-driving">自行開車</TransitionLink>
             </TransitionItem>
           </TransitionList>
-        </NavItem>
+        </NavItem> */}
       </Nav>
-    </>
+    </Container>
   );
 }
 

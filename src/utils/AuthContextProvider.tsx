@@ -29,6 +29,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         console.log(response);
         if (response !== undefined) {
           const currentUser = await api.getUser(response);
+          console.log(currentUser);
+
           setUser(currentUser);
         }
 
@@ -39,7 +41,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
       }
     };
     getAuth();
-  }, []);
+  }, [loginState]);
 
   return <AuthContext.Provider value={{ loginState, setLoginState, user, setUser }}>{children}</AuthContext.Provider>;
 }

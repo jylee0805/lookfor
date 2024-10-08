@@ -35,6 +35,7 @@ import { MerchPost } from "../pages/FansSupport";
 import { Place, PlaceAvailable } from "../pages/TransportationDriving";
 import Profile from "../pages/Profile";
 import { Notify } from "../components/Header";
+import { AllPost } from "../pages/View";
 
 interface Data {
   content: string;
@@ -62,6 +63,12 @@ const api = {
 
     return querySnapshot.docs;
   },
+  async findUserUid(uid: string) {
+    const q = query(collection(db, "users"), where("UID", "==", uid));
+    const querySnapshot = await getDocs(q);
+
+    return querySnapshot.docs;
+  },
   async getUser(id: string) {
     const q = query(collection(db, "users"), where("UID", "==", id));
 
@@ -70,7 +77,7 @@ const api = {
     return list;
   },
 
-  async setNotify(postId: string, concertId: string, state: string) {
+  async setNotify(postId: string, concertId: string, state: string, item: string) {
     const stateText = state === "0" ? "未發放" : state === "1" ? "發放中" : "發放完畢";
     const q = query(collection(db, "users"), where("keepIds", "array-contains", postId));
     const querySnapshot = await getDocs(q);
@@ -78,7 +85,7 @@ const api = {
       console.log(doc.data());
       const notifyRef = collection(db, "users", doc.id, "notify");
       await addDoc(notifyRef, {
-        title: "收藏的文章狀態已更新",
+        title: `${item}的發放狀態已更新`,
         message: `${stateText}`,
         createdTime: serverTimestamp(),
         isRead: false,
@@ -155,10 +162,15 @@ const api = {
   async userLogInGoogle() {
     try {
       const result = await signInWithPopup(auth, provider);
-      console.log(result);
 
       const user = result.user;
-      return { user };
+
+      const data = await this.findUserUid(user.uid);
+      if (data.length === 0) {
+        this.setUser(user.displayName as string, user.uid, user.photoURL as string);
+      }
+
+      return user.uid;
     } catch (error) {
       if (error instanceof FirebaseError) {
         const errorCode = error.code;
@@ -201,11 +213,12 @@ const api = {
 
     return downloadURL;
   },
-  async setUser(name: string, uid: string) {
+  async setUser(name: string, uid: string, avatar: string) {
     await addDoc(collection(db, "users"), {
       userName: name,
       UID: uid,
-      avatar: "https://firebasestorage.googleapis.com/v0/b/look-for-18287.appspot.com/o/images%2Fprofile.png?alt=media&token=e5653560-c959-4f42-a741-a30794521275",
+      avatar: avatar,
+      //
     });
     return;
   },
@@ -312,6 +325,23 @@ const api = {
     return unsubscribe;
   },
 
+  async getAllSectionViewPost() {
+    try {
+      const q = query(collection(db, "viewPosts"));
+
+      const querySnapshot = await getDocs(q);
+      console.log(querySnapshot);
+      const allView: AllPost[] = [];
+      querySnapshot.forEach((doc) => {
+        allView.push({ section: doc.data().section, row: doc.data().row, seat: doc.data().seat, img: doc.data().image });
+      });
+      console.log(querySnapshot);
+
+      return allView;
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  },
   async deleteViewPost(id: string) {
     try {
       const postDoc = doc(db, "viewPosts", id);
@@ -419,8 +449,9 @@ const api = {
   async getConcert(id: string) {
     const q = doc(db, "concerts", `${id}`);
     const querySnapshot = await getDoc(q);
-    console.log(querySnapshot.data());
-    return { ...querySnapshot.data(), id: querySnapshot.id };
+    const data = { ...querySnapshot.data(), id: querySnapshot.id } as Concerts;
+    console.log(data);
+    return data;
   },
   async getConcertDetail(concert: string) {
     const q = query(collection(db, `concerts/${concert}/details`));

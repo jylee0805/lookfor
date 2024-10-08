@@ -20,15 +20,44 @@ const Input = styled.input`
   padding: 10px 20px;
   display: block;
   width: 100%;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.5;
   @media (max-width: 575px) {
-    font-size: 14px;
   }
 `;
 
 const LoginBtn = styled(Input)`
   margin-top: 20px;
+`;
+const Error = styled.span`
+  margin-top: -20px;
+  color: #ff6262;
+`;
+
+const OrBox = styled.div`
+  display: flex;
+  align-items: center;
+`;
+const Or = styled.p`
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #ffffff;
+  margin: 0 8px;
+  @media (max-width: 575px) {
+  }
+`;
+const Line = styled.div`
+  height: 1px;
+  width: 100%;
+  background: #d2d2d2;
+  flex-grow: 1;
+`;
+const GoogleBtn = styled.button`
+  display: block;
+  width: 100%;
+  background: #ffffff;
+  @media (max-width: 575px) {
+  }
 `;
 
 interface Props {
@@ -47,31 +76,91 @@ function LogIn({ isLogin }: Props) {
   const {
     register,
     handleSubmit,
+    setFocus,
     formState: { errors },
+    setError,
+    getValues,
+    clearErrors,
   } = useForm<FormInputs>();
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     const response = await api.userLogIn(data.email, data.password);
     console.log(response);
     if (response === "Firebase: Error (auth/invalid-credential).") {
-      alert("帳號或密碼有誤");
+      setError("password", {
+        type: "manual",
+        message: "帳號或密碼有誤",
+      });
       return;
     } else if (response === "Firebase: Error (auth/invalid-email).") {
-      alert("無效的 mail");
+      setError("email", {
+        type: "manual",
+        message: "無效的 mail",
+      });
       return;
     }
 
-    authContext?.setLoginState(response.uid as string);
+    if (typeof response !== "string" && response.uid) {
+      authContext?.setLoginState(response.uid);
+    }
     navigate("/");
   };
 
+  const handlerKeyDown = (e: React.KeyboardEvent, nextFieldName: keyof FormInputs | null) => {
+    const currentValue = getValues();
+    console.log(e.currentTarget);
+
+    if (e.keyCode === 13) {
+      if (nextFieldName) {
+        const regex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+        if (!regex.test(currentValue.email)) {
+          setError("email", {
+            type: "manual",
+            message: "請輸入正確的電子郵件",
+          });
+          return; // Exit if validation fails
+        }
+        clearErrors();
+        setFocus(nextFieldName);
+      } else {
+        handleSubmit(onSubmit)(e);
+      }
+    }
+  };
+  const handlerGoogleLogin = async () => {
+    const response = await api.userLogInGoogle();
+
+    if (response) {
+      authContext?.setLoginState(response as string);
+      navigate("/");
+    }
+  };
   return (
     <LoginBox isLogin={isLogin}>
-      <Input type="email" placeholder="請輸入電子信箱" defaultValue="" {...register("email", { required: "請輸入電子信箱" })} />
-      {errors.email && <span>{errors.email.message}</span>}
-      <Input type="password" placeholder="請輸入密碼" defaultValue="" {...register("password", { required: "請輸入密碼" })} />
+      <Input
+        type="email"
+        placeholder="請輸入電子信箱"
+        defaultValue=""
+        {...register("email", {
+          required: "請輸入電子信箱",
+          pattern: {
+            value: /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/,
+            message: "請輸入正確的電子郵件",
+          },
+        })}
+        onKeyDown={(e) => handlerKeyDown(e, "password")}
+      />
+      {errors.email && <Error>{errors.email.message}</Error>}
+      <Input type="password" placeholder="請輸入密碼" defaultValue="" {...register("password", { required: "請輸入密碼" })} onKeyDown={(e) => handlerKeyDown(e, null)} />
+      {errors.password && <Error>{errors.password.message}</Error>}
       <LoginBtn type="button" value="登入" onClick={handleSubmit(onSubmit)} />
-      {errors.password && <span>{errors.password.message}</span>}
+
+      <OrBox>
+        <Line />
+        <Or>or</Or>
+        <Line />
+      </OrBox>
+      <GoogleBtn onClick={handlerGoogleLogin}>Login with Google</GoogleBtn>
     </LoginBox>
   );
 }

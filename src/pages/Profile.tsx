@@ -1,14 +1,15 @@
-import { useContext, useEffect, useReducer } from "react";
+import { useContext, useEffect, useReducer, useState } from "react";
 import styled from "styled-components";
 import api from "../utils/api";
 import { AuthContext } from "../utils/AuthContextProvider";
 import { PostState } from "../pages/View";
 import { MerchPost } from "../pages/FansSupport";
 import { Link, useNavigate } from "react-router-dom";
+import Loading from "../components/Loading";
 
 const Container = styled.div`
   padding: 60px 60px;
-  @media (max-width: 768px) {
+  @media (max-width: 992px) {
     padding: 60px 40px;
   }
   @media (max-width: 575px) {
@@ -39,13 +40,12 @@ const UserName = styled.p`
 const EditBtn = styled.button``;
 const PostContainer = styled.ul`
   display: flex;
-  overflow: scroll;
+  overflow-x: auto;
   column-gap: 20px;
-  overflow-y: hidden;
   padding: 20px 0;
   margin-bottom: 25px;
   &::-webkit-scrollbar {
-    height: 10px;
+    height: 8px;
   }
   &::-webkit-scrollbar-track {
     background-color: #fff3e7;
@@ -53,7 +53,7 @@ const PostContainer = styled.ul`
   }
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: #ff9e5a;
+    background-color: #3f3f3f;
   }
 `;
 
@@ -62,7 +62,7 @@ const PostImg = styled.img`
   border-radius: 8px;
 `;
 const PostImgBox = styled.div`
-  width: 180px;
+  width: 100%;
   height: 150px;
   text-align: center;
   margin-top: 20px;
@@ -102,6 +102,8 @@ const PostItem = styled.li`
 `;
 const StyleLink = styled(Link)`
   color: #000;
+  display: block;
+  min-width: 240px;
 `;
 const PostTitle = styled.p`
   font-weight: 700;
@@ -199,17 +201,26 @@ function Profile() {
   const [state, dispatch] = useReducer(reducer, initial);
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
-
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    // 假设在一开始或某个资源加载完成后我们设置 loaded 状态
+    setTimeout(() => {
+      setLoaded(true);
+      document.body.style.overflowY = "auto";
+    }, 2000);
+  }, []);
   useEffect(() => {
     const getData = async () => {
       if (authContext) {
-        const concertName = [];
+        const concertName: string[] = [];
         const user = await api.getUser(authContext.loginState as string);
         const viewPosts = await api.getUserViewPosts(authContext?.loginState as string);
         const merchPosts = await api.getUserMerchPosts(authContext?.loginState as string);
         for (const item of merchPosts) {
           const concert = await api.getConcert(item.concertId);
+
           concertName.push(concert?.concertName);
+          console.log(concert);
         }
 
         dispatch({ type: "setData", payload: { profile: user as Profile, viewPosts: viewPosts, supportPosts: merchPosts, concertNames: concertName, editUserName: user.userName } });
@@ -235,12 +246,12 @@ function Profile() {
         profile.avatar = url;
       }
       const update = {
-        avatar: state.selectPhoto ? url : state.profile.avatar,
+        avatar: state.selectPhoto ? (url as string) : (state.profile.avatar as string),
         userName: state.editUserName,
         UID: state.profile.UID,
       };
       await api.updateUser(state.profile.id as string, update);
-
+      authContext?.setUser((prev) => ({ ...prev, ...update }));
       dispatch({ type: "setProfile", payload: { profile } });
       dispatch({ type: "toggleIsEditProfile" });
     }
@@ -251,10 +262,15 @@ function Profile() {
       dispatch({ type: "setPhoto", payload: { selectPhoto: target.files[0], localPhotoUrl: URL.createObjectURL(target.files[0]) } });
     }
   };
-  const handleViewPostClick = () => {};
+  const handleViewPostClick = (section: string, row: number, seat: number) => {
+    navigate("/view", {
+      state: { section, row, seat },
+    });
+  };
 
   return (
     <Container>
+      {!loaded && <Loading />}
       <ProfileContainer>
         <HeadShot src={state.localPhotoUrl === "" ? state.profile.avatar : state.localPhotoUrl} />
         {state.isEditProfile ? (
@@ -272,7 +288,7 @@ function Profile() {
       {state.viewPosts.length !== 0 ? (
         <PostContainer>
           {state.viewPosts.map((item) => (
-            <PostItem key={item.id} onClick={() => handleViewPostClick()}>
+            <PostItem key={item.id} onClick={() => handleViewPostClick(item.section as string, item.row as number, item.seat as number)}>
               <StyleLink to={`/view`}>
                 <PostTextContainer>
                   <PostTitle>{`${item.section}區${item.row}排${item.seat}號`}</PostTitle>
@@ -287,7 +303,7 @@ function Profile() {
           ))}
         </PostContainer>
       ) : (
-        <Hint>你還沒有發佈過視角文章喔</Hint>
+        <Hint>尚未發布視角文章</Hint>
       )}
 
       <Title>我的應援發放公告</Title>
@@ -310,7 +326,7 @@ function Profile() {
           ))}
         </PostContainer>
       ) : (
-        <Hint>你還沒有發佈過視角文章喔</Hint>
+        <Hint>尚未發布應援物資訊</Hint>
       )}
     </Container>
   );

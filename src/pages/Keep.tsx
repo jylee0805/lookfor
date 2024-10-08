@@ -8,10 +8,10 @@ import { Link } from "react-router-dom";
 const Container = styled.div`
   padding: 20px 80px;
   margin: 0 auto;
-  @media (max-width: 992px) {
+  @media (max-width: 1280px) {
     padding: 20px 60px;
   }
-  @media (max-width: 768px) {
+  @media (max-width: 992px) {
     padding: 20px 40px;
   }
   @media (max-width: 575px) {
@@ -26,15 +26,16 @@ const Title = styled.h3`
 `;
 const Articles = styled.ul``;
 const ArticleItem = styled.li`
-  background: #00000070;
+  background: #bdbdbd6f;
   color: #fff;
   border-radius: 15px;
   padding: 15px 20px;
-  display: flex;
   margin-bottom: 20px;
   min-height: 200px;
+  display: flex;
+
   @media (max-width: 768px) {
-    min-height: 240px;
+    min-height: 180px;
   }
   @media (max-width: 575px) {
     flex-direction: column;
@@ -42,12 +43,16 @@ const ArticleItem = styled.li`
 `;
 const ImgBox = styled.div`
   width: 30%;
+
+  border-radius: 15px;
   @media (max-width: 575px) {
     width: 100%;
     margin-top: 10px;
   }
 `;
-const Img = styled.img``;
+const Img = styled.img`
+  border-radius: 15px;
+`;
 const ArticleContent = styled.div`
   flex-grow: 1;
 `;
@@ -57,6 +62,10 @@ const ArticleTitle = styled.div`
 `;
 const StyleLink = styled(Link)`
   color: #fff;
+  display: flex;
+  @media (max-width: 575px) {
+    flex-direction: column;
+  }
 `;
 const ArticleText = styled.p`
   color: #ffffff;
@@ -83,9 +92,16 @@ const ArticlePass = styled.p`
   font-size: 1rem;
   font-weight: 700;
   @media (max-width: 575px) {
-    font-size: 0.8rem;
   }
 `;
+const Hint = styled.p`
+  padding: 10px 15px;
+  color: #fff;
+  font-size: 1.5rem;
+  text-align: center;
+  line-height: 2;
+`;
+
 function Keep() {
   const authContext = useContext(AuthContext);
   const [keepPosts, setKeepPosts] = useState<MerchPost[]>([]);
@@ -107,26 +123,30 @@ function Keep() {
       <Title>我的收藏</Title>
 
       <Articles>
-        {keepPosts.map((item) => (
-          <ArticleItem key={item.id}>
-            <StyleLink to={`/fanssupport?concert=${item.concertId}#${item.id}`}>
-              <ArticleContent>
-                <ArticleTitle>{item.concertName}</ArticleTitle>
-                <ArticlePassBox>
-                  <ArticlePass>發放日期：{item.passDay}</ArticlePass>
-                  <ArticlePass>發放時間：{item.passTime}</ArticlePass>
-                  <ArticlePass>發放地點：{item.passPlace}</ArticlePass>
-                  <ArticlePass>發放狀態：{item.passState}</ArticlePass>
-                </ArticlePassBox>
-                <ArticleText dangerouslySetInnerHTML={{ __html: item.content.replace(/\n/g, "<br />") }}></ArticleText>
-              </ArticleContent>
-              <ImgBox>
-                {" "}
-                <Img src={item.image ? item.image[0] : ""} />
-              </ImgBox>
-            </StyleLink>
-          </ArticleItem>
-        ))}
+        {keepPosts.length > 0 ? (
+          keepPosts.map((item) => (
+            <ArticleItem key={item.id}>
+              <StyleLink to={`/fanssupport?concert=${item.concertId}#${item.id}`}>
+                <ArticleContent>
+                  <ArticleTitle>{item.concertName}</ArticleTitle>
+                  <ArticlePassBox>
+                    <ArticlePass>發放日期：{item.passDay}</ArticlePass>
+                    <ArticlePass>發放時間：{item.passTime}</ArticlePass>
+                    <ArticlePass>發放地點：{item.passPlace}</ArticlePass>
+                    <ArticlePass>發放狀態：{item.passState}</ArticlePass>
+                  </ArticlePassBox>
+                  <ArticleText dangerouslySetInnerHTML={{ __html: item.content.replace(/\n/g, "<br />") }}></ArticleText>
+                </ArticleContent>
+                <ImgBox>
+                  {" "}
+                  <Img src={item.image ? item.image[0] : ""} />
+                </ImgBox>
+              </StyleLink>
+            </ArticleItem>
+          ))
+        ) : (
+          <Hint>目前沒有收藏的文章</Hint>
+        )}
       </Articles>
     </Container>
   );

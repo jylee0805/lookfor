@@ -26,12 +26,11 @@ const SubTitle = styled.h4`
   letter-spacing: 10px;
   padding: 0 50px;
   display: flex;
-  margin: auto;
+  justify-content: center;
   @media (max-width: 992px) {
     padding: 0;
   }
   @media (max-width: 575px) {
-    font-size: 1.5rem;
   }
 `;
 const Station = styled.p`
@@ -45,7 +44,6 @@ const Away = styled.p`
   }
 `;
 const Detail = styled.div`
-  padding: 50px 0 20px;
   @media (max-width: 992px) {
     grid-template-columns: auto;
     padding: 0;
@@ -56,6 +54,7 @@ const Line = styled.div`
   width: 100%;
   height: 1px;
   background: #d2d2d2;
+  margin-bottom: 30px;
   @media (max-width: 992px) {
     grid-column: span 1;
   }
