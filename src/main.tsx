@@ -11,7 +11,6 @@ import View from "./pages/View";
 import TransportationDriving from "./pages/TransportationDriving.tsx";
 import TransportationPublic from "./pages/TransportationPublic.tsx";
 import FansSupport from "./pages/FansSupport/index.tsx";
-import "./index.css";
 import Profile from "./pages/Profile.tsx";
 import Keep from "./pages/Keep.tsx";
 

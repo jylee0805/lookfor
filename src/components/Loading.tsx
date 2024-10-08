@@ -1,143 +1,111 @@
 import styled, { keyframes } from "styled-components";
 
-const blobs = keyframes`
-  0%{border-radius:26% 74% 61% 39% / 54% 67% 33% 46%}
-	10%{border-radius:74% 26% 47% 53% / 68% 46% 54% 32%}
-	20%{border-radius:48% 52% 30% 70% / 27% 37% 63% 73%}
-	30%{border-radius:73% 27% 57% 43% / 28% 67% 33% 72%}
-	40%{border-radius:63% 37% 56% 44% / 25% 28% 72% 75%}
-	50%{border-radius:39% 61% 70% 30% / 61% 29% 71% 39%}
-	60%{border-radius:27% 73% 29% 71% / 73% 51% 49% 27%}
-	70%{border-radius:39% 61% 65% 35% / 74% 65% 35% 26%}
-	80%{border-radius:55% 45% 37% 63% / 38% 30% 70% 62%}
-	90%{border-radius:25% 75% 70% 30% / 39% 50% 50% 61%}
-	100%{border-radius:66% 34% 33% 67% / 65% 73% 27% 35%}
+const spotlight = keyframes`
+  0% {
+    clip-path: circle(100px at 0% 0%);
+    -webkit-clip-path: circle(100px at 0% 50%);
+  }
+  50% {
+    clip-path: circle(100px at 0% 50%);
+    -webkit-clip-path: circle(100px at 100% 50%);
+  }
+  100% {
+    clip-path: circle(100px at 0% 50%);
+    -webkit-clip-path: circle(100px at 0% 50%);
+  }
 `;
 const Container = styled.div`
   position: absolute;
-  width: 320px;
-  height: 320px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 5;
+  width: 100vw;
+  height: 100vh;
+  top: 0%;
+  left: 0%;
+  z-index: 50;
   text-align: center;
-`;
-const Title = styled.p`
-  background: #ff0000;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  font-size: 90px;
-  font-weight: 700;
-  flex-flow: row wrap;
-  align-content: center;
-  justify-content: center;
-`;
-const Text = styled.span`
-  width: 100%;
-  position: relative;
+  background: #000;
   &::before {
-    background: linear-gradient(45deg, #fc5c7d, #6a82fb, #fc5c7d);
-    width: 100%;
-    height: 100%;
-    display: block;
-    position: absolute;
+    z-index: -1;
+
     content: "";
-    mix-blend-mode: screen;
+    position: fixed;
+    top: 0%;
+    right: -20vw;
+    display: block;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    width: 60vw;
+    background: #232222;
+
+    box-shadow:
+      -50vw 20vh 0 0 #1b1a1a,
+      90vw 0vh 0 75vw #ffe600,
+      -45vw -30vh 0 25vw #181818,
+      -90vw 20vh 0 20vw #ff5213,
+      -10vw -10vh 0 25vw #ff3714,
+      20vw 80vh 0 100vw #000000;
+    filter: blur(12rem);
+    /* z-index: -1;
+
+    content: "";
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    width: 20%;
+    background: #535252;
+    overflow: hidden;
+    box-shadow:
+      5vw 60vh 0 10vw #504f4f,
+      30vw 20vh 0 10vw #171414,
+      35vw 50vh 0 2vw #2b2b2a,
+      60vw -10vh 0 3vw #737272,
+      80vw 80vh 0 20vw #4a4a4a;
+    filter: blur(12rem); */
   }
 `;
-const Blob1 = styled.div`
-  background: #ff1493;
-  width: 60px;
-  height: 60px;
-  top: 90px;
-  left: 210px;
+const Title = styled.p`
+  color: #373535;
+  font-size: 6rem;
+  height: 72px;
+  font-family: "Kalam", cursive;
+  font-weight: 700;
   position: absolute;
-  mix-blend-mode: color;
-  animation: ${blobs} 15s ease-in-out infinite alternate;
+  width: 100%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  @media (max-width: 768px) {
+    font-size: 5.5rem;
+  }
+  @media (max-width: 575px) {
+    font-size: 4rem;
+  }
+  &::after {
+    content: "Look For";
+    font-family: "Kalam", cursive;
+    font-weight: 700;
+    color: transparent;
+    position: absolute;
+
+    left: 50%;
+    top: 0%;
+    transform: translate(-50%, -50%);
+    background: -webkit-linear-gradient(left, #e13f1a, #4e6dbb, #01e7e7, yellow, #b43782, #2e86de);
+    background-clip: text;
+    -webkit-background-clip: text;
+    clip-path: circle(100px at 0% 50%);
+    -webkit-clip-path: circle(100px at 0% 50%);
+    animation: ${spotlight} 6s infinite;
+  }
 `;
 
-const Blob2 = styled.div`
-  background: #ff4500;
-  width: 80px;
-  height: 80px;
-  top: 155px;
-  left: 230px;
-  position: absolute;
-  mix-blend-mode: color;
-  animation: ${blobs} 15s ease-in-out infinite alternate;
-`;
-const Blob3 = styled.div`
-  background: #00ff00;
-  width: 60px;
-  height: 60px;
-  top: 145px;
-  left: 20px;
-  position: absolute;
-  mix-blend-mode: color;
-  animation: ${blobs} 15s ease-in-out infinite alternate;
-`;
-const Blob4 = styled.div`
-  background: #ff0000;
-  width: 100px;
-  height: 100px;
-  top: 115px;
-  left: 100px;
-  position: absolute;
-  mix-blend-mode: color;
-  animation: ${blobs} 15s ease-in-out infinite alternate;
-`;
-const Blob5 = styled.div`
-  background: #ffff00;
-  width: 50px;
-  height: 50px;
-  top: 55px;
-  left: 70px;
-  position: absolute;
-  mix-blend-mode: color;
-  animation: ${blobs} 15s ease-in-out infinite alternate;
-`;
-const Blob6 = styled.div`
-  background: #00ffff;
-  width: 60px;
-  height: 60px;
-  top: 220px;
-  left: 55px;
-  position: absolute;
-  mix-blend-mode: color;
-  animation: ${blobs} 15s ease-in-out infinite alternate;
-`;
-const Blob7 = styled.div`
-  background: #ff8c00;
-  width: 50px;
-  height: 50px;
-  top: 210px;
-  left: 180px;
-  position: absolute;
-  mix-blend-mode: color;
-  animation: ${blobs} 15s ease-in-out infinite alternate;
-`;
 function Loading() {
+  document.body.style.overflowY = "hidden";
   return (
     <Container>
-      <Title>
-        <Text>
-          THE
-          <br />
-          BLOBS
-        </Text>
-      </Title>
-
-      <Blob1></Blob1>
-      <Blob2></Blob2>
-      <Blob3></Blob3>
-      <Blob4></Blob4>
-      <Blob5></Blob5>
-      <Blob6></Blob6>
-      <Blob7></Blob7>
+      <Title></Title>
     </Container>
   );
 }

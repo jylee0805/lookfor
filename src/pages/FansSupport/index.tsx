@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import api from "../../utils/api";
 import { useEffect, useReducer, useState, useContext, useRef } from "react";
 import FanPost from "./FanPost";
@@ -11,37 +11,43 @@ import { MdOutlineBookmark } from "react-icons/md";
 import { MdOutlineMoreVert } from "react-icons/md";
 import { Profile } from "../../utils/AuthContextProvider";
 import { Concerts } from "../ConcertList";
+import { ComponentContext } from "../../utils/ComponentContextProvider";
+import LoginDialog from "../../components/LoginDialog";
+import { ConcertContext } from "../../utils/ConcertContextProvider";
+import "react-photo-view/dist/react-photo-view.css";
+import { PhotoProvider, PhotoView } from "react-photo-view";
 
 const StyleSort = styled(FaSort)`
-  font-size: 24px;
+  font-size: 1.5rem;
   margin-right: 4px;
   @media (max-width: 575px) {
-    font-size: 20px;
   }
 `;
 const StyleAdd = styled(MdOutlineAdd)`
-  font-size: 24px;
+  font-size: 1.5rem;
   margin-right: 4px;
   @media (max-width: 575px) {
-    font-size: 20px;
   }
 `;
 const StyleKeep = styled(MdOutlineBookmarkBorder)`
-  font-size: 24px;
+  font-size: 1.5em;
   margin-right: 4px;
 `;
 const StyleKeepFill = styled(MdOutlineBookmark)`
-  font-size: 24px;
+  font-size: 1.5rem;
   margin-right: 4px;
 `;
 const StyleMore = styled(MdOutlineMoreVert)`
-  font-size: 24px;
+  font-size: 1.5rem;
   margin-right: 4px;
 `;
 const Container = styled.div`
   width: 80%;
   margin: 60px auto;
   @media (max-width: 992px) {
+    width: 100%;
+  }
+  @media (max-width: 768px) {
     width: 90%;
   }
 `;
@@ -51,10 +57,8 @@ const ConcertName = styled.h3`
   font-weight: 700;
   text-align: center;
   @media (max-width: 992px) {
-    font-size: 1.96rem;
   }
   @media (max-width: 768px) {
-    font-size: 1.6rem;
   }
 `;
 const BtnBox = styled.div`
@@ -65,10 +69,8 @@ const BtnBox = styled.div`
   text-align: center;
   margin: 0 auto 30px;
 
-  border: 2px solid transparent;
-  background-clip: padding-box, border-box;
-  background-origin: padding-box, border-box;
-  background-image: linear-gradient(to right, #222, #222), linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
+  border: 2px solid #fff;
+
   @media (max-width: 575px) {
     width: 320px;
     padding: 6px 10px;
@@ -83,10 +85,7 @@ const PageBtn = styled(Link)`
   font-weight: 700;
   color: #fff;
   &:hover {
-    background: linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
-    background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: rgb(255, 98, 19);
   }
 `;
 
@@ -108,7 +107,7 @@ const Content = styled.div`
   width: 75%;
   margin: 0 auto;
   @media (max-width: 768px) {
-    width: 90%;
+    width: 95%;
   }
 `;
 const FeatureBox = styled.div`
@@ -116,6 +115,10 @@ const FeatureBox = styled.div`
   justify-content: end;
   margin-bottom: 20px;
   margin-left: auto;
+  @media (max-width: 575px) {
+    justify-content: start;
+    margin: 0 auto 20px;
+  }
 `;
 const ActionBtn = styled.button`
   display: flex;
@@ -123,6 +126,9 @@ const ActionBtn = styled.button`
   background: none;
   color: #fff;
   border: none;
+  @media (max-width: 575px) {
+    padding: 10px 15px;
+  }
 `;
 
 const PostList = styled.ul``;
@@ -139,10 +145,12 @@ const PostItem = styled.li`
     left: 0;
   }
 `;
+const PostContent = styled.div`
+  margin-left: 50px;
+`;
 const PostHeader = styled.div`
   display: flex;
-  align-items: center;
-  margin-bottom: 15px;
+  align-items: flex-start;
 `;
 const MoreContainer = styled.div`
   position: relative;
@@ -191,6 +199,7 @@ const HeadShot = styled.img`
 `;
 const UserName = styled.p`
   font-size: 1.2rem;
+  font-weight: 700;
   @media (max-width: 575px) {
     font-size: 1rem;
   }
@@ -203,7 +212,7 @@ const ImportInfo = styled.div`
   width: 80%;
   margin-bottom: 10px;
   color: #ffffff;
-  font-weight: 700;
+
   @media (max-width: 992px) {
     width: 90%;
   }
@@ -213,6 +222,7 @@ const ImportInfo = styled.div`
   @media (max-width: 575px) {
     font-size: 1rem;
     width: 100%;
+    grid-template-columns: 60px auto;
   }
 `;
 const ImportInfoContent = styled.p`
@@ -223,11 +233,41 @@ const InfoContent = styled.div`
   font-size: 20px;
   margin-bottom: 20px;
 `;
-const ImageContainer = styled.div``;
-const Image = styled.img`
-  width: 240px;
-`;
 
+const ImageContainer = styled.div`
+  white-space: nowrap;
+  overflow-x: auto;
+  position: relative;
+  &::-webkit-scrollbar {
+    height: 10px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: #fff3e7;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #888888;
+  }
+`;
+const Image = styled.img`
+  max-width: 500px;
+  max-height: 300px;
+  object-fit: cover;
+  margin-right: 20px;
+  margin-bottom: 10px;
+  border-radius: 15px;
+  border: 2px solid #fff;
+  @media (max-width: 768px) {
+    max-width: 400px;
+    max-height: 200px;
+  }
+`;
+const Hint = styled.p`
+  font-size: 28px;
+  text-align: center;
+  margin-top: 60px;
+`;
 export interface MerchPost {
   concertId: string;
   content: string;
@@ -243,6 +283,7 @@ export interface MerchPost {
   concertName?: string;
   id?: string;
   avatar?: string;
+  item: string;
 }
 
 export interface State {
@@ -278,6 +319,7 @@ const initial: State = {
     passTime: "",
     qualify: "",
     userUID: "",
+    item: "",
     image: [],
     createdTime: { seconds: 0, nanoseconds: 0 },
   },
@@ -308,19 +350,17 @@ function FansSupport() {
   const queryParams = new URLSearchParams(window.location.search);
   const concertId = queryParams.get("concert") || "";
   const [state, dispatch] = useReducer(reducer, initial);
-  const [concert, setConcert] = useState<Concerts | null>(null);
   const [isMoreClick, setIsMoreClick] = useState<string>("");
   const authContext = useContext(AuthContext);
-  const navigate = useNavigate();
-  useEffect(() => {}, []);
+  const componentContext = useContext(ComponentContext);
+  const concertContext = useContext(ConcertContext);
+  console.log(concertId);
+
   useEffect(() => {
     const loadViewPosts = async () => {
       const unsubscribesPost: (() => void)[] = [];
       let posts: MerchPost[] = [];
-      const concertRes = await api.getConcert(concertId);
-      console.log(concertRes);
 
-      setConcert(concertRes as Concerts);
       const unsubscribePost = api.getMerchPost(concertId, (updatedPosts: MerchPost[]) => {
         posts = JSON.parse(JSON.stringify(updatedPosts));
 
@@ -354,11 +394,15 @@ function FansSupport() {
       };
     };
 
+    if (!concertContext?.concertId) {
+      concertContext?.setConcertId(concertId);
+    }
     loadViewPosts();
   }, []);
 
   const location = useLocation();
   const targetRef = useRef<(HTMLLIElement | null)[]>([]);
+
   useEffect(() => {
     console.log(location.hash && targetRef.current);
 
@@ -382,7 +426,7 @@ function FansSupport() {
         handleScroll();
       }
     }, 1000);
-
+    document.body.style.overflow = "auto";
     // 清理計時器
     return () => clearTimeout(timeoutId);
   }, [location, state.postData]);
@@ -421,8 +465,8 @@ function FansSupport() {
     console.log(authContext?.loginState);
 
     if (authContext?.loginState === null || authContext?.loginState === undefined) {
-      alert("請先登入");
-      navigate("/login");
+      componentContext?.setIsDialogOpen(true);
+      document.body.style.overflowY = "hidden";
       return;
     }
     dispatch({ type: "toggleIsPostClick", payload: { isPostClick: true } });
@@ -430,7 +474,8 @@ function FansSupport() {
 
   const handleKeep = async (id: string) => {
     if (authContext?.loginState === undefined) {
-      alert("請登入");
+      componentContext?.setIsDialogOpen(true);
+      document.body.style.overflowY = "hidden";
       return;
     }
     if (authContext?.user.keepIds?.includes(id)) {
@@ -449,7 +494,8 @@ function FansSupport() {
   };
   return (
     <Container>
-      <ConcertName>{concert?.concertName}</ConcertName>
+      <LoginDialog />
+      <ConcertName>{concertContext?.concertData.concertName}</ConcertName>
       <BtnBox>
         <PageBtn to={`/concert?concert=${concertId}`}>演唱會資訊</PageBtn>
         <PageBtn to={`/fanssupport?concert=${concertId}`}>應援物發放資訊</PageBtn>
@@ -466,7 +512,7 @@ function FansSupport() {
             發佈資訊
           </ActionBtn>
         </FeatureBox>
-        <FanPost concert={concert as Concerts} dispatch={dispatch} state={state} />
+        <FanPost concert={concertContext?.concertData as Concerts} dispatch={dispatch} state={state} />
         <PostList>
           {state.postData &&
             state.postData.map((item, index) => (
@@ -489,24 +535,32 @@ function FansSupport() {
                     </MoreContainer>
                   )}
                 </PostHeader>
-                <ImportInfo>
-                  <ImportInfoContent>時間</ImportInfoContent>
-                  <ImportInfoContent>{`${item.passDay} ${item.passTime}`}</ImportInfoContent>
-                  <ImportInfoContent>地點</ImportInfoContent>
-                  <ImportInfoContent>{item.passPlace}</ImportInfoContent>
-                  <ImportInfoContent>狀態</ImportInfoContent>
-                  <ImportInfoContent>{item.passState === "0" ? "未發放" : item.passState === "1" ? "發放中" : "發放完畢"}</ImportInfoContent>
-                  <ImportInfoContent>領取資格</ImportInfoContent>
-                  <ImportInfoContent>{item.qualify}</ImportInfoContent>
-                </ImportInfo>
-                <InfoContent dangerouslySetInnerHTML={{ __html: item.content.replace(/\n/g, "<br />") }}></InfoContent>
-                <ImageContainer>
-                  {item.image.map((item) => (
-                    <Image src={item} />
-                  ))}
-                </ImageContainer>
+                <PostContent>
+                  <ImportInfo>
+                    <ImportInfoContent>時間</ImportInfoContent>
+                    <ImportInfoContent>{`${item.passDay} ${item.passTime}`}</ImportInfoContent>
+                    <ImportInfoContent>地點</ImportInfoContent>
+                    <ImportInfoContent>{item.passPlace}</ImportInfoContent>
+                    <ImportInfoContent>狀態</ImportInfoContent>
+                    <ImportInfoContent>{item.passState === "0" ? "未發放" : item.passState === "1" ? "發放中" : "發放完畢"}</ImportInfoContent>
+                    <ImportInfoContent>領取資格</ImportInfoContent>
+                    <ImportInfoContent>{item.qualify}</ImportInfoContent>
+                  </ImportInfo>
+                  <InfoContent>{item.item}</InfoContent>
+                  <InfoContent dangerouslySetInnerHTML={{ __html: item.content.replace(/\n/g, "<br />") }}></InfoContent>
+                  <PhotoProvider maskOpacity={0.8} bannerVisible={false}>
+                    <ImageContainer>
+                      {item.image.map((item) => (
+                        <PhotoView key={index} src={item}>
+                          <Image src={item} />
+                        </PhotoView>
+                      ))}
+                    </ImageContainer>
+                  </PhotoProvider>
+                </PostContent>
               </PostItem>
             ))}
+          {state.postData.length === 0 && <Hint>目前沒有應援物發放資訊</Hint>}
         </PostList>
       </Content>
     </Container>
