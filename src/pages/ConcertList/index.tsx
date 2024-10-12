@@ -1,15 +1,23 @@
 import styled, { keyframes } from "styled-components";
 import { Link } from "react-router-dom";
 import api from "../../utils/api";
-import { useEffect, useState } from "react";
-import dayjs from "dayjs";
+import { useEffect, useState, useRef } from "react";
 import concertImg from "../../images/concert.jpg";
 import { IoSearch } from "react-icons/io5";
-
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import Fuse from "fuse.js";
+import { QueryDocumentSnapshot } from "../../utils/firebase";
+import { DocumentData } from "firebase/firestore";
 
+const skeletonLoading = keyframes`
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+`;
 const StyleSearch = styled(IoSearch)`
   font-size: 1.2rem;
   margin-right: 4px;
@@ -31,13 +39,6 @@ const Container = styled.div`
     margin: 40px auto;
   }
 `;
-const Title = styled.h3`
-  font-size: 1.96rem;
-  font-weight: 700;
-  @media (max-width: 575px) {
-    margin-bottom: 20px;
-  }
-`;
 const Header = styled.div`
   display: flex;
   align-items: center;
@@ -47,20 +48,17 @@ const Header = styled.div`
     display: block;
   }
 `;
+const Title = styled.h3`
+  font-size: 1.96rem;
+  font-weight: 700;
+  @media (max-width: 575px) {
+    margin-bottom: 20px;
+  }
+`;
 const SearchContainer = styled.div`
   display: flex;
   align-items: center;
 `;
-const SearchBtn = styled.button`
-  background: #ffffff;
-  padding: 5px 12px;
-  height: 36px;
-  color: #000;
-  border-radius: 0 8px 8px 0;
-  border: none;
-  box-shadow: none;
-`;
-
 const SearchInput = styled.input`
   border-radius: 8px 0 0 8px;
   height: 36px;
@@ -73,7 +71,15 @@ const SearchInput = styled.input`
     flex-grow: 1;
   }
 `;
-const AllBtn = styled.button``;
+const SearchBtn = styled.button`
+  background: #ffffff;
+  padding: 5px 12px;
+  height: 36px;
+  color: #000;
+  border-radius: 0 8px 8px 0;
+  border: none;
+  box-shadow: none;
+`;
 const AllList = styled.ul`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -96,44 +102,9 @@ const ListItem = styled.li`
     margin-bottom: 10px;
   }
 `;
-
 const StyleLink = styled(Link)`
   display: block;
 `;
-
-const Detail = styled.div`
-  margin: 15px 30px 20px;
-`;
-const DetailItem = styled.p`
-  color: #545454;
-  line-height: 2;
-`;
-const Hint = styled.p`
-  color: #ffffff;
-  line-height: 2;
-  background: #ff602c;
-  text-align: center;
-  width: 25%;
-  margin: 0 auto 30px;
-`;
-const DetailName = styled(DetailItem)`
-  font-size: 1.2rem;
-  font-weight: 700;
-  grid-column: span 2;
-`;
-const DetailPlace = styled(DetailItem)`
-  grid-column: span 2;
-`;
-
-const skeletonLoading = keyframes`
-  0% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0 50%;
-  }
-`;
-
 const ImageBox = styled.div`
   height: 240px;
   display: block;
@@ -143,12 +114,34 @@ const ImageBox = styled.div`
   border-radius: 20px;
   animation: ${skeletonLoading} 1.2s ease infinite;
 `;
-
 const Image = styled.img`
   object-fit: cover;
   object-position: 0% 10%;
   width: 100%;
   border-radius: 20px 20px 0 0;
+`;
+const Detail = styled.div`
+  margin: 15px 30px 20px;
+`;
+const DetailItem = styled.p`
+  color: #545454;
+  line-height: 2;
+`;
+const DetailName = styled(DetailItem)`
+  font-size: 1.2rem;
+  font-weight: 700;
+  grid-column: span 2;
+`;
+const DetailPlace = styled(DetailItem)`
+  grid-column: span 2;
+`;
+const Hint = styled.p`
+  color: #ffffff;
+  line-height: 2;
+  background: #ff602c;
+  text-align: center;
+  width: 25%;
+  margin: 0 auto 30px;
 `;
 
 export interface Concerts {
@@ -173,35 +166,57 @@ function ConcertList() {
   const [searchData, setSearchData] = useState<Concerts[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [searchHint, setSearchHint] = useState<boolean>(false);
+  const [startAt, setStartAt] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [nextLoad, setNextLoad] = useState(false);
+  const scrollRef = useRef<HTMLDivElement | null>(null); // 創建 ref
 
-  const stringToTime = (data: Concerts[]) => {
-    const all = data.map((item: Concerts) => {
-      const dateString = item.date[0];
-      const date = new Date(dateString);
-
-      const options = { month: "short" as const, day: "2-digit" as const };
-      const formattedDate = date.toLocaleDateString("en-US", options);
-
-      return { ...item, firstDay: formattedDate };
-    });
-    console.log(all);
-
-    setConcertData(all);
-  };
   useEffect(() => {
-    const today = dayjs().format("YYYY/MM/DD");
-
-    const getConcert = async () => {
-      const data = await api.getConcerts();
-      const result = data.filter((item) => item.date[item.date.length - 1] > today);
-      console.log(result);
-
-      setConcertData(result);
-      stringToTime(result);
-    };
-    getConcert();
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+      document.body.style.overflowY = "auto";
+    }, 2000);
     document.body.style.overflow = "auto";
+    window.addEventListener("scroll", handleScroll);
+    setNextLoad(true);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(timer);
+    };
   }, []);
+
+  useEffect(() => {
+    const getConcert = async () => {
+      const data = await api.getNextConcerts(startAt);
+      console.log(data);
+      if (data.data.length === 0) {
+        setNextLoad(false); // 停止加載
+        return;
+      }
+      setConcertData((prev) => [...prev, ...data.data]);
+      setStartAt(data.lastVisibleDoc);
+      setNextLoad(false);
+    };
+    if (nextLoad) {
+      getConcert();
+    }
+  }, [nextLoad]);
+  const handleScroll = () => {
+    const windowHeight = window.innerHeight;
+    const documentHeight = scrollRef.current?.offsetHeight;
+
+    if (documentHeight) {
+      if (window.scrollY + windowHeight - 150 >= documentHeight) {
+        setNextLoad((prevNextLoad) => {
+          if (!prevNextLoad) {
+            return true;
+          }
+          return prevNextLoad;
+        });
+      }
+    }
+  };
 
   const handleSearch = () => {
     const fuse = new Fuse(concertData, options);
@@ -218,26 +233,12 @@ function ConcertList() {
     setSearchData(search);
   };
 
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-      document.body.style.overflowY = "auto";
-    }, 2000);
-
-    // 清除定时器，避免内存泄漏
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
-
   return (
-    <Container>
+    <Container ref={scrollRef}>
       <Header>
         <Title>演唱會資訊</Title>
         <SearchContainer>
-          <SearchInput type="text" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} placeholder="搜尋演唱會" />
+          <SearchInput type="text" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} placeholder="搜尋演唱會、場地" />
           <SearchBtn onClick={() => handleSearch()}>
             <StyleSearch />
           </SearchBtn>

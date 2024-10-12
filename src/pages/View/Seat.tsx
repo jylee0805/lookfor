@@ -3,29 +3,28 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { PostState, Action, State } from "./index";
 import api from "../../utils/api";
 import { IoSend } from "react-icons/io5";
-import { MdOutlineMoreVert } from "react-icons/md";
+import { MdOutlineMoreVert, MdOutlineClose } from "react-icons/md";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../utils/AuthContextProvider";
 import defaultSeat from "../../images/defaultSeat.png";
 import dataSeat from "../../images/dataSeat.png";
-import { MdOutlineClose } from "react-icons/md";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { motion } from "framer-motion";
+import Dialog from "../../components/Dialog";
+import { useDialog } from "../../utils/useDialog";
 
 const StyleClose = styled(MdOutlineClose)`
-  font-size: 1.96rem;
+  font-size: 1.5rem;
   margin-right: 4px;
 `;
-
 const StyleMore = styled(MdOutlineMoreVert)`
-  font-size: 1.96rem;
+  font-size: 1.5rem;
 `;
 const SeatSection = styled.div<{ rowSelect: boolean }>`
   grid-column: span 2;
   margin-top: 80px;
   padding: 0 60px;
   margin-bottom: 80px;
-
   color: #fff;
   overflow-x: hidden;
   overflow-y: auto;
@@ -73,7 +72,6 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
 
   &::before {
     z-index: -1;
-
     content: "";
     display: block;
     position: fixed;
@@ -93,8 +91,8 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
     transition:
       left ease 1s,
       opacity ease 0.5s; /* 添加過渡 */
-    opacity: ${(props) => (props.rowSelect ? 1 : 0)}; /* 控制顯示與隱藏 */
-    transition-delay: ${(props) => (props.rowSelect ? "0.2s" : "0s")}; /* 延遲顯示陰影 */
+    opacity: ${(props) => (props.rowSelect ? 1 : 0)};
+    transition-delay: ${(props) => (props.rowSelect ? "0.2s" : "0s")};
 
     @media (max-width: 992px) {
       top: 20%;
@@ -107,81 +105,16 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
     }
   }
 `;
-const Title = styled.h4`
-  font-size: 1.96rem;
-  font-weight: 600;
-  margin: 25px 0;
-  @media (max-width: 575px) {
-    font-size: 1.6rem;
-  }
-`;
-const Card = styled.div`
-  border-radius: 10px;
-  display: flex;
-  column-gap: 35px;
-  padding: 15px 20px;
-  box-shadow: 3px 3px 3px #000000;
-  height: 420px;
-  background: #ffffff50;
-  margin-bottom: 25px;
-  @media (max-width: 768px) {
-    flex-direction: column;
-    row-gap: 20px;
-    padding: 25px;
-    height: auto;
-  }
-  @media (max-width: 575px) {
-    padding: 15px;
-  }
-`;
-const UserBox = styled.div`
-  display: flex;
-  align-items: center;
-  column-gap: 10px;
-`;
-const PostHeader = styled.div`
-  display: flex;
-  align-items: center;
-  column-gap: 10px;
-  margin-bottom: 20px;
-`;
-const CommentHeader = styled.div`
-  display: flex;
-  align-items: center;
-  column-gap: 10px;
-  margin-bottom: 5px;
-`;
-
-const FeatureBox = styled.div<{ show: boolean }>`
+const CloseBtn = styled.button`
   margin-left: auto;
-  position: relative;
-  display: ${(props) => (props.show ? "block" : "none")};
-`;
-const FeatureList = styled.ul<{ open: boolean }>`
-  display: ${(props) => (props.open ? "block" : "none")};
-  position: absolute;
-  background: #fff;
-  width: 70px;
-  right: 0;
-  border-radius: 8px;
-`;
-const FeatureItem = styled.li`
-  padding: 0;
-`;
-const FeatureBtn = styled.button`
-  padding: 0;
-  color: #fff;
+  display: block;
+  margin-top: 25px;
   background: none;
   border: none;
-`;
-const MoreBtn = styled(FeatureBtn)`
-  margin-right: 10px;
-`;
-const FeatureInnerBtn = styled(FeatureBtn)`
-  display: block;
-  margin: 0 auto;
-  padding: 10px 18px;
-  color: #000;
+  color: #fff;
+  @media (max-width: 575px) {
+    margin-top: 15px;
+  }
 `;
 const Seats = styled.div`
   width: 100%;
@@ -232,6 +165,20 @@ const SeatBtn = styled.button<{ haveData: boolean }>`
     height: 50px;
   }
 `;
+const SeatBtnText = styled.span`
+  position: absolute;
+  display: block;
+  width: 55px;
+  top: 10px;
+  right: 0;
+  font-weight: 700;
+  @media (max-width: 992px) {
+    width: 50px;
+  }
+  @media (max-width: 768px) {
+    width: 40px;
+  }
+`;
 const SeatPoint = styled(motion.div)`
   position: absolute;
   top: -60%;
@@ -247,19 +194,32 @@ const SeatPoint = styled(motion.div)`
     top: -65%;
   }
 `;
-
-const SeatBtnText = styled.span`
-  position: absolute;
-  display: block;
-  width: 55px;
-  top: 10px;
-  right: 0;
-  font-weight: 700;
-  @media (max-width: 992px) {
-    width: 50px;
+const Title = styled.h4`
+  font-size: 1.96rem;
+  font-weight: 600;
+  margin: 25px 0;
+  @media (max-width: 575px) {
+    font-size: 1.6rem;
   }
+`;
+const Card = styled.div`
+  border-radius: 10px;
+  display: flex;
+  column-gap: 35px;
+  padding: 15px 15px;
+  box-shadow: 3px 3px 3px #000000;
+  height: 420px;
+  background: #ffffff50;
+  margin-bottom: 25px;
+
   @media (max-width: 768px) {
-    width: 40px;
+    flex-direction: column;
+    row-gap: 20px;
+    padding: 25px;
+    height: auto;
+  }
+  @media (max-width: 575px) {
+    padding: 15px;
   }
 `;
 const ImgBox = styled.div`
@@ -279,28 +239,88 @@ const Img = styled.img`
   object-fit: contain;
 `;
 const ContentBox = styled.div`
+  width: 60%;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 `;
-const UserName = styled.p``;
-const Note = styled.p`
-  margin-bottom: 20px;
+const ContentContainer = styled.div`
+  overflow-y: auto;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: #fff3e7;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #3f3f3f;
+  }
 `;
-const Content = styled.p``;
+const PostContainer = styled.div`
+  display: flex;
+  column-gap: 10px;
+`;
 const Avatar = styled.img`
   border-radius: 20px;
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   @media (max-width: 575px) {
     width: 30px;
     height: 30px;
   }
 `;
+const PosterContent = styled.div`
+  flex-grow: 1;
+`;
+const UserName = styled.p``;
+const Note = styled.p``;
+const Content = styled.p``;
+const FeatureBox = styled.div<{ show: boolean }>`
+  margin-left: auto;
+  position: relative;
+  display: ${(props) => (props.show ? "block" : "none")};
+  z-index: 5;
+`;
+const FeatureBtn = styled.button`
+  padding: 0;
+  color: #fff;
+  background: none;
+  border: none;
+`;
+const FeatureList = styled.ul<{ open: boolean }>`
+  display: ${(props) => (props.open ? "block" : "none")};
+  position: absolute;
+  background: #fff;
+  width: 70px;
+  right: 0;
+  border-radius: 8px;
+`;
+const FeatureItem = styled.li`
+  padding: 0;
+`;
+const FeatureInnerBtn = styled(FeatureBtn)`
+  display: block;
+  margin: 0 auto;
+  padding: 10px 18px;
+  color: #000;
+`;
+const Line = styled.div`
+  width: 100%;
+  height: 1px;
+  background: #c6c6c6;
+  margin-bottom: 20px;
+  margin-top: 20px;
+`;
+
 const CommentSection = styled.div`
-  height: 80%;
   overflow-y: auto;
   margin-bottom: 15px;
+  flex-grow: 1;
   &::-webkit-scrollbar {
     width: 8px;
   }
@@ -316,44 +336,19 @@ const CommentSection = styled.div`
     max-height: 150px;
   }
 `;
-const CommentBox = styled.div`
+const CommentContainer = styled.div`
+  display: flex;
+  column-gap: 10px;
   margin-bottom: 15px;
 `;
-const CommentAvatar = styled.img`
-  width: 30px;
-  height: 30px;
-  border-radius: 20px;
-  object-fit: cover;
-  @media (max-width: 575px) {
-    width: 25px;
-    height: 25px;
-  }
-`;
-const CommentUserName = styled.p``;
-const CommentText = styled.p``;
 const EditContainer = styled.div`
   display: flex;
   align-items: center;
+  margin-top: 5px;
 `;
 const EditCommentText = styled.input`
-  margin-top: 5px;
   padding: 5px 15px;
   width: 100%;
-  border-radius: 10px;
-  border: 1px solid #d2d2d2;
-`;
-
-const TypeIn = styled.div`
-  margin-top: auto;
-  display: flex;
-  padding: 0 5px;
-  align-items: center;
-`;
-
-const Type = styled.input`
-  margin-top: auto;
-  padding: 10px 15px;
-  flex-grow: 1;
   border-radius: 10px;
   border: 1px solid #d2d2d2;
 `;
@@ -363,47 +358,51 @@ const Send = styled.button`
   padding: 0 15px;
   border: none;
 `;
+const CommentText = styled.p``;
+const MoreBtn = styled(FeatureBtn)`
+  margin-right: 10px;
+`;
+const TypeIn = styled.div`
+  margin-top: auto;
+  display: flex;
+  padding: 0 5px;
+  align-items: center;
+`;
+const Type = styled.input`
+  margin-top: auto;
+  padding: 10px 15px;
+  flex-grow: 1;
+  border-radius: 10px;
+  border: 1px solid #d2d2d2;
+`;
 const NoView = styled.p`
   font-size: 1.5rem;
   text-align: center;
   margin: 40px 0;
 `;
 
-const CloseBtn = styled.button`
-  margin-left: auto;
-  display: block;
-  margin-top: 25px;
-  background: none;
-  border: none;
-  color: #fff;
-  @media (max-width: 575px) {
-    margin-top: 15px;
-  }
-`;
 interface Props {
   state: State;
   dispatch: React.Dispatch<Action>;
   handlerComment: (id: string) => void;
-  deletePost: (id: string) => void;
-  deleteComment: (post: string, id: string) => void;
 }
 
 interface CommentEdit {
   comment: string;
 }
 
-function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Props) {
+function Seat({ state, handlerComment, dispatch }: Props) {
+  const authContext = useContext(AuthContext);
+  const { isOpen, setIsOpen, closeDialog } = useDialog();
   const { register: registerEditComment, setValue, handleSubmit: handlerEditComment } = useForm<CommentEdit>();
   const [isMoreClick, setIsMoreClick] = useState<string>("");
-  const authContext = useContext(AuthContext);
 
   const createSubmitHandler = (postId: string, commentId: string): SubmitHandler<CommentEdit> => {
     const onSubmitEditComment: SubmitHandler<CommentEdit> = async (data) => {
       await api.updateComment(postId, commentId, data.comment);
-      console.log("提交成功");
       dispatch({ type: "toggleCommentMode", payload: { isCommentEditMode: "" } });
 
-      const update = state.viewPosts.map((item) => {
+      const update = state.viewPosts?.map((item) => {
         if (item.id == postId) {
           const updatedComments = item.comment?.map((comment) => {
             if (comment.id == commentId) {
@@ -415,7 +414,7 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
         }
         return item;
       });
-
+      console.log(update);
       dispatch({ type: "setViewPosts", payload: { viewPosts: update } });
     };
     return onSubmitEditComment;
@@ -428,8 +427,7 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
   };
   const handlerEditPost = (post: PostState) => {
     setIsMoreClick("");
-    dispatch({ type: "setPostMode", payload: { isPostEditMode: post } });
-    dispatch({ type: "togglePostClick", payload: { isPostClick: true } });
+    dispatch({ type: "setPostMode", payload: { isPostEditMode: post, isPostClick: true, isShowMask: true } });
     document.body.style.overflow = "hidden";
   };
 
@@ -438,11 +436,45 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
 
     dispatch({ type: "selectSeat", payload: { seat: value } });
   };
+  const handlerClickDelete = (id: string) => {
+    dispatch({ type: "toggleDeleteDialog", payload: { setDeleteViewId: id } });
+    setIsOpen(true);
+  };
+  const handlerClickCommentDelete = (post: string, id: string) => {
+    dispatch({ type: "setDeleteComment", payload: { viewId: post, deleteCommentId: id } });
+    setIsOpen(true);
+  };
+  const deleteComment = async () => {
+    await api.deleteComment(state.viewId, state.deleteCommentId);
+    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts?.map((post) => ({ ...post, comment: post.comment?.filter((comment) => comment.id !== state.deleteCommentId) })) } });
+  };
 
-  console.log(state.viewPosts);
-
+  const deletePost = async () => {
+    await api.deleteViewPost(state.setDeleteViewId);
+    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts?.filter((post) => post.id !== state.setDeleteViewId) } });
+    dispatch({ type: "toggleDeleteDialog", payload: { setDeleteViewId: "" } });
+  };
+  const handleCancel = () => {
+    if (state.setDeleteViewId !== "") {
+      dispatch({ type: "toggleDeleteDialog", payload: { setDeleteViewId: "" } });
+    } else if (state.deleteCommentId !== "") {
+      dispatch({ type: "setDeleteComment", payload: { viewId: "", deleteCommentId: "" } });
+    }
+    closeDialog();
+  };
   return (
     <SeatSection rowSelect={state.isSelectRow}>
+      {state.setDeleteViewId && (
+        <Dialog isOpen={isOpen} title="刪除視角貼文" onConfirm={deletePost} onCancel={handleCancel} confirmText="刪除">
+          確定刪除該篇視角貼文?
+        </Dialog>
+      )}
+
+      {state.deleteCommentId && (
+        <Dialog isOpen={isOpen} title="刪除留言" onConfirm={deleteComment} onCancel={handleCancel} confirmText="刪除">
+          確定刪除留言?
+        </Dialog>
+      )}
       <CloseBtn onClick={() => dispatch({ type: "isSelectRow" })}>
         <StyleClose />
       </CloseBtn>
@@ -474,6 +506,7 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
       </Seats>
 
       <Title> 視角分享</Title>
+
       {state.viewPosts && state.viewPosts.length !== 0 ? (
         state.viewPosts.map((post: PostState, index) => (
           <Card key={index}>
@@ -485,38 +518,48 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
               </ImgBox>
             </PhotoProvider>
             <ContentBox>
-              <PostHeader>
-                <UserBox>
+              <ContentContainer>
+                <PostContainer>
                   <Avatar src={post.avatar} />
-                  <UserName>{post.userName}</UserName>
-                </UserBox>
-
-                <FeatureBox show={authContext?.loginState === post.userUID}>
-                  <FeatureBtn onClick={() => setIsMoreClick((prev) => (prev === post.id ? "" : (post.id as string)))}>
-                    <StyleMore />
-                  </FeatureBtn>
-                  <FeatureList open={isMoreClick === post.id}>
-                    <FeatureItem>
-                      <FeatureInnerBtn onClick={() => handlerEditPost(post)}>編輯</FeatureInnerBtn>
-                    </FeatureItem>
-                    <FeatureItem>
-                      <FeatureInnerBtn onClick={() => deletePost(post.id)}>刪除</FeatureInnerBtn>
-                    </FeatureItem>
-                  </FeatureList>
-                </FeatureBox>
-              </PostHeader>
-              <Content>{post.concert}</Content>
-              <Content>{post.content}</Content>
-              <Note>備註 {post.note}</Note>
-              <CommentSection>
-                {post.comment &&
-                  post.comment.map((comment, index) => (
-                    <CommentBox key={index}>
-                      <CommentHeader>
-                        <UserBox>
-                          <CommentAvatar src={comment.avatar} />
-                          <CommentUserName>{comment.userName}</CommentUserName>
-                        </UserBox>
+                  <PosterContent>
+                    <UserName>{post.userName}</UserName>
+                    <Content>{post.concert}</Content>
+                    {post.content && <Content dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, "<br />") }}></Content>}
+                    {post.note !== "" && <Note>備註 {post.note}</Note>}
+                  </PosterContent>
+                  <FeatureBox show={authContext?.loginState === post.userUID}>
+                    <FeatureBtn onClick={() => setIsMoreClick((prev) => (prev === post.id ? "" : (post.id as string)))}>
+                      <StyleMore />
+                    </FeatureBtn>
+                    <FeatureList open={isMoreClick === post.id}>
+                      <FeatureItem>
+                        <FeatureInnerBtn onClick={() => handlerEditPost(post)}>編輯</FeatureInnerBtn>
+                      </FeatureItem>
+                      <FeatureItem>
+                        <FeatureInnerBtn onClick={() => handlerClickDelete(post.id)}>刪除</FeatureInnerBtn>
+                      </FeatureItem>
+                    </FeatureList>
+                  </FeatureBox>
+                </PostContainer>
+                <Line />
+                <CommentSection>
+                  {post.comment &&
+                    post.comment.map((comment, index) => (
+                      <CommentContainer key={index}>
+                        <Avatar src={comment.avatar} />
+                        <PosterContent>
+                          <UserName>{comment.userName}</UserName>
+                          {state.isCommentEditMode === comment.id ? (
+                            <EditContainer>
+                              <EditCommentText type="text" {...registerEditComment("comment")} />
+                              <Send onClick={handlerEditComment(createSubmitHandler(post.id, comment.id))}>
+                                <IoSend />
+                              </Send>
+                            </EditContainer>
+                          ) : (
+                            <CommentText>{comment.content}</CommentText>
+                          )}
+                        </PosterContent>
                         <FeatureBox show={authContext?.loginState === comment.userUID}>
                           <MoreBtn onClick={() => setIsMoreClick((prev) => (prev === comment.id ? "" : (comment.id as string)))}>
                             <StyleMore />
@@ -526,25 +569,14 @@ function Seat({ state, handlerComment, deletePost, deleteComment, dispatch }: Pr
                               <FeatureInnerBtn onClick={() => handleComment(comment.id, comment.content as string)}>編輯</FeatureInnerBtn>
                             </FeatureItem>
                             <FeatureItem>
-                              <FeatureInnerBtn onClick={() => deleteComment(post.id, comment.id)}>刪除</FeatureInnerBtn>
+                              <FeatureInnerBtn onClick={() => handlerClickCommentDelete(post.id, comment.id)}>刪除</FeatureInnerBtn>
                             </FeatureItem>
                           </FeatureList>
                         </FeatureBox>
-                      </CommentHeader>
-
-                      {state.isCommentEditMode === comment.id ? (
-                        <EditContainer>
-                          <EditCommentText type="text" {...registerEditComment("comment")} />
-                          <Send onClick={handlerEditComment(createSubmitHandler(post.id, comment.id))}>
-                            <IoSend />
-                          </Send>
-                        </EditContainer>
-                      ) : (
-                        <CommentText>{comment.content}</CommentText>
-                      )}
-                    </CommentBox>
-                  ))}
-              </CommentSection>
+                      </CommentContainer>
+                    ))}
+                </CommentSection>
+              </ContentContainer>
               {authContext?.loginState !== undefined ? (
                 <TypeIn>
                   <Type type="text" placeholder="留言..." value={state.comment[post.id]} onChange={(e) => dispatch({ type: "setComment", payload: { id: post.id, commentText: e.target.value } })} />

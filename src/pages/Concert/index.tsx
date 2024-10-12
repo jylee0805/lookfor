@@ -1,12 +1,12 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
 import api from "../../utils/api";
-import { useContext, useEffect, useState } from "react";
 import { ConcertContext } from "../../utils/ConcertContextProvider";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
 
 const Container = styled.div`
   margin: 0 auto;
-  padding: 0 60px;
+  padding: 60px 60px;
   @media (max-width: 992px) {
     padding: 0 40px;
   }
@@ -19,10 +19,6 @@ const ConcertName = styled.h3`
   margin-bottom: 40px;
   font-weight: 700;
   text-align: center;
-  @media (max-width: 992px) {
-  }
-  @media (max-width: 768px) {
-  }
 `;
 const BtnBox = styled.div`
   border-radius: 50px;
@@ -31,7 +27,6 @@ const BtnBox = styled.div`
   width: 360px;
   text-align: center;
   margin: 0 auto 50px;
-
   border: 2px solid #fff;
 
   @media (max-width: 575px) {
@@ -51,18 +46,6 @@ const PageBtn = styled(Link)`
     color: rgb(255, 98, 19);
   }
 `;
-
-const Poster = styled.img`
-  max-width: 300px;
-`;
-const PosterBox = styled.div`
-  width: 50%;
-  text-align: center;
-  @media (max-width: 992px) {
-    width: 100%;
-  }
-`;
-
 const Content = styled.div`
   display: flex;
   flex: auto;
@@ -74,19 +57,25 @@ const Content = styled.div`
     row-gap: 25px;
   }
 `;
-
+const PosterBox = styled.div`
+  width: 50%;
+  text-align: center;
+  margin-bottom: 40px;
+  @media (max-width: 992px) {
+    width: 100%;
+  }
+`;
+const Poster = styled.img`
+  max-width: 320px;
+  border: 5px solid #fff;
+`;
 const InfoContainer = styled.div`
   @media (max-width: 768px) {
     padding: 0 20px;
   }
 `;
-
 const Info = styled.div`
   margin-bottom: 30px;
-`;
-const InfoItem = styled.div`
-  display: flex;
-  margin-bottom: 5px;
 `;
 const Title = styled.h4`
   font-size: 1.7rem;
@@ -101,7 +90,10 @@ const Title = styled.h4`
     font-size: 1.5rem;
   }
 `;
-
+const InfoItem = styled.div`
+  display: flex;
+  margin-bottom: 5px;
+`;
 const SubTitle = styled.p`
   font-size: 1.2rem;
   letter-spacing: 4px;
@@ -112,10 +104,7 @@ const SubTitle = styled.p`
     letter-spacing: 5px;
   }
 `;
-const Text = styled.p`
-  font-size: 1.1rem;
-  line-height: 1.5;
-`;
+
 const List = styled.ul`
   font-size: 1.1rem;
   line-height: 1.5;
@@ -123,7 +112,10 @@ const List = styled.ul`
     font-size: 1rem;
   }
 `;
-
+const Text = styled.p`
+  font-size: 1.1rem;
+  line-height: 1.5;
+`;
 const WebLink = styled.a`
   font-size: 1.1rem;
   line-height: 1.5;
@@ -144,16 +136,19 @@ export interface Detail {
   images: string;
 }
 function Concert() {
+  const navigate = useNavigate();
+  const concertContext = useContext(ConcertContext);
   const queryParams = new URLSearchParams(window.location.search);
   const concertId = queryParams.get("concert") || "";
   const [detailData, setDetailData] = useState<Detail | null>(null);
-  const concertContext = useContext(ConcertContext);
 
   useEffect(() => {
     const getDetail = async (concertId: string) => {
       const detail = await api.getConcertDetail(concertId);
+      if (detail === null) {
+        navigate("/");
+      }
       setDetailData(detail);
-      console.log(detail);
     };
     getDetail(concertId);
     concertContext?.setConcertId(concertId);
@@ -190,12 +185,10 @@ function Concert() {
               <List>{detailData?.ticketSaleTime && detailData.ticketSaleTime.map((item) => <li>{item}</li>)}</List>
             </InfoItem>
             <InfoItem>
-              {" "}
-              <SubTitle>票　　價｜</SubTitle>
+              <SubTitle>票{"　　"}價｜</SubTitle>
               <Text>{detailData?.ticketPrice}</Text>
             </InfoItem>
             <InfoItem>
-              {" "}
               <SubTitle>售票網頁｜</SubTitle>
               <WebLink href={detailData?.ticketSaleWebsite} target="blank">
                 {detailData?.ticketSaleWebsite}

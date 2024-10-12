@@ -60,31 +60,10 @@ const Vip = styled.div`
     height: 60px;
   }
 `;
-const Second = styled.div`
-  position: relative;
-  height: 180px;
-  color: #000;
-  @media (max-width: 768px) {
-    height: 140px;
-  }
-  @media (max-width: 575px) {
-    height: 80px;
-  }
-`;
-const Third = styled.div`
-  height: 300px;
-  position: relative;
-  color: #000;
-  @media (max-width: 768px) {
-    height: 200px;
-  }
-  @media (max-width: 575px) {
-    height: 150px;
-  }
-`;
+
 const VipAMain = styled.div<{ x: number; y: number }>`
-  width: 240px;
-  height: 160px;
+  width: 300px;
+  height: 200px;
   position: fixed;
   display: none;
   top: ${(props) => `${props.y}px`};
@@ -168,7 +147,17 @@ const VipC = styled(motion.div)`
     height: 100%;
   }
 `;
-
+const Second = styled.div`
+  position: relative;
+  height: 180px;
+  color: #000;
+  @media (max-width: 768px) {
+    height: 140px;
+  }
+  @media (max-width: 575px) {
+    height: 80px;
+  }
+`;
 const SecondDiv = styled(motion.div)`
   position: absolute;
   background-color: #ffb3b3;
@@ -181,12 +170,12 @@ const SecondDiv = styled(motion.div)`
   }
 `;
 
-const SecondG = styled(SecondDiv)`
-  width: 15%;
+const SecondA = styled(SecondDiv)`
+  width: 14.5%;
   height: 150px;
-  top: 0px;
-  left: 77.5%;
-  mask-image: url("${SecondGPhoto}");
+  top: 0;
+  left: 5%;
+  mask-image: url("${SecondAPhoto}");
 
   @media (max-width: 575px) {
     height: 100%;
@@ -195,27 +184,28 @@ const SecondG = styled(SecondDiv)`
     display: block;
   }
 `;
-const SecondF = styled(SecondDiv)`
+const SecondB = styled(SecondDiv)`
   width: 13.2%;
   height: 165px;
-  top: 47px;
-  left: 68%;
-  mask-image: url("${SecondFPhoto}");
+  top: 48px;
+  left: 16.5%;
+  mask-image: url("${SecondBPhoto}");
 
   @media (max-width: 575px) {
     height: 100%;
-    top: 25px;
+    top: 28px;
   }
   &:hover + ${VipAMain} {
     display: block;
   }
 `;
-const SecondE = styled(SecondDiv)`
+
+const SecondC = styled(SecondDiv)`
   width: 11.9%;
   height: 156px;
-  top: 74px;
-  left: 57.5%;
-  mask-image: url("${SecondEPhoto}");
+  top: 72px;
+  left: 28.5%;
+  mask-image: url("${SecondCPhoto}");
 
   @media (max-width: 575px) {
     height: 100%;
@@ -240,12 +230,12 @@ const SecondD = styled(SecondDiv)`
     display: block;
   }
 `;
-const SecondC = styled(SecondDiv)`
+const SecondE = styled(SecondDiv)`
   width: 11.9%;
   height: 156px;
-  top: 72px;
-  left: 28.5%;
-  mask-image: url("${SecondCPhoto}");
+  top: 74px;
+  left: 57.5%;
+  mask-image: url("${SecondEPhoto}");
 
   @media (max-width: 575px) {
     height: 100%;
@@ -255,33 +245,45 @@ const SecondC = styled(SecondDiv)`
     display: block;
   }
 `;
-const SecondB = styled(SecondDiv)`
+const SecondF = styled(SecondDiv)`
   width: 13.2%;
   height: 165px;
-  top: 48px;
-  left: 16.5%;
-  mask-image: url("${SecondBPhoto}");
+  top: 47px;
+  left: 68%;
+  mask-image: url("${SecondFPhoto}");
 
   @media (max-width: 575px) {
     height: 100%;
-    top: 28px;
+    top: 25px;
   }
   &:hover + ${VipAMain} {
     display: block;
   }
 `;
-const SecondA = styled(SecondDiv)`
-  width: 14.5%;
+const SecondG = styled(SecondDiv)`
+  width: 15%;
   height: 150px;
-  top: 0;
-  left: 5%;
-  mask-image: url("${SecondAPhoto}");
+  top: 0px;
+  left: 77.5%;
+  mask-image: url("${SecondGPhoto}");
 
   @media (max-width: 575px) {
     height: 100%;
   }
   &:hover + ${VipAMain} {
     display: block;
+  }
+`;
+
+const Third = styled.div`
+  height: 300px;
+  position: relative;
+  color: #000;
+  @media (max-width: 768px) {
+    height: 200px;
+  }
+  @media (max-width: 575px) {
+    height: 150px;
   }
 `;
 const ThirdDiv = styled(motion.div)`
@@ -405,17 +407,6 @@ const Text = styled.p<{ haveData: boolean; color: string }>`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  /* &::after {
-    content: "";
-    display: ${(props) => (props.haveData ? "block" : "none")};
-    position: absolute;
-    top: -15%;
-    left: 100%;
-    background: ${(props) => props.color};
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-  }*/
 `;
 
 interface Props {
@@ -445,7 +436,7 @@ function Sections({ handlerSection, state }: Props) {
           data-section="VIPA"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "VIPA" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "VIPA" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -460,14 +451,14 @@ function Sections({ handlerSection, state }: Props) {
         </VipA>
         {state.allSectionPost?.find((view) => view.section === "VIPA") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "VIPA")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "VIPA")?.image || ""} />
           </VipAMain>
         )}
         <VipB
           data-section="VIPB"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "VIPB" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "VIPB" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -482,14 +473,14 @@ function Sections({ handlerSection, state }: Props) {
         </VipB>
         {state.allSectionPost?.find((view) => view.section === "VIPB") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "VIPB")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "VIPB")?.image || ""} />
           </VipAMain>
         )}
         <VipC
           data-section="VIPC"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "VIPC" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "VIPC" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -504,7 +495,7 @@ function Sections({ handlerSection, state }: Props) {
         </VipC>
         {state.allSectionPost?.find((view) => view.section === "VIPC") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "VIPC")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "VIPC")?.image || ""} />
           </VipAMain>
         )}
       </Vip>
@@ -513,7 +504,7 @@ function Sections({ handlerSection, state }: Props) {
           data-section="2A"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2A" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "2A" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 100, damping: 5 }}
           onMouseEnter={handleMouseMove}
@@ -525,17 +516,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             2A
           </Text>
-        </SecondA>{" "}
+        </SecondA>
         {state.allSectionPost?.find((view) => view.section === "2A") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2A")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2A")?.image || ""} />
           </VipAMain>
         )}
         <SecondB
           data-section="2B"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2B" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "2B" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -547,17 +538,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             2B
           </Text>
-        </SecondB>{" "}
+        </SecondB>
         {state.allSectionPost?.find((view) => view.section === "2B") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2B")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2B")?.image || ""} />
           </VipAMain>
         )}
         <SecondC
           data-section="2C"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2C" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "2C" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -569,17 +560,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             2C
           </Text>
-        </SecondC>{" "}
+        </SecondC>
         {state.allSectionPost?.find((view) => view.section === "2C") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2C")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2C")?.image || ""} />
           </VipAMain>
         )}
         <SecondD
           data-section="2D"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2D" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "2D" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -591,17 +582,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             2D
           </Text>
-        </SecondD>{" "}
+        </SecondD>
         {state.allSectionPost?.find((view) => view.section === "2D") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2D")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2D")?.image || ""} />
           </VipAMain>
         )}
         <SecondE
           data-section="2E"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2E" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "2E" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -613,17 +604,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             2E
           </Text>
-        </SecondE>{" "}
+        </SecondE>
         {state.allSectionPost?.find((view) => view.section === "2E") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2E")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2E")?.image || ""} />
           </VipAMain>
         )}
         <SecondF
           data-section="2F"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2F" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "2F" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -635,17 +626,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             2F
           </Text>
-        </SecondF>{" "}
+        </SecondF>
         {state.allSectionPost?.find((view) => view.section === "2F") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2F")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2F")?.image || ""} />
           </VipAMain>
         )}
         <SecondG
           data-section="2G"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2G" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "2G" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -657,10 +648,10 @@ function Sections({ handlerSection, state }: Props) {
           >
             2G
           </Text>
-        </SecondG>{" "}
+        </SecondG>
         {state.allSectionPost?.find((view) => view.section === "2G") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2G")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2G")?.image || ""} />
           </VipAMain>
         )}
       </Second>
@@ -669,7 +660,7 @@ function Sections({ handlerSection, state }: Props) {
           data-section="3A"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3A" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "3A" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -681,17 +672,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             3A
           </Text>
-        </ThirdA>{" "}
+        </ThirdA>
         {state.allSectionPost?.find((view) => view.section === "3A") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3A")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3A")?.image || ""} />
           </VipAMain>
         )}
         <ThirdB
           data-section="3B"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3B" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "3B" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -703,17 +694,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             3B
           </Text>
-        </ThirdB>{" "}
+        </ThirdB>
         {state.allSectionPost?.find((view) => view.section === "3B") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3B")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3B")?.image || ""} />
           </VipAMain>
         )}
         <ThirdC
           data-section="3C"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3C" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "3C" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -725,17 +716,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             3C
           </Text>
-        </ThirdC>{" "}
+        </ThirdC>
         {state.allSectionPost?.find((view) => view.section === "3C") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3C")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3C")?.image || ""} />
           </VipAMain>
         )}
         <ThirdD
           data-section="3D"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3D" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "3D" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -747,17 +738,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             3D
           </Text>
-        </ThirdD>{" "}
+        </ThirdD>
         {state.allSectionPost?.find((view) => view.section === "3D") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3D")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3D")?.image || ""} />
           </VipAMain>
         )}
         <ThirdE
           data-section="3E"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3E" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "3E" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -769,17 +760,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             3E
           </Text>
-        </ThirdE>{" "}
+        </ThirdE>
         {state.allSectionPost?.find((view) => view.section === "3E") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3E")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3E")?.image || ""} />
           </VipAMain>
         )}
         <ThirdF
           data-section="3F"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3F" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "3F" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -791,17 +782,17 @@ function Sections({ handlerSection, state }: Props) {
           >
             3F
           </Text>
-        </ThirdF>{" "}
+        </ThirdF>
         {state.allSectionPost?.find((view) => view.section === "3F") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3F")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3F")?.image || ""} />
           </VipAMain>
         )}
         <ThirdG
           data-section="3G"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3G" ? 1.1 : 1, // 根據狀態決定縮放比例
+            scale: state.section === "3G" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
@@ -816,7 +807,7 @@ function Sections({ handlerSection, state }: Props) {
         </ThirdG>
         {state.allSectionPost?.find((view) => view.section === "3G") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3G")?.img || ""} />
+            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3G")?.image || ""} />
           </VipAMain>
         )}
       </Third>

@@ -1,7 +1,9 @@
 import styled from "styled-components";
 import SignUp from "./SignUp";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import LogIn from "./Login";
+import { AuthContext } from "../../utils/AuthContextProvider";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   color: #fff;
@@ -14,8 +16,6 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   padding: 32px 56px;
-  //background: #b1b1b160;
-  //box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   row-gap: 25px;
   margin: 0 auto;
@@ -26,7 +26,6 @@ const Card = styled.div`
     width: 90%;
     margin: 0 auto;
     padding: 32px 6%;
-
     row-gap: 10px;
   }
 `;
@@ -42,15 +41,19 @@ const SelectBtn = styled.button<{ isSelect: boolean }>`
   border-radius: 10px 0 0 10px;
   font-weight: 600;
   border: none;
-  @media (max-width: 575px) {
-  }
 `;
 const SignUpBtn = styled(SelectBtn)`
   border-radius: 0 10px 10px 0;
 `;
 
 function Login() {
+  const navigate = useNavigate();
+  const authContext = useContext(AuthContext);
   const [isLogin, setIsLogin] = useState<boolean>(true);
+
+  if (authContext?.loginState) {
+    navigate("/");
+  }
 
   return (
     <Container>
@@ -63,7 +66,7 @@ function Login() {
             Sign Up
           </SignUpBtn>
         </ButtonGroup>
-        {isLogin ? <LogIn isLogin={isLogin} /> : <SignUp isLogin={isLogin} setIsLogin={setIsLogin} />}
+        {isLogin ? <LogIn isLogin={isLogin} /> : <SignUp isLogin={isLogin} />}
       </Card>
     </Container>
   );

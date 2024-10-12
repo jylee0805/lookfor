@@ -1,11 +1,9 @@
 import { createGlobalStyle } from "styled-components";
-
+import swei500 from "./utils/SweiGothicCJKtc-Regular.ttf";
 import swei600 from "./utils/SweiGothicCJKtc-Medium.ttf";
-
 import swei700 from "./utils/SweiGothicCJKtc-Bold.ttf";
 
 const GlobalStyle = createGlobalStyle`
-
 
 @font-face {
   font-family: "swei";
@@ -14,12 +12,13 @@ const GlobalStyle = createGlobalStyle`
 }
 @font-face {
   font-family: "swei";
-  src: url("${swei600}") format("TrueType");
- 
+  src: url("${swei500}") format("TrueType");
 }
-
-
-
+@font-face {
+  font-family: "swei";
+  src: url("${swei600}") format("TrueType");
+  font-weight: 600;
+}
 html,
 body,
 div,

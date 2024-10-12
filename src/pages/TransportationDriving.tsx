@@ -44,12 +44,11 @@ const SubTitle = styled.h4`
   @media (max-width: 575px) {
   }
 `;
-const ParkSubTitle = styled(SubTitle)`
-  grid-column: span 2;
-  margin: 0;
-  justify-content: flex-start;
+const Detail = styled.div`
+  padding: 0px 0 20px;
   @media (max-width: 992px) {
-    grid-column: span 1;
+    grid-template-columns: auto;
+    padding: 0;
   }
 `;
 const Station = styled.p`
@@ -58,16 +57,6 @@ const Station = styled.p`
 `;
 const Away = styled.p`
   margin-bottom: 25px;
-
-  @media (max-width: 992px) {
-  }
-`;
-const Detail = styled.div`
-  padding: 0px 0 20px;
-  @media (max-width: 992px) {
-    grid-template-columns: auto;
-    padding: 0;
-  }
 `;
 const Line = styled.div`
   grid-column: span 2;
@@ -78,7 +67,14 @@ const Line = styled.div`
     grid-column: span 1;
   }
 `;
-
+const ParkSubTitle = styled(SubTitle)`
+  grid-column: span 2;
+  margin: 0;
+  justify-content: flex-start;
+  @media (max-width: 992px) {
+    grid-column: span 1;
+  }
+`;
 const containerStyle = {
   width: "100%",
   height: "600px",
@@ -211,7 +207,6 @@ function TransportationDriving() {
   return (
     <Container>
       <VenueHeader />
-      {/* {!loaded && <Loading />} */}
       <Main>
         <Content>
           <SubTitle>自行開車</SubTitle>
@@ -240,12 +235,6 @@ function TransportationDriving() {
                         url: place.name === selectedMarker?.name ? selectPin : pin,
                         scaledSize: new window.google.maps.Size(65, 65),
                       }}
-                      // label={{
-                      //   text: place.availablecar === undefined ? " " : place.availablecar === -9 ? "0" : place.availablecar.toString(),
-                      //   color: "#000000",
-                      //   fontWeight: "700",
-                      //   fontSize: "18px",
-                      // }}
                     >
                       <CustomMarkerLabel
                         position={{ lat: place.lat as number, lng: place.lng as number }}

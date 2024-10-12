@@ -19,7 +19,6 @@ function App() {
   };
 
   useEffect(() => {
-    // 假设在一开始或某个资源加载完成后我们设置 loaded 状态
     setTimeout(() => {
       onLoad();
     }, 5000);

@@ -2,7 +2,7 @@ import { useContext, useEffect, useReducer, useState } from "react";
 import styled from "styled-components";
 import api from "../utils/api";
 import { AuthContext } from "../utils/AuthContextProvider";
-import { PostState } from "../pages/View";
+import { OriginView } from "../pages/View";
 import { MerchPost } from "../pages/FansSupport";
 import { Link, useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
@@ -32,12 +32,34 @@ const HeadShot = styled.img`
   object-fit: cover;
   border-radius: 50%;
 `;
+const EditName = styled.input`
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 1px solid #fff;
+  outline: none;
+  background: none;
+  color: #fff;
+  font-size: 1.1rem;
+  text-align: center;
+`;
 const UserName = styled.p`
   font-size: 20px;
   line-height: 1.5;
   font-weight: 700;
 `;
+const Label = styled.label<{ isEdit: boolean }>`
+  display: ${(props) => (props.isEdit ? "block" : "none")};
+`;
+const Input = styled.input`
+  display: none;
+`;
 const EditBtn = styled.button``;
+const Title = styled.h3`
+  font-size: 1.8rem;
+  font-weight: 700;
+  grid-column: span 2;
+  margin-top: 50px;
+`;
 const PostContainer = styled.ul`
   display: flex;
   overflow-x: auto;
@@ -56,10 +78,40 @@ const PostContainer = styled.ul`
     background-color: #3f3f3f;
   }
 `;
+const PostItem = styled.li`
+  padding: 15px 20px;
+  background: #f8f8f8;
+  border-radius: 10px;
+  color: #000;
+  display: block;
+  min-width: 280px;
+  max-width: 280px;
+`;
+const PostTextContainer = styled.div`
+  flex-grow: 1;
+  min-height: 120px;
+`;
+const SupportPostTextContainer = styled(PostTextContainer)`
+  width: 250px;
+  min-height: 120px;
+  @media (max-width: 575px) {
+    width: 180px;
+  }
+`;
 
-const PostImg = styled.img`
-  object-fit: cover;
-  border-radius: 8px;
+const PostTitle = styled.p`
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+`;
+const PostText = styled.p`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 `;
 const PostImgBox = styled.div`
   width: 100%;
@@ -78,53 +130,9 @@ const SupportPostImgBox = styled(PostImgBox)`
     margin: 15px auto 0;
   }
 `;
-const Title = styled.h3`
-  font-size: 1.8rem;
-  font-weight: 700;
-  grid-column: span 2;
-  margin-top: 50px;
-`;
-const PostTextContainer = styled.div`
-  flex-grow: 1;
-`;
-const SupportPostTextContainer = styled(PostTextContainer)`
-  width: 250px;
-  @media (max-width: 575px) {
-    width: 180px;
-  }
-`;
-
-const PostItem = styled.li`
-  padding: 15px 20px;
-  background: #f8f8f8;
-  border-radius: 10px;
-  color: #000;
-`;
-const StyleLink = styled(Link)`
-  color: #000;
-  display: block;
-  min-width: 240px;
-`;
-const PostTitle = styled.p`
-  font-weight: 700;
-  margin-bottom: 8px;
-`;
-const PostText = styled.p``;
-const Label = styled.label<{ isEdit: boolean }>`
-  display: ${(props) => (props.isEdit ? "block" : "none")};
-`;
-const Input = styled.input`
-  display: none;
-`;
-const EditName = styled.input`
-  padding: 10px 15px;
-  border-radius: 10px;
-  border: 1px solid #fff;
-  outline: none;
-  background: none;
-  color: #fff;
-  font-size: 1.1rem;
-  text-align: center;
+const PostImg = styled.img`
+  object-fit: cover;
+  border-radius: 8px;
 `;
 const Hint = styled.p`
   padding: 10px 15px;
@@ -134,16 +142,23 @@ const Hint = styled.p`
   line-height: 2;
 `;
 
+const StyleLink = styled(Link)`
+  color: #000;
+  display: block;
+  min-width: 240px;
+`;
+
 interface Profile {
   avatar: string;
   userName: string;
   UID: string;
   id: string;
+  keepIds?: string[];
 }
 
 interface ProfileState {
   profile: Profile;
-  viewPosts: PostState[];
+  viewPosts: OriginView[];
   merchPosts: MerchPost[];
   concertNames: string[];
   isEditProfile: boolean;
@@ -152,7 +167,7 @@ interface ProfileState {
   localPhotoUrl: string;
 }
 type ProfileAction =
-  | { type: "setData"; payload: { profile: Profile; viewPosts: PostState[]; supportPosts: MerchPost[]; concertNames: string[]; editUserName: string } }
+  | { type: "setData"; payload: { profile: Profile; viewPosts: OriginView[]; supportPosts: MerchPost[]; concertNames: string[]; editUserName: string } }
   | { type: "toggleIsEditProfile" }
   | { type: "setPhoto"; payload: { selectPhoto: File | null; localPhotoUrl: string } }
   | { type: "setProfile"; payload: { profile: Profile } }
@@ -198,9 +213,9 @@ const reducer = (state: ProfileState, action: ProfileAction): ProfileState => {
 };
 
 function Profile() {
-  const [state, dispatch] = useReducer(reducer, initial);
-  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
+  const authContext = useContext(AuthContext);
+  const [state, dispatch] = useReducer(reducer, initial);
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     // 假设在一开始或某个资源加载完成后我们设置 loaded 状态
@@ -209,6 +224,7 @@ function Profile() {
       document.body.style.overflowY = "auto";
     }, 2000);
   }, []);
+
   useEffect(() => {
     const getData = async () => {
       if (authContext) {
@@ -256,12 +272,14 @@ function Profile() {
       dispatch({ type: "toggleIsEditProfile" });
     }
   };
+
   const handleImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
       dispatch({ type: "setPhoto", payload: { selectPhoto: target.files[0], localPhotoUrl: URL.createObjectURL(target.files[0]) } });
     }
   };
+
   const handleViewPostClick = (section: string, row: number, seat: number) => {
     navigate("/view", {
       state: { section, row, seat },
@@ -289,16 +307,14 @@ function Profile() {
         <PostContainer>
           {state.viewPosts.map((item) => (
             <PostItem key={item.id} onClick={() => handleViewPostClick(item.section as string, item.row as number, item.seat as number)}>
-              <StyleLink to={`/view`}>
-                <PostTextContainer>
-                  <PostTitle>{`${item.section}區${item.row}排${item.seat}號`}</PostTitle>
-                  <PostText>{item.note}</PostText>
-                  <PostText>{item.content}</PostText>
-                </PostTextContainer>
-                <PostImgBox>
-                  <PostImg src={item.image} />
-                </PostImgBox>
-              </StyleLink>
+              <PostTextContainer>
+                <PostTitle>{`${item.section}區${item.row}排${item.seat}號`}</PostTitle>
+                <PostText>{item.note}</PostText>
+                <PostText>{item.content}</PostText>
+              </PostTextContainer>
+              <PostImgBox>
+                <PostImg src={item.image} />
+              </PostImgBox>
             </PostItem>
           ))}
         </PostContainer>
@@ -316,7 +332,7 @@ function Profile() {
                   <PostTitle>{state.concertNames[index]}</PostTitle>
                   <PostText>{item.passDay}</PostText>
                   <PostText>{item.passTime}</PostText>
-                  <PostText>{item.passState}</PostText>
+                  <PostText>{item.passState === "0" ? "尚未發放" : item.passState === "1 " ? "發放中" : "發放完畢"}</PostText>
                 </SupportPostTextContainer>
                 <SupportPostImgBox>
                   <PostImg src={item.image[0]} />

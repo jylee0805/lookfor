@@ -7,6 +7,7 @@ interface Props {
 }
 const CustomMarkerLabel = ({ position, text }: Props) => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+
   return (
     <OverlayView
       position={position}
@@ -17,18 +18,20 @@ const CustomMarkerLabel = ({ position, text }: Props) => {
       })}
       onLoad={() => setIsMapLoaded(true)}
     >
-      <div
-        style={{
-          width: "30px",
-          fontWeight: "700",
-          fontSize: "16px",
-          textAlign: "center",
-          lineHeight: "1.5",
-          color: "#000",
-        }}
-      >
-        {text}
-      </div>
+      {isMapLoaded && (
+        <div
+          style={{
+            width: "30px",
+            fontWeight: "700",
+            fontSize: "16px",
+            textAlign: "center",
+            lineHeight: "1.5",
+            color: "#000",
+          }}
+        >
+          {text}
+        </div>
+      )}
     </OverlayView>
   );
 };

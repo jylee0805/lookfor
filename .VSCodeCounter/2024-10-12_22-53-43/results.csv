@@ -1,0 +1,67 @@
+"filename", "language", "JSON", "JSON with Comments", "TypeScript", "Markdown", "JavaScript", "TypeScript JSX", "HTML", "XML", "comment", "blank", "total"
+"d:\WEB\lookfor\README.md", "Markdown", 0, 0, 0, 40, 0, 0, 0, 0, 0, 11, 51
+"d:\WEB\lookfor\eslint.config.js", "JavaScript", 0, 0, 0, 0, 27, 0, 0, 0, 0, 2, 29
+"d:\WEB\lookfor\firebase.json", "JSON", 12, 0, 0, 0, 0, 0, 0, 0, 0, 1, 13
+"d:\WEB\lookfor\index.html", "HTML", 0, 0, 0, 0, 0, 0, 27, 0, 0, 5, 32
+"d:\WEB\lookfor\package-lock.json", "JSON", 5569, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5570
+"d:\WEB\lookfor\package.json", "JSON", 54, 0, 0, 0, 0, 0, 0, 0, 0, 1, 55
+"d:\WEB\lookfor\src\App.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 40, 0, 0, 0, 6, 46
+"d:\WEB\lookfor\src\GlobalStyle.ts", "TypeScript", 0, 0, 218, 0, 0, 0, 0, 0, 1, 10, 229
+"d:\WEB\lookfor\src\components\CustomLabel.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 36, 0, 0, 0, 4, 40
+"d:\WEB\lookfor\src\components\Dialog.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 77, 0, 0, 0, 5, 82
+"d:\WEB\lookfor\src\components\Header.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 461, 0, 0, 0, 22, 483
+"d:\WEB\lookfor\src\components\Loading.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 90, 0, 0, 0, 4, 94
+"d:\WEB\lookfor\src\components\VenueHeader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 159, 0, 0, 0, 7, 166
+"d:\WEB\lookfor\src\images\Vector 7-1.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 7-2.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 7.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 8.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-1.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-10.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-11.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-12.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-13.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-2.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-3.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-4.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-5.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-6.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-7.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-8.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-9.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 4
+"d:\WEB\lookfor\src\main.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 35, 0, 0, 0, 3, 38
+"d:\WEB\lookfor\src\pages\Background.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 61, 0, 0, 0, 4, 65
+"d:\WEB\lookfor\src\pages\ConcertList\index.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 277, 0, 0, 0, 15, 292
+"d:\WEB\lookfor\src\pages\Concert\index.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 196, 0, 0, 0, 9, 205
+"d:\WEB\lookfor\src\pages\FansSupport\FanPost.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 351, 0, 0, 3, 22, 376
+"d:\WEB\lookfor\src\pages\FansSupport\index.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 588, 0, 0, 3, 39, 630
+"d:\WEB\lookfor\src\pages\Home.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 262, 0, 0, 1, 22, 285
+"d:\WEB\lookfor\src\pages\Keep.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 189, 0, 0, 0, 10, 199
+"d:\WEB\lookfor\src\pages\Login\Login.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 149, 0, 0, 0, 13, 162
+"d:\WEB\lookfor\src\pages\Login\SignUp.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 239, 0, 0, 0, 13, 252
+"d:\WEB\lookfor\src\pages\Login\index.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 70, 0, 0, 0, 6, 76
+"d:\WEB\lookfor\src\pages\Profile.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 333, 0, 0, 1, 18, 352
+"d:\WEB\lookfor\src\pages\TransportationDriving.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 256, 0, 0, 0, 15, 271
+"d:\WEB\lookfor\src\pages\TransportationPublic.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 111, 0, 0, 0, 5, 116
+"d:\WEB\lookfor\src\pages\View\Post.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 507, 0, 0, 0, 32, 539
+"d:\WEB\lookfor\src\pages\View\Rows.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 102, 0, 0, 0, 7, 109
+"d:\WEB\lookfor\src\pages\View\Seat.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 587, 0, 0, 0, 16, 603
+"d:\WEB\lookfor\src\pages\View\Sections.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 803, 0, 0, 0, 16, 819
+"d:\WEB\lookfor\src\pages\View\index.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 454, 0, 0, 3, 43, 500
+"d:\WEB\lookfor\src\types\ProfileTypes.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 23, 0, 0, 0, 2, 25
+"d:\WEB\lookfor\src\utils\AuthContextProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 39, 0, 0, 0, 9, 48
+"d:\WEB\lookfor\src\utils\ComponentContextProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 13, 0, 0, 0, 3, 16
+"d:\WEB\lookfor\src\utils\ConcertContextProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 29, 0, 0, 0, 8, 37
+"d:\WEB\lookfor\src\utils\api.ts", "TypeScript", 0, 0, 531, 0, 0, 0, 0, 0, 15, 76, 622
+"d:\WEB\lookfor\src\utils\firebase.ts", "TypeScript", 0, 0, 74, 0, 0, 0, 0, 0, 0, 4, 78
+"d:\WEB\lookfor\src\utils\useDialog.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 16, 0, 0, 0, 5, 21
+"d:\WEB\lookfor\src\utils\useGoogleVisionAPI.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 53, 0, 0, 0, 7, 60
+"d:\WEB\lookfor\src\vite-env.d.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2
+"d:\WEB\lookfor\tsconfig.app.json", "JSON", 20, 0, 0, 0, 0, 0, 0, 0, 2, 3, 25
+"d:\WEB\lookfor\tsconfig.app.tsbuildinfo", "JSON", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"d:\WEB\lookfor\tsconfig.json", "JSON with Comments", 0, 9, 0, 0, 0, 0, 0, 0, 0, 1, 10
+"d:\WEB\lookfor\tsconfig.node.json", "JSON", 18, 0, 0, 0, 0, 0, 0, 0, 2, 3, 23
+"d:\WEB\lookfor\tsconfig.node.tsbuildinfo", "JSON", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"d:\WEB\lookfor\vite.config.ts", "TypeScript", 0, 0, 9, 0, 0, 0, 0, 0, 1, 1, 11
+"Total", "-", 5675, 9, 832, 40, 27, 6606, 27, 54, 33, 528, 13831

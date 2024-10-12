@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 const Container = styled.div`
   width: 100%;
-  max-width: 100vw; /* 確保容器寬度不超出螢幕 */
+  max-width: 100vw;
   max-height: 800px;
   margin-bottom: 60px;
   @media (max-width: 992px) {
@@ -14,7 +14,6 @@ const Container = styled.div`
     margin-bottom: 30px;
   }
 `;
-
 const Banner = styled.div`
   text-align: center;
   padding: 10vh 0 20vh;
@@ -24,7 +23,6 @@ const VenueTitle = styled.h2`
   line-height: 1.5;
   letter-spacing: 1rem;
   text-align: center;
-
   font-family: lihsianti;
   color: #fff;
   @media (max-width: 992px) {
@@ -41,12 +39,10 @@ const VenueSubTitle = styled.h3`
   line-height: 1.5;
   letter-spacing: 5px;
   text-align: center;
-
   color: #fff;
   @media (max-width: 992px) {
     font-size: 3.6rem;
   }
-
   @media (max-width: 575px) {
     font-size: 2.8rem;
     letter-spacing: 0.2rem;
@@ -77,10 +73,8 @@ const StyleLink = styled(Link)`
   letter-spacing: 4px;
   color: #fff;
   padding: 8px 90px;
-
   background-clip: text;
   -webkit-text-fill-color: transparent;
-
   background-image: linear-gradient(to right, #ffe53b, #ff5001 50%, #fff 50%);
   background-size: 200% 100%;
   background-position: 100%;
@@ -88,7 +82,6 @@ const StyleLink = styled(Link)`
   &:hover {
     background-position: 0%;
   }
-
   @media (max-width: 992px) {
     padding: 8px 50px;
   }
@@ -106,7 +99,6 @@ const TransitionList = styled.ul`
   display: none;
   position: absolute;
   background: #000;
-
   border-radius: 0 0 15px 15px;
   bottom: -105px;
   right: 50%;
@@ -132,7 +124,6 @@ function VenueHeader() {
   useEffect(() => {
     const checkIfPageIsLoaded = () => {
       if (document.readyState === "complete") {
-        // 頁面完全加載後刷新字型
         if (window._jf && typeof window._jf.flush === "function") {
           window._jf.flush();
           console.log("字型已刷新");
@@ -140,15 +131,11 @@ function VenueHeader() {
       }
     };
 
-    // 如果頁面已經載入完成，立即執行
     if (document.readyState === "complete") {
       checkIfPageIsLoaded();
     } else {
-      // 監聽頁面完全加載的事件
       window.addEventListener("load", checkIfPageIsLoaded);
     }
-
-    // 清除副作用
     return () => {
       window.removeEventListener("load", checkIfPageIsLoaded);
     };
@@ -170,17 +157,6 @@ function VenueHeader() {
         <NavItem>
           <StyleLink to="/transportation-driving">自行開車</StyleLink>
         </NavItem>
-        {/* <NavItem>
-          <StyleLink to="/transportation-public">交通資訊</StyleLink>
-          <TransitionList>
-            <TransitionItem>
-              <TransitionLink to="/transportation-public">大眾運輸</TransitionLink>
-            </TransitionItem>
-            <TransitionItem>
-              <TransitionLink to="/transportation-driving">自行開車</TransitionLink>
-            </TransitionItem>
-          </TransitionList>
-        </NavItem> */}
       </Nav>
     </Container>
   );

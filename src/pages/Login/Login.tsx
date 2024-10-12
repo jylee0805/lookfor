@@ -12,7 +12,6 @@ const LoginBox = styled.div<{ isLogin: boolean }>`
   row-gap: 25px;
   margin-top: 50px;
 `;
-
 const Input = styled.input`
   border-radius: 30px;
   background: #ededed;
@@ -22,18 +21,10 @@ const Input = styled.input`
   width: 100%;
   font-size: 1rem;
   line-height: 1.5;
-  @media (max-width: 575px) {
-  }
 `;
-
 const LoginBtn = styled(Input)`
   margin-top: 20px;
 `;
-const Error = styled.span`
-  margin-top: -20px;
-  color: #ff6262;
-`;
-
 const OrBox = styled.div`
   display: flex;
   align-items: center;
@@ -43,8 +34,6 @@ const Or = styled.p`
   line-height: 1.5;
   color: #ffffff;
   margin: 0 8px;
-  @media (max-width: 575px) {
-  }
 `;
 const Line = styled.div`
   height: 1px;
@@ -58,6 +47,10 @@ const GoogleBtn = styled.button`
   background: #ffffff;
   @media (max-width: 575px) {
   }
+`;
+const Error = styled.span`
+  margin-top: -20px;
+  color: #ff6262;
 `;
 
 interface Props {

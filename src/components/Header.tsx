@@ -13,12 +13,10 @@ const StyleClose = styled(MdOutlineClose)`
   font-size: 24px;
   margin-right: 4px;
 `;
-
 const StyleMenu = styled(MdMenu)`
   font-size: 24px;
   margin-right: 4px;
 `;
-
 const StyleNotify = styled(IoMdNotifications)`
   font-size: 24px;
   margin-right: 4px;
@@ -53,15 +51,18 @@ const LogoBox = styled(Link)`
     margin-top: -5px;
   }
 `;
-const NavBtn = styled.button`
-  display: none;
-  background: none;
-  border: none;
-  color: #fff;
+const NavBox = styled.div`
+  z-index: 5;
   @media (max-width: 575px) {
-    display: block;
-    padding: 5px;
-    z-index: 3;
+    display: flex;
+    align-items: center;
+  }
+`;
+const NotifyBox = styled.div<{ show: boolean }>`
+  display: none;
+  @media (max-width: 575px) {
+    display: ${(props) => (props.show ? "none" : "flex")};
+    align-items: center;
     position: relative;
   }
 `;
@@ -92,14 +93,14 @@ const NotifyBtn = styled.button<{ num: boolean }>`
 `;
 const NotifyList = styled.ul<{ isNotifyOpen: boolean }>`
   display: ${(props) => (props.isNotifyOpen ? "block" : "none")};
-  width: 210px;
+  width: 300px;
   padding: 0;
   background: #fff;
   color: #000;
   position: absolute;
   right: 50%;
   font-size: 1rem;
-  border-radius: 15px;
+  border-radius: 8px;
 
   & :first-child {
     border-radius: 15px 15px 0 0;
@@ -137,26 +138,16 @@ const NotifyContent = styled.p``;
 const NotifyTime = styled.p`
   font-size: 0.8rem;
 `;
-const NavCloseBtn = styled(NavBtn)`
+
+const NavBtn = styled.button`
   display: none;
+  background: none;
+  border: none;
+  color: #fff;
   @media (max-width: 575px) {
-    display: inline;
-    margin-left: auto;
-    margin-top: 15px;
-  }
-`;
-const NavBox = styled.div`
-  z-index: 5;
-  @media (max-width: 575px) {
-    display: flex;
-    align-items: center;
-  }
-`;
-const NotifyBox = styled.div<{ show: boolean }>`
-  display: none;
-  @media (max-width: 575px) {
-    display: ${(props) => (props.show ? "none" : "flex")};
-    align-items: center;
+    display: block;
+    padding: 5px;
+    z-index: 3;
     position: relative;
   }
 `;
@@ -181,11 +172,6 @@ const NavItem = styled.li`
     padding: 0;
   }
 `;
-const NavNotifyItem = styled(NavItem)`
-  @media (max-width: 575px) {
-    display: none;
-  }
-`;
 const NavCloseItem = styled(NavItem)`
   display: none;
   @media (max-width: 575px) {
@@ -194,10 +180,21 @@ const NavCloseItem = styled(NavItem)`
     margin-left: 15px;
   }
 `;
-
+const NavCloseBtn = styled(NavBtn)`
+  display: none;
+  @media (max-width: 575px) {
+    display: inline;
+    margin-left: auto;
+    margin-top: 15px;
+  }
+`;
+const NavNotifyItem = styled(NavItem)`
+  @media (max-width: 575px) {
+    display: none;
+  }
+`;
 const StyleLink = styled(Link)`
   font-size: 1.2rem;
-
   padding: 20px 24px;
   color: #ffffff;
   @media (max-width: 768px) {
@@ -210,21 +207,10 @@ const StyleLink = styled(Link)`
     font-size: 1rem;
     padding: 10px 30px;
   }
-
   &:hover {
     background: linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
     background-clip: text;
     color: transparent;
-  }
-`;
-const LogOutBtn = styled.button`
-  background: none;
-  padding: 0;
-  font-weight: 700;
-  @media (max-width: 575px) {
-    display: block;
-    padding: 10px 42px;
-    color: #fff;
   }
 `;
 const PersonalBtn = styled.button<{ avatar: string }>`
@@ -236,15 +222,6 @@ const PersonalBtn = styled.button<{ avatar: string }>`
   background-repeat: no-repeat;
   @media (max-width: 575px) {
     display: none;
-  }
-`;
-
-const ProfileLink = styled(Link)`
-  color: #000;
-  @media (max-width: 575px) {
-    color: #fff;
-    display: block;
-    padding: 10px 28px;
   }
 `;
 const PersonalList = styled.ul<{ isPersonalClick: boolean }>`
@@ -269,6 +246,24 @@ const PersonalItem = styled.li`
   color: #000;
   @media (max-width: 575px) {
     padding: 0;
+  }
+`;
+const ProfileLink = styled(Link)`
+  color: #000;
+  @media (max-width: 575px) {
+    color: #fff;
+    display: block;
+    padding: 10px 28px;
+  }
+`;
+const LogOutBtn = styled.button`
+  background: none;
+  padding: 0;
+  font-weight: 700;
+  @media (max-width: 575px) {
+    display: block;
+    padding: 10px 42px;
+    color: #fff;
   }
 `;
 
@@ -327,11 +322,11 @@ declare global {
 function Header() {
   const authContext = useContext(AuthContext);
   const [state, dispatch] = useReducer(reducer, initial);
+  const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
     const checkIfPageIsLoaded = () => {
       if (document.readyState === "complete") {
-        // 頁面完全加載後刷新字型
         if (window._jf && typeof window._jf.flush === "function") {
           window._jf.flush();
           console.log("字型已刷新");
@@ -339,29 +334,21 @@ function Header() {
       }
     };
 
-    // 如果頁面已經載入完成，立即執行
     if (document.readyState === "complete") {
       checkIfPageIsLoaded();
     } else {
-      // 監聽頁面完全加載的事件
       window.addEventListener("load", checkIfPageIsLoaded);
     }
-
-    // 清除副作用
     return () => {
       window.removeEventListener("load", checkIfPageIsLoaded);
     };
   }, []);
 
-  if (authContext) {
-    console.log(authContext.loginState);
-  }
-
-  const [isLogin, setIsLogin] = useState(false);
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsLogin(true);
+        console.log(user);
       } else {
         setIsLogin(false);
       }
@@ -376,7 +363,6 @@ function Header() {
 
       unsubscribeNotify.push(await unsubscribe);
 
-      // 清除訂閱
       return () => {
         unsubscribeNotify.forEach((unsubscribe) => unsubscribe());
       };

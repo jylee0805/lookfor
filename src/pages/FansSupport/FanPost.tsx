@@ -6,10 +6,16 @@ import { Concerts } from "../ConcertList";
 import api from "../../utils/api";
 import { State, Action, MerchPost } from "./index";
 import { useEffect } from "react";
+import { MdOutlineClose } from "react-icons/md";
+
+const StyleClose = styled(MdOutlineClose)`
+  font-size: 24px;
+  margin-right: 4px;
+`;
 
 const Container = styled.div<{ isPostClick: boolean }>`
   width: 60%;
-  padding: 20px 50px;
+  padding: 20px 5px 20px 30px;
   display: ${(props) => (props.isPostClick ? "block" : "none")};
   position: fixed;
   background: #ffffff;
@@ -19,8 +25,28 @@ const Container = styled.div<{ isPostClick: boolean }>`
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 15px;
+  max-height: 80vh;
   @media (max-width: 992px) {
     width: 80%;
+  }
+`;
+const ContentContainer = styled.div`
+  overflow-y: auto;
+  max-height: 55vh;
+  margin-top: 50px;
+  margin-bottom: 45px;
+  padding-right: 25px;
+  &::-webkit-scrollbar {
+    width: 8px;
+    scroll-margin-left: 10px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: #fff3e7;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #6d6d6d;
   }
 `;
 const Title = styled.h3`
@@ -29,14 +55,21 @@ const Title = styled.h3`
   font-weight: 700;
   margin-bottom: 15px;
   color: #000;
+  z-index: 20;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
 `;
 const Label = styled.p`
   color: #000;
 `;
+
 const InputContainer = styled.div`
   display: grid;
   grid-template-columns: auto 1fr auto 1fr;
-  margin-bottom: 15px;
+
   column-gap: 20px;
   row-gap: 15px;
   @media (max-width: 768px) {
@@ -82,6 +115,11 @@ const Select = styled.select`
 const BtnBox = styled.div`
   display: flex;
   align-items: center;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  padding: 0 30px 20px 30px;
 `;
 const Btn = styled.button`
   background: #191919;
@@ -106,15 +144,34 @@ const MoreContent = styled.textarea`
   }
 `;
 const Image = styled.img`
-  width: 120px;
-  margin-bottom: 15px;
+  object-fit: cover;
+  width: 100%;
+`;
+const ImagePreviewDelete = styled.button`
+  position: absolute;
+  background: none;
+  padding: 0;
+  right: 5px;
+  top: 5px;
+  color: #fff;
 `;
 const SelectPhotoBtn = styled.label`
   text-align: center;
+  background: #d2d2d2;
+  padding: 5px 15px;
+  border-radius: 8px;
+  cursor: pointer;
 `;
 const FileBtn = styled.input`
   visibility: hidden;
   width: 0;
+`;
+const ImagePreviewBox = styled.div<{ show: boolean }>`
+  display: ${(props) => (props.show ? "block" : "none")};
+  width: fit-content;
+  height: 180px;
+  position: relative;
+  margin-top: 15px;
 `;
 
 export interface FormInputs {
@@ -140,7 +197,8 @@ function FanPost({ concert, state, dispatch }: Props) {
       time: dayjs(), // 預設值為當前時間
     },
   });
-
+  console.log((state.selectPhotos?.length !== 0 || state.isEditMode.image?.length !== 0) && state.selectPhotos);
+  console.log(state.selectPhotos, state.selectPhotos?.length, state.isEditMode.image?.length);
   useEffect(() => {
     if (state.isEditMode.passDay) {
       const values = {
@@ -155,6 +213,7 @@ function FanPost({ concert, state, dispatch }: Props) {
         // image: state.isEditMode.image,
       };
       reset(values);
+      console.log(values);
     }
   }, [state.isEditMode]);
 
@@ -211,7 +270,12 @@ function FanPost({ concert, state, dispatch }: Props) {
     };
     if (state.isEditMode.id) {
       if (state.isEditMode.passState !== data.status) {
-        api.setNotify(state.isEditMode.id, concert.id, data.status, state.isEditMode.item);
+        const stateText = data.status === "0" ? "尚未發放" : data.status === "1" ? "發放中" : "發放完畢";
+        api.setNotify(state.isEditMode.id, concert.id, `應援物${stateText}`, state.isEditMode.item);
+      } else if (state.isEditMode.passPlace !== data.place) {
+        api.setNotify(state.isEditMode.id, concert.id, `地點更改為${data.place}`, state.isEditMode.item);
+      } else if (state.isEditMode.passTime !== total) {
+        api.setNotify(state.isEditMode.id, concert.id, `時間更改為${total}`, state.isEditMode.item);
       }
       await api.updateMerchPost(state.isEditMode.id, allData);
     } else {
@@ -220,7 +284,7 @@ function FanPost({ concert, state, dispatch }: Props) {
       await api.setMerchPost(allData);
     }
     dispatch({ type: "toggleIsEditMode", payload: { isEditMode: {} as MerchPost, isPostClick: false } });
-    reset({ day: "", status: "", concert: "", place: "", qualify: "", more: "" });
+    reset({ day: "", status: "", concert: "", place: "", qualify: "", more: "", item: "" });
     dispatch({ type: "setLocalPhotoUrl", payload: { localPhotoUrl: [], selectPhotos: [] } });
 
     // dispatch({ type: "toggleIsPostClick", payload: { isPostClick: false } });
@@ -242,42 +306,60 @@ function FanPost({ concert, state, dispatch }: Props) {
     }
   };
 
+  const handleDeletePreview = () => {
+    if (state.selectPhotos) {
+      dispatch({ type: "setLocalPhotoUrl", payload: { localPhotoUrl: [], selectPhotos: [] } });
+    } else if (state.isEditMode.image) {
+      const update = JSON.parse(JSON.stringify(state.isEditMode));
+      update.image = "";
+      dispatch({ type: "toggleIsEditMode", payload: { isEditMode: update, isPostClick: true } });
+    }
+  };
+
   return (
     <Container isPostClick={state.isPostClick}>
       <Title>建立資訊</Title>
-      <InputContainer>
-        <Label>應援物品</Label>
-        <QualifyInput type="text" {...register("item", { required: true })} />
-        <Label>日期</Label>
-        <Select {...register("day", { required: true })}>
-          <option value="">請選擇日期</option>
-          {concert?.date && day.map((item) => <option value={item}>{item}</option>)}
-        </Select>
-        <Label>時間</Label>
-        <Controller
-          name="time"
-          control={control}
-          render={({ field }) => (
-            <CustomTimePicker
-              value={field.value}
-              onChange={(newValue) => field.onChange(newValue)} // 更新時間
-            />
-          )}
-        />
-        <Label>狀態</Label>
-        <Select {...register("status", { required: true })}>
-          <option value="0">未發放</option>
-          <option value="1">發放中</option>
-          <option value="2">發放完畢</option>
-        </Select>
-        <Label>地點</Label>
-        <Input type="text" {...register("place", { required: true })} />
-        <Label>領取資格</Label>
-        <QualifyInput type="text" {...register("qualify", { required: true })} />
-        <MoreContent {...register("more", { required: true })}></MoreContent>
-      </InputContainer>
-      {state.localPhotoUrl && state.localPhotoUrl.map((item: string) => <Image src={item} />)}
-      {state.isEditMode.image && state.isEditMode.image.map((item: string) => <Image src={item} />)}
+      <ContentContainer>
+        <InputContainer>
+          <Label>應援物品</Label>
+          <QualifyInput type="text" {...register("item", { required: true })} />
+          <Label>日期</Label>
+          <Select {...register("day", { required: true })}>
+            <option value="">請選擇日期</option>
+            {concert?.date && day.map((item) => <option value={item}>{item}</option>)}
+          </Select>
+          <Label>時間</Label>
+          <Controller
+            name="time"
+            control={control}
+            render={({ field }) => (
+              <CustomTimePicker
+                value={field.value}
+                onChange={(newValue) => field.onChange(newValue)} // 更新時間
+              />
+            )}
+          />
+          <Label>狀態</Label>
+          <Select {...register("status", { required: true })}>
+            <option value="0">未發放</option>
+            <option value="1">發放中</option>
+            <option value="2">發放完畢</option>
+          </Select>
+          <Label>地點</Label>
+          <Input type="text" {...register("place", { required: true })} />
+          <Label>領取資格</Label>
+          <QualifyInput type="text" {...register("qualify", { required: true })} />
+          <MoreContent {...register("more", { required: true })}></MoreContent>
+        </InputContainer>
+        <ImagePreviewBox show={state.selectPhotos !== null && (state.selectPhotos?.length > 0 || state.isEditMode?.image?.length > 0)}>
+          <ImagePreviewDelete onClick={() => handleDeletePreview()}>
+            <StyleClose />
+          </ImagePreviewDelete>
+          {state.localPhotoUrl && state.localPhotoUrl.map((item: string) => <Image src={item} />)}
+          {state.isEditMode.image && state.isEditMode.image.map((item: string) => <Image src={item} />)}
+        </ImagePreviewBox>
+      </ContentContainer>
+
       <BtnBox>
         <SelectPhotoBtn>
           選擇照片

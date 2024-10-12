@@ -27,15 +27,18 @@ import {
   getDoc,
   arrayUnion,
   documentId,
+  limit,
+  startAfter,
+  Timestamp,
+  DocumentSnapshot,
 } from "../utils/firebase";
-import { PostState, Comment } from "../pages/View";
+import { Comment, OriginView } from "../pages/View";
 import { Concerts } from "../pages/ConcertList";
 import { Detail } from "../pages/Concert";
 import { MerchPost } from "../pages/FansSupport";
 import { Place, PlaceAvailable } from "../pages/TransportationDriving";
 import Profile from "../pages/Profile";
 import { Notify } from "../components/Header";
-import { AllPost } from "../pages/View";
 
 interface Data {
   content: string;
@@ -60,33 +63,36 @@ const api = {
   async findUser(name: string) {
     const q = query(collection(db, "users"), where("userName", "==", name));
     const querySnapshot = await getDocs(q);
-
     return querySnapshot.docs;
   },
   async findUserUid(uid: string) {
     const q = query(collection(db, "users"), where("UID", "==", uid));
     const querySnapshot = await getDocs(q);
-
     return querySnapshot.docs;
+  },
+  async getUsers() {
+    const q = query(collection(db, "users"));
+    const querySnapshot = await getDocs(q);
+    const list: Profile[] = [];
+    querySnapshot.forEach((doc) => list.push({ id: doc.id, ...doc.data() } as Profile));
+    return list;
   },
   async getUser(id: string) {
     const q = query(collection(db, "users"), where("UID", "==", id));
-
     const querySnapshot = await getDocs(q);
     const list: Profile = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Profile;
     return list;
   },
 
   async setNotify(postId: string, concertId: string, state: string, item: string) {
-    const stateText = state === "0" ? "未發放" : state === "1" ? "發放中" : "發放完畢";
     const q = query(collection(db, "users"), where("keepIds", "array-contains", postId));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach(async (doc) => {
       console.log(doc.data());
       const notifyRef = collection(db, "users", doc.id, "notify");
       await addDoc(notifyRef, {
-        title: `${item}的發放狀態已更新`,
-        message: `${stateText}`,
+        title: `${item}的發放資訊已更新`,
+        message: `${state}`,
         createdTime: serverTimestamp(),
         isRead: false,
         postId: postId,
@@ -97,9 +103,7 @@ const api = {
 
   async getNotify(userId: string, onUpdate: (notify: Notify[]) => void) {
     const id = await this.getUser(userId);
-
     const q = query(collection(db, `users/${id.id}/notify`));
-
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const notifyList: Notify[] = [];
       querySnapshot.forEach((doc) => {
@@ -162,14 +166,11 @@ const api = {
   async userLogInGoogle() {
     try {
       const result = await signInWithPopup(auth, provider);
-
       const user = result.user;
-
       const data = await this.findUserUid(user.uid);
       if (data.length === 0) {
         this.setUser(user.displayName as string, user.uid, user.photoURL as string);
       }
-
       return user.uid;
     } catch (error) {
       if (error instanceof FirebaseError) {
@@ -218,22 +219,15 @@ const api = {
       userName: name,
       UID: uid,
       avatar: avatar,
-      //
     });
     return;
   },
 
   async getKeepPost(uid: string) {
-    console.log(uid);
-
     try {
-      // 查找 userId 等於 uid 的文件
       const usersRef = collection(db, "users");
       const q = query(usersRef, where("UID", "==", uid));
-
-      // 執行查詢
       const querySnapshot = await getDocs(q);
-
       console.log(querySnapshot.docs[0].data());
     } catch (e) {
       console.error("Error updating document: ", e);
@@ -242,20 +236,13 @@ const api = {
 
   async setKeepPost(uid: string, keepId: string) {
     console.log(uid);
-
     try {
-      // 查找 userId 等於 uid 的文件
       const usersRef = collection(db, "users");
       const q = query(usersRef, where("UID", "==", uid));
-
-      // 執行查詢
       const querySnapshot = await getDocs(q);
-
-      // 如果找到了對應的文件
       querySnapshot.forEach(async (docSnapshot) => {
-        // 更新 keepIds 欄位，將新的 keepId 添加到陣列中
         await updateDoc(docSnapshot.ref, {
-          keepIds: arrayUnion(keepId), // 使用 arrayUnion 來避免重複加入相同的值
+          keepIds: arrayUnion(keepId),
         });
       });
 
@@ -290,33 +277,21 @@ const api = {
     const q = query(collection(db, "viewPosts"), where("userUID", "==", uid));
 
     const querySnapshot = await getDocs(q);
-    const list: PostState[] = [];
+    const list: OriginView[] = [];
     querySnapshot.forEach((doc) => {
-      list.push({ id: doc.id, ...doc.data() } as PostState);
+      list.push({ id: doc.id, ...doc.data() } as OriginView);
     });
 
     return list;
   },
 
-  async getUserMerchPosts(uid: string) {
-    const q = query(collection(db, "merchPost"), where("userUID", "==", uid));
-
-    const querySnapshot = await getDocs(q);
-    const list: MerchPost[] = [];
-    querySnapshot.forEach((doc) => {
-      list.push({ id: doc.id, ...doc.data() } as MerchPost);
-    });
-
-    return list;
-  },
-
-  async getViewPosts(section: string, row: number, seat: number, onUpdate: (post: PostState[]) => void) {
+  async getViewPosts(section: string, row: number, seat: number, onUpdate: (post: OriginView[]) => void) {
     const q = query(collection(db, "viewPosts"), where("section", "==", section), where("row", "==", row), where("seat", "==", seat));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const updatedPosts: PostState[] = [];
+      const updatedPosts: OriginView[] = [];
       querySnapshot.forEach((doc) => {
-        updatedPosts.push({ id: doc.id, ...doc.data() });
+        updatedPosts.push({ id: doc.id, ...doc.data() } as OriginView);
       });
       console.log(updatedPosts);
 
@@ -324,23 +299,32 @@ const api = {
     });
     return unsubscribe;
   },
+  async getNewestViewPosts(onUpdate: (post: OriginView[]) => void) {
+    const q = query(collection(db, "viewPosts"), orderBy("createdTime", "asc"), limit(6));
 
-  async getAllSectionViewPost() {
-    try {
-      const q = query(collection(db, "viewPosts"));
-
-      const querySnapshot = await getDocs(q);
-      console.log(querySnapshot);
-      const allView: AllPost[] = [];
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const updatedPosts: OriginView[] = [];
       querySnapshot.forEach((doc) => {
-        allView.push({ section: doc.data().section, row: doc.data().row, seat: doc.data().seat, img: doc.data().image });
+        updatedPosts.push({ id: doc.id, ...doc.data() } as OriginView);
       });
-      console.log(querySnapshot);
+      console.log(updatedPosts);
 
-      return allView;
-    } catch (e) {
-      console.error("Error updating document: ", e);
-    }
+      onUpdate(updatedPosts);
+    });
+    return unsubscribe;
+  },
+  async getAllSectionViewPost(onUpdate: (post: OriginView[]) => void) {
+    const q = query(collection(db, "viewPosts"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const updatedPosts: OriginView[] = [];
+      querySnapshot.forEach((doc) => {
+        updatedPosts.push({ id: doc.id, ...doc.data() } as OriginView);
+      });
+      console.log(updatedPosts);
+
+      onUpdate(updatedPosts);
+    });
+    return unsubscribe;
   },
   async deleteViewPost(id: string) {
     try {
@@ -435,17 +419,30 @@ const api = {
     return row;
   },
 
-  async getConcerts() {
-    const q = query(collection(db, "concerts"), orderBy("date", "asc"));
+  async getNextConcerts(lastDoc: DocumentSnapshot | null) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTimestamp = Timestamp.fromDate(today);
+    let q;
+    if (lastDoc) {
+      q = query(collection(db, "concerts"), orderBy("date", "asc"), where("endDay", ">=", todayTimestamp), limit(10), startAfter(lastDoc));
+    } else {
+      q = query(collection(db, "concerts"), orderBy("date", "asc"), where("endDay", ">=", todayTimestamp), limit(10));
+    }
     const querySnapshot = await getDocs(q);
     const data: Concerts[] = [];
+
     querySnapshot.forEach((doc) => {
       const concertData = { ...doc.data(), id: doc.id };
       data.push(concertData as Concerts);
     });
+
+    const lastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+
     console.log(data);
-    return data;
+    return { data, lastVisibleDoc };
   },
+
   async getConcert(id: string) {
     const q = doc(db, "concerts", `${id}`);
     const querySnapshot = await getDoc(q);
@@ -463,6 +460,18 @@ const api = {
     console.log(detail);
 
     return detail;
+  },
+
+  async getUserMerchPosts(uid: string) {
+    const q = query(collection(db, "merchPost"), where("userUID", "==", uid));
+
+    const querySnapshot = await getDocs(q);
+    const list: MerchPost[] = [];
+    querySnapshot.forEach((doc) => {
+      list.push({ id: doc.id, ...doc.data() } as MerchPost);
+    });
+
+    return list;
   },
 
   async setMerchPost(merch: object) {
