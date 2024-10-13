@@ -436,66 +436,54 @@ function Sections({ handlerSection, state }: Props) {
           data-section="VIPA"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "VIPA" ? 1.1 : 1,
+            scale: state.selectedSection === "VIPA" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="VIPA"
-            haveData={state.allSectionPost?.some((item) => item.section === "VIPA") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "VIPA") ? "#d51aff" : "none"}
-          >
+          <Text data-section="VIPA" haveData={state.allPost?.some((item) => item.section === "VIPA") ?? false} color={state.allPost?.some((item) => item.section === "VIPA") ? "#d51aff" : "none"}>
             VIPA
           </Text>
         </VipA>
-        {state.allSectionPost?.find((view) => view.section === "VIPA") && (
+        {state.allPost?.find((view) => view.section === "VIPA") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "VIPA")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "VIPA")?.image || ""} />
           </VipAMain>
         )}
         <VipB
           data-section="VIPB"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "VIPB" ? 1.1 : 1,
+            scale: state.selectedSection === "VIPB" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="VIPB"
-            haveData={state.allSectionPost?.some((item) => item.section === "VIPB") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "VIPB") ? "#d51aff" : "none"}
-          >
+          <Text data-section="VIPB" haveData={state.allPost?.some((item) => item.section === "VIPB") ?? false} color={state.allPost?.some((item) => item.section === "VIPB") ? "#d51aff" : "none"}>
             VIPB
           </Text>
         </VipB>
-        {state.allSectionPost?.find((view) => view.section === "VIPB") && (
+        {state.allPost?.find((view) => view.section === "VIPB") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "VIPB")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "VIPB")?.image || ""} />
           </VipAMain>
         )}
         <VipC
           data-section="VIPC"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "VIPC" ? 1.1 : 1,
+            scale: state.selectedSection === "VIPC" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="VIPC"
-            haveData={state.allSectionPost?.some((item) => item.section === "VIPC") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "VIPC") ? "#d51aff" : "none"}
-          >
+          <Text data-section="VIPC" haveData={state.allPost?.some((item) => item.section === "VIPC") ?? false} color={state.allPost?.some((item) => item.section === "VIPC") ? "#d51aff" : "none"}>
             VIPC
           </Text>
         </VipC>
-        {state.allSectionPost?.find((view) => view.section === "VIPC") && (
+        {state.allPost?.find((view) => view.section === "VIPC") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "VIPC")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "VIPC")?.image || ""} />
           </VipAMain>
         )}
       </Vip>
@@ -504,154 +492,126 @@ function Sections({ handlerSection, state }: Props) {
           data-section="2A"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2A" ? 1.1 : 1,
+            scale: state.selectedSection === "2A" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 100, damping: 5 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="2A"
-            haveData={state.allSectionPost?.some((item) => item.section === "2A") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "2A") ? "#ff1a1a" : "none"}
-          >
+          <Text data-section="2A" haveData={state.allPost?.some((item) => item.section === "2A") ?? false} color={state.allPost?.some((item) => item.section === "2A") ? "#ff1a1a" : "none"}>
             2A
           </Text>
         </SecondA>
-        {state.allSectionPost?.find((view) => view.section === "2A") && (
+        {state.allPost?.find((view) => view.section === "2A") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2A")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "2A")?.image || ""} />
           </VipAMain>
         )}
         <SecondB
           data-section="2B"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2B" ? 1.1 : 1,
+            scale: state.selectedSection === "2B" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="2B"
-            haveData={state.allSectionPost?.some((item) => item.section === "2B") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "2B") ? "#ff1a1a" : "none"}
-          >
+          <Text data-section="2B" haveData={state.allPost?.some((item) => item.section === "2B") ?? false} color={state.allPost?.some((item) => item.section === "2B") ? "#ff1a1a" : "none"}>
             2B
           </Text>
         </SecondB>
-        {state.allSectionPost?.find((view) => view.section === "2B") && (
+        {state.allPost?.find((view) => view.section === "2B") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2B")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "2B")?.image || ""} />
           </VipAMain>
         )}
         <SecondC
           data-section="2C"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2C" ? 1.1 : 1,
+            scale: state.selectedSection === "2C" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="2C"
-            haveData={state.allSectionPost?.some((item) => item.section === "2C") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "2C") ? "#ff1a1a" : "none"}
-          >
+          <Text data-section="2C" haveData={state.allPost?.some((item) => item.section === "2C") ?? false} color={state.allPost?.some((item) => item.section === "2C") ? "#ff1a1a" : "none"}>
             2C
           </Text>
         </SecondC>
-        {state.allSectionPost?.find((view) => view.section === "2C") && (
+        {state.allPost?.find((view) => view.section === "2C") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2C")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "2C")?.image || ""} />
           </VipAMain>
         )}
         <SecondD
           data-section="2D"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2D" ? 1.1 : 1,
+            scale: state.selectedSection === "2D" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="2D"
-            haveData={state.allSectionPost?.some((item) => item.section === "2D") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "2D") ? "#ff1a1a" : "none"}
-          >
+          <Text data-section="2D" haveData={state.allPost?.some((item) => item.section === "2D") ?? false} color={state.allPost?.some((item) => item.section === "2D") ? "#ff1a1a" : "none"}>
             2D
           </Text>
         </SecondD>
-        {state.allSectionPost?.find((view) => view.section === "2D") && (
+        {state.allPost?.find((view) => view.section === "2D") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2D")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "2D")?.image || ""} />
           </VipAMain>
         )}
         <SecondE
           data-section="2E"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2E" ? 1.1 : 1,
+            scale: state.selectedSection === "2E" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="2E"
-            haveData={state.allSectionPost?.some((item) => item.section === "2E") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "2E") ? "#ff1a1a" : "none"}
-          >
+          <Text data-section="2E" haveData={state.allPost?.some((item) => item.section === "2E") ?? false} color={state.allPost?.some((item) => item.section === "2E") ? "#ff1a1a" : "none"}>
             2E
           </Text>
         </SecondE>
-        {state.allSectionPost?.find((view) => view.section === "2E") && (
+        {state.allPost?.find((view) => view.section === "2E") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2E")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "2E")?.image || ""} />
           </VipAMain>
         )}
         <SecondF
           data-section="2F"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2F" ? 1.1 : 1,
+            scale: state.selectedSection === "2F" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="2F"
-            haveData={state.allSectionPost?.some((item) => item.section === "2F") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "2F") ? "#ff1a1a" : "none"}
-          >
+          <Text data-section="2F" haveData={state.allPost?.some((item) => item.section === "2F") ?? false} color={state.allPost?.some((item) => item.section === "2F") ? "#ff1a1a" : "none"}>
             2F
           </Text>
         </SecondF>
-        {state.allSectionPost?.find((view) => view.section === "2F") && (
+        {state.allPost?.find((view) => view.section === "2F") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2F")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "2F")?.image || ""} />
           </VipAMain>
         )}
         <SecondG
           data-section="2G"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "2G" ? 1.1 : 1,
+            scale: state.selectedSection === "2G" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="2G"
-            haveData={state.allSectionPost?.some((item) => item.section === "2G") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "2G") ? "#ff1a1a" : "none"}
-          >
+          <Text data-section="2G" haveData={state.allPost?.some((item) => item.section === "2G") ?? false} color={state.allPost?.some((item) => item.section === "2G") ? "#ff1a1a" : "none"}>
             2G
           </Text>
         </SecondG>
-        {state.allSectionPost?.find((view) => view.section === "2G") && (
+        {state.allPost?.find((view) => view.section === "2G") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "2G")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "2G")?.image || ""} />
           </VipAMain>
         )}
       </Second>
@@ -660,154 +620,126 @@ function Sections({ handlerSection, state }: Props) {
           data-section="3A"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3A" ? 1.1 : 1,
+            scale: state.selectedSection === "3A" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="3A"
-            haveData={state.allSectionPost?.some((item) => item.section === "3A") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "3A") ? "#ffd51a" : "none"}
-          >
+          <Text data-section="3A" haveData={state.allPost?.some((item) => item.section === "3A") ?? false} color={state.allPost?.some((item) => item.section === "3A") ? "#ffd51a" : "none"}>
             3A
           </Text>
         </ThirdA>
-        {state.allSectionPost?.find((view) => view.section === "3A") && (
+        {state.allPost?.find((view) => view.section === "3A") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3A")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "3A")?.image || ""} />
           </VipAMain>
         )}
         <ThirdB
           data-section="3B"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3B" ? 1.1 : 1,
+            scale: state.selectedSection === "3B" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="3B"
-            haveData={state.allSectionPost?.some((item) => item.section === "3B") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "3B") ? "#ffd51a" : "none"}
-          >
+          <Text data-section="3B" haveData={state.allPost?.some((item) => item.section === "3B") ?? false} color={state.allPost?.some((item) => item.section === "3B") ? "#ffd51a" : "none"}>
             3B
           </Text>
         </ThirdB>
-        {state.allSectionPost?.find((view) => view.section === "3B") && (
+        {state.allPost?.find((view) => view.section === "3B") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3B")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "3B")?.image || ""} />
           </VipAMain>
         )}
         <ThirdC
           data-section="3C"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3C" ? 1.1 : 1,
+            scale: state.selectedSection === "3C" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="3C"
-            haveData={state.allSectionPost?.some((item) => item.section === "3C") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "3C") ? "#ffd51a" : "none"}
-          >
+          <Text data-section="3C" haveData={state.allPost?.some((item) => item.section === "3C") ?? false} color={state.allPost?.some((item) => item.section === "3C") ? "#ffd51a" : "none"}>
             3C
           </Text>
         </ThirdC>
-        {state.allSectionPost?.find((view) => view.section === "3C") && (
+        {state.allPost?.find((view) => view.section === "3C") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3C")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "3C")?.image || ""} />
           </VipAMain>
         )}
         <ThirdD
           data-section="3D"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3D" ? 1.1 : 1,
+            scale: state.selectedSection === "3D" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="3D"
-            haveData={state.allSectionPost?.some((item) => item.section === "3D") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "3D") ? "#ffd51a" : "none"}
-          >
+          <Text data-section="3D" haveData={state.allPost?.some((item) => item.section === "3D") ?? false} color={state.allPost?.some((item) => item.section === "3D") ? "#ffd51a" : "none"}>
             3D
           </Text>
         </ThirdD>
-        {state.allSectionPost?.find((view) => view.section === "3D") && (
+        {state.allPost?.find((view) => view.section === "3D") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3D")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "3D")?.image || ""} />
           </VipAMain>
         )}
         <ThirdE
           data-section="3E"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3E" ? 1.1 : 1,
+            scale: state.selectedSection === "3E" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="3E"
-            haveData={state.allSectionPost?.some((item) => item.section === "3E") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "3E") ? "#ffd51a" : "none"}
-          >
+          <Text data-section="3E" haveData={state.allPost?.some((item) => item.section === "3E") ?? false} color={state.allPost?.some((item) => item.section === "3E") ? "#ffd51a" : "none"}>
             3E
           </Text>
         </ThirdE>
-        {state.allSectionPost?.find((view) => view.section === "3E") && (
+        {state.allPost?.find((view) => view.section === "3E") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3E")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "3E")?.image || ""} />
           </VipAMain>
         )}
         <ThirdF
           data-section="3F"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3F" ? 1.1 : 1,
+            scale: state.selectedSection === "3F" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="3F"
-            haveData={state.allSectionPost?.some((item) => item.section === "3F") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "3F") ? "#ffd51a" : "none"}
-          >
+          <Text data-section="3F" haveData={state.allPost?.some((item) => item.section === "3F") ?? false} color={state.allPost?.some((item) => item.section === "3F") ? "#ffd51a" : "none"}>
             3F
           </Text>
         </ThirdF>
-        {state.allSectionPost?.find((view) => view.section === "3F") && (
+        {state.allPost?.find((view) => view.section === "3F") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3F")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "3F")?.image || ""} />
           </VipAMain>
         )}
         <ThirdG
           data-section="3G"
           whileTap={{ scale: 1 }}
           animate={{
-            scale: state.section === "3G" ? 1.1 : 1,
+            scale: state.selectedSection === "3G" ? 1.1 : 1,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
           onMouseEnter={handleMouseMove}
         >
-          <Text
-            data-section="3G"
-            haveData={state.allSectionPost?.some((item) => item.section === "3G") ?? false}
-            color={state.allSectionPost?.some((item) => item.section === "3G") ? "#ffd51a" : "none"}
-          >
+          <Text data-section="3G" haveData={state.allPost?.some((item) => item.section === "3G") ?? false} color={state.allPost?.some((item) => item.section === "3G") ? "#ffd51a" : "none"}>
             3G
           </Text>
         </ThirdG>
-        {state.allSectionPost?.find((view) => view.section === "3G") && (
+        {state.allPost?.find((view) => view.section === "3G") && (
           <VipAMain x={mousePosition.x} y={mousePosition.y}>
-            <VipMainImg src={state.allSectionPost?.find((view) => view.section === "3G")?.image || ""} />
+            <VipMainImg src={state.allPost?.find((view) => view.section === "3G")?.image || ""} />
           </VipAMain>
         )}
       </Third>

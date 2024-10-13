@@ -8,6 +8,7 @@ import proj4 from "proj4";
 import VenueHeader from "../components/VenueHeader";
 import CustomMarkerLabel from "../components/CustomLabel";
 import Loading from "../components/Loading";
+import { PlaceInfo, PlaceAvailable } from "../types";
 
 const Container = styled.div`
   padding: 0 30px;
@@ -40,8 +41,6 @@ const SubTitle = styled.h4`
   justify-content: center;
   @media (max-width: 992px) {
     padding: 0;
-  }
-  @media (max-width: 575px) {
   }
 `;
 const Detail = styled.div`
@@ -99,8 +98,8 @@ const Map = styled.div`
   position: relative;
   border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加陰影 */
-  overflow: hidden; /* 防止地圖超出容器 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 `;
 const Place = styled.div`
   width: 30%;
@@ -129,34 +128,13 @@ const GoogleLink = styled.a`
   text-decoration: underline;
 `;
 
-export interface Place {
-  lat: number | string;
-  lng: number | string;
-  name: string;
-  parkNum: string;
-  fee: string;
-  openTime: string;
-  address?: string;
-  placeId?: string;
-  availablecar?: number;
-  availablemotor?: number;
-}
-
-export interface PlaceAvailable {
-  availablebus: number;
-  availablecar: number;
-  availablehandicap: number;
-  availableheavymotor: number;
-  availablemotor: number;
-  id: string;
-}
 function TransportationDriving() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_KEY,
     libraries: ["places"],
   });
-  const [places, setPlaces] = useState<Place[]>([]);
-  const [selectedMarker, setSelectedMarker] = useState<Place | null>(null);
+  const [places, setPlaces] = useState<PlaceInfo[]>([]);
+  const [selectedMarker, setSelectedMarker] = useState<PlaceInfo | null>(null);
 
   const tw97 = "+proj=tmerc +lat_0=0 +lon_0=121 +k=1 +x_0=250000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
   const wgs84 = "EPSG:4326"; // WGS84 坐标系
@@ -171,16 +149,16 @@ function TransportationDriving() {
   }, []);
   const onLoad = async () => {
     try {
-      const res = await api.getParkInfo(tw97Max, tw97Min); // 直接在 onLoad 中呼叫 getParkInfo
-      console.log(res); // 使用回傳的資料
-      const result = res.map((element: Place) => {
+      const res = await api.getParkInfo(tw97Max, tw97Min);
+      console.log(res);
+      const result = res.map((element: PlaceInfo) => {
         const wgs = proj4(tw97, wgs84, [parseFloat(element.lng as string), parseFloat(element.lat as string)]);
         return { ...element, lng: wgs[0], lat: wgs[1] };
       });
 
       const resAvailable = await api.getParkAvailable(result);
       console.log(resAvailable);
-      const all = result.map((item: Place) => {
+      const all = result.map((item: PlaceInfo) => {
         const matchedRes = resAvailable.find((res: PlaceAvailable) => item.placeId === res.id);
         return {
           ...item,
@@ -198,7 +176,7 @@ function TransportationDriving() {
     }
   };
 
-  const handleMarkerClick = (place: Place) => {
+  const handleMarkerClick = (place: PlaceInfo) => {
     setSelectedMarker(place);
     console.log(place);
   };

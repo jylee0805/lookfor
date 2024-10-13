@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { PostState, Action, State } from "./index";
+import { Action, State } from ".";
+import { ViewPost } from "../../types";
 import api from "../../utils/api";
 import { IoSend } from "react-icons/io5";
 import { MdOutlineMoreVert, MdOutlineClose } from "react-icons/md";
@@ -400,7 +401,7 @@ function Seat({ state, handlerComment, dispatch }: Props) {
   const createSubmitHandler = (postId: string, commentId: string): SubmitHandler<CommentEdit> => {
     const onSubmitEditComment: SubmitHandler<CommentEdit> = async (data) => {
       await api.updateComment(postId, commentId, data.comment);
-      dispatch({ type: "toggleCommentMode", payload: { isCommentEditMode: "" } });
+      dispatch({ type: "setCommentMode", payload: { commentEdit: "" } });
 
       const update = state.viewPosts?.map((item) => {
         if (item.id == postId) {
@@ -422,22 +423,22 @@ function Seat({ state, handlerComment, dispatch }: Props) {
 
   const handleComment = (id: string, content: string) => {
     setIsMoreClick("");
-    dispatch({ type: "toggleCommentMode", payload: { isCommentEditMode: id } });
+    dispatch({ type: "setCommentMode", payload: { commentEdit: id } });
     setValue("comment", content);
   };
-  const handlerEditPost = (post: PostState) => {
+  const handlerEditPost = (post: ViewPost) => {
     setIsMoreClick("");
-    dispatch({ type: "setPostMode", payload: { isPostEditMode: post, isPostClick: true, isShowMask: true } });
+    dispatch({ type: "setPostMode", payload: { postEdit: post, isPostClick: true, isShowMask: true } });
     document.body.style.overflow = "hidden";
   };
 
   const handlerSeat = (value: number) => {
     console.log(value);
 
-    dispatch({ type: "selectSeat", payload: { seat: value } });
+    dispatch({ type: "selectSeat", payload: { selectedSeat: value } });
   };
   const handlerClickDelete = (id: string) => {
-    dispatch({ type: "toggleDeleteDialog", payload: { setDeleteViewId: id } });
+    dispatch({ type: "setDeleteViewId", payload: { deleteViewId: id } });
     setIsOpen(true);
   };
   const handlerClickCommentDelete = (post: string, id: string) => {
@@ -447,16 +448,17 @@ function Seat({ state, handlerComment, dispatch }: Props) {
   const deleteComment = async () => {
     await api.deleteComment(state.viewId, state.deleteCommentId);
     dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts?.map((post) => ({ ...post, comment: post.comment?.filter((comment) => comment.id !== state.deleteCommentId) })) } });
+    setIsOpen(false);
   };
 
   const deletePost = async () => {
-    await api.deleteViewPost(state.setDeleteViewId);
-    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts?.filter((post) => post.id !== state.setDeleteViewId) } });
-    dispatch({ type: "toggleDeleteDialog", payload: { setDeleteViewId: "" } });
+    await api.deleteViewPost(state.deleteViewId);
+    dispatch({ type: "deletePost", payload: { viewPosts: state.viewPosts?.filter((post) => post.id !== state.deleteViewId), deleteViewId: "" } });
+    setIsOpen(false);
   };
   const handleCancel = () => {
-    if (state.setDeleteViewId !== "") {
-      dispatch({ type: "toggleDeleteDialog", payload: { setDeleteViewId: "" } });
+    if (state.deleteViewId !== "") {
+      dispatch({ type: "setDeleteViewId", payload: { deleteViewId: "" } });
     } else if (state.deleteCommentId !== "") {
       dispatch({ type: "setDeleteComment", payload: { viewId: "", deleteCommentId: "" } });
     }
@@ -464,7 +466,7 @@ function Seat({ state, handlerComment, dispatch }: Props) {
   };
   return (
     <SeatSection rowSelect={state.isSelectRow}>
-      {state.setDeleteViewId && (
+      {state.deleteViewId && (
         <Dialog isOpen={isOpen} title="刪除視角貼文" onConfirm={deletePost} onCancel={handleCancel} confirmText="刪除">
           確定刪除該篇視角貼文?
         </Dialog>
@@ -479,25 +481,25 @@ function Seat({ state, handlerComment, dispatch }: Props) {
         <StyleClose />
       </CloseBtn>
       <Seats>
-        {Array.from({ length: state.rowSeats[state.row] }).map((_, index) => (
+        {Array.from({ length: state.rowSeats[state.selectedRow] }).map((_, index) => (
           <SeatBtn
             key={index}
-            haveData={state.allRowPost?.some((item) => item.row === state.row + 1 && item.seat === index + 1) ?? false}
+            haveData={state.allRowPost?.some((item) => item.row === state.selectedRow + 1 && item.seat === index + 1) ?? false}
             onClick={() => {
               handlerSeat(index);
             }}
           >
             <SeatBtnText>{index + 1}</SeatBtnText>
-            {state.seat === index && (
+            {state.selectedSeat === index && (
               <SeatPoint
                 animate={{
-                  y: [20, 25, 20], // 垂直跳動的高度
+                  y: [20, 25, 20],
                 }}
                 transition={{
-                  duration: 1, // 每次跳動的持續時間
-                  ease: "easeInOut", // 動畫的效果
-                  repeat: Infinity, // 無限重複
-                  repeatType: "loop", // 重複類型
+                  duration: 1,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatType: "loop",
                 }}
               ></SeatPoint>
             )}
@@ -508,7 +510,7 @@ function Seat({ state, handlerComment, dispatch }: Props) {
       <Title> 視角分享</Title>
 
       {state.viewPosts && state.viewPosts.length !== 0 ? (
-        state.viewPosts.map((post: PostState, index) => (
+        state.viewPosts.map((post: ViewPost, index) => (
           <Card key={index}>
             <PhotoProvider maskOpacity={0.8} bannerVisible={false}>
               <ImgBox>
@@ -549,7 +551,7 @@ function Seat({ state, handlerComment, dispatch }: Props) {
                         <Avatar src={comment.avatar} />
                         <PosterContent>
                           <UserName>{comment.userName}</UserName>
-                          {state.isCommentEditMode === comment.id ? (
+                          {state.commentEdit === comment.id ? (
                             <EditContainer>
                               <EditCommentText type="text" {...registerEditComment("comment")} />
                               <Send onClick={handlerEditComment(createSubmitHandler(post.id, comment.id))}>

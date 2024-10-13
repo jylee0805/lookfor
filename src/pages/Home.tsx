@@ -5,7 +5,7 @@ import { ComponentContext } from "../utils/ComponentContextProvider";
 import Loading from "../components/Loading";
 import Background from "./Background";
 import api from "../utils/api";
-import { OriginView } from "./View";
+import { OriginView } from "../types";
 import { MdDoubleArrow } from "react-icons/md";
 
 const moveArrow = keyframes`
@@ -148,6 +148,7 @@ const NewViewItem = styled.li`
   margin-bottom: 10px;
   align-self: flex-start;
   padding: 5px;
+  cursor: pointer;
   &:nth-child(even) {
     align-self: flex-end;
   }

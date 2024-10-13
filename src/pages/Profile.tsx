@@ -2,8 +2,7 @@ import { useContext, useEffect, useReducer, useState } from "react";
 import styled from "styled-components";
 import api from "../utils/api";
 import { AuthContext } from "../utils/AuthContextProvider";
-import { OriginView } from "../pages/View";
-import { MerchPost } from "../pages/FansSupport";
+import { OriginView, MerchPost, Personal } from "../types";
 import { Link, useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
 
@@ -148,16 +147,8 @@ const StyleLink = styled(Link)`
   min-width: 240px;
 `;
 
-interface Profile {
-  avatar: string;
-  userName: string;
-  UID: string;
-  id: string;
-  keepIds?: string[];
-}
-
 interface ProfileState {
-  profile: Profile;
+  profile: Personal;
   viewPosts: OriginView[];
   merchPosts: MerchPost[];
   concertNames: string[];
@@ -167,14 +158,14 @@ interface ProfileState {
   localPhotoUrl: string;
 }
 type ProfileAction =
-  | { type: "setData"; payload: { profile: Profile; viewPosts: OriginView[]; supportPosts: MerchPost[]; concertNames: string[]; editUserName: string } }
+  | { type: "setData"; payload: { profile: Personal; viewPosts: OriginView[]; supportPosts: MerchPost[]; concertNames: string[]; editUserName: string } }
   | { type: "toggleIsEditProfile" }
   | { type: "setPhoto"; payload: { selectPhoto: File | null; localPhotoUrl: string } }
-  | { type: "setProfile"; payload: { profile: Profile } }
+  | { type: "setProfile"; payload: { profile: Personal } }
   | { type: "setEditUserName"; payload: { editUserName: string } };
 
 const initial: ProfileState = {
-  profile: {} as Profile,
+  profile: {} as Personal,
   viewPosts: [],
   merchPosts: [],
   concertNames: [],
@@ -239,7 +230,7 @@ function Profile() {
           console.log(concert);
         }
 
-        dispatch({ type: "setData", payload: { profile: user as Profile, viewPosts: viewPosts, supportPosts: merchPosts, concertNames: concertName, editUserName: user.userName } });
+        dispatch({ type: "setData", payload: { profile: user as Personal, viewPosts: viewPosts, supportPosts: merchPosts, concertNames: concertName, editUserName: user.userName } });
       }
     };
     getData();
@@ -319,7 +310,7 @@ function Profile() {
           ))}
         </PostContainer>
       ) : (
-        <Hint>尚未發布視角文章</Hint>
+        <Hint>尚未發佈視角文章</Hint>
       )}
 
       <Title>我的應援發放公告</Title>

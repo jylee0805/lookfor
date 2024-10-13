@@ -9,6 +9,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import Fuse from "fuse.js";
 import { QueryDocumentSnapshot } from "../../utils/firebase";
 import { DocumentData } from "firebase/firestore";
+import { Concerts } from "../../types";
 
 const skeletonLoading = keyframes`
   0% {
@@ -53,6 +54,29 @@ const Title = styled.h3`
   font-weight: 700;
   @media (max-width: 575px) {
     margin-bottom: 20px;
+  }
+`;
+const FilterContainer = styled.div`
+  margin-right: auto;
+  margin-left: 15px;
+`;
+const FilterBtn = styled.button`
+  background: transparent;
+  color: #fff;
+  position: relative;
+  padding: 5px 15px;
+  font-size: 1.2rem;
+  & + & {
+    &::before {
+      content: "";
+      width: 1px;
+      height: 60%;
+
+      background: #fff;
+      position: absolute;
+      left: 0;
+      top: 7px;
+    }
   }
 `;
 const SearchContainer = styled.div`
@@ -144,17 +168,6 @@ const Hint = styled.p`
   margin: 0 auto 30px;
 `;
 
-export interface Concerts {
-  concertName: string;
-  date: string[];
-  images: string;
-  place: string;
-  concertId: string;
-  firstDay?: string;
-  id: string;
-  poster?: string;
-}
-
 const options = {
   keys: ["concertName", "place"],
   threshold: 0.8,
@@ -164,6 +177,7 @@ const options = {
 function ConcertList() {
   const [concertData, setConcertData] = useState<Concerts[]>([]);
   const [searchData, setSearchData] = useState<Concerts[]>([]);
+  const [weekData, setWeekData] = useState<Concerts[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [searchHint, setSearchHint] = useState<boolean>(false);
   const [startAt, setStartAt] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
@@ -176,7 +190,6 @@ function ConcertList() {
       setIsLoaded(true);
       document.body.style.overflowY = "auto";
     }, 2000);
-    document.body.style.overflow = "auto";
     window.addEventListener("scroll", handleScroll);
     setNextLoad(true);
 
@@ -185,6 +198,7 @@ function ConcertList() {
       clearTimeout(timer);
     };
   }, []);
+  console.log(concertData);
 
   useEffect(() => {
     const getConcert = async () => {
@@ -233,10 +247,33 @@ function ConcertList() {
     setSearchData(search);
   };
 
+  const handleAll = () => {
+    setSearchData([]);
+    setWeekData([]);
+  };
+
+  const handleWeek = () => {
+    const today = new Date();
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? 0 : 7);
+    const endOfWeek = new Date(today.setDate(diff));
+    endOfWeek.setHours(23, 59, 59, 999);
+    setSearchData([]);
+    setWeekData(
+      concertData.filter((concert) => {
+        const date: Date = new Date(concert.endDay.seconds * 1000);
+        return date <= endOfWeek;
+      })
+    );
+  };
   return (
     <Container ref={scrollRef}>
       <Header>
         <Title>演唱會資訊</Title>
+        <FilterContainer>
+          <FilterBtn onClick={handleAll}>全部</FilterBtn>
+          <FilterBtn onClick={handleWeek}>本週</FilterBtn>
+        </FilterContainer>
         <SearchContainer>
           <SearchInput type="text" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} placeholder="搜尋演唱會、場地" />
           <SearchBtn onClick={() => handleSearch()}>
@@ -246,29 +283,8 @@ function ConcertList() {
       </Header>
       {searchHint && <Hint>查無該關鍵字活動</Hint>}
       <AllList>
-        {searchData.length === 0
-          ? concertData &&
-            concertData.map((concert, index) => (
-              <ListItem key={index}>
-                <StyleLink to={`/concert?concert=${concert.id}`}>
-                  {isLoaded ? (
-                    <ImageBox>
-                      <Image src={concert.poster ? concert.poster : concertImg} />
-                    </ImageBox>
-                  ) : (
-                    <Skeleton height="240px" line-height="inherit" containerClassName="avatar-skeleton" baseColor="#c3c3c3" borderRadius="20px 20px 0 0 " />
-                  )}
-
-                  <Detail>
-                    <DetailName>{concert.concertName}</DetailName>
-                    {concert.date && Array.from({ length: concert.date.length }).map((_, index) => <DetailItem key={index}>{concert.date[index]}</DetailItem>)}
-
-                    <DetailPlace>{concert.place}</DetailPlace>
-                  </Detail>
-                </StyleLink>
-              </ListItem>
-            ))
-          : searchData.map((concert, index) => (
+        {searchData.length !== 0
+          ? searchData.map((concert, index) => (
               <ListItem key={index}>
                 <StyleLink to={`/concert?concert=${concert.id}`}>
                   <ImageBox>
@@ -282,7 +298,44 @@ function ConcertList() {
                   </Detail>
                 </StyleLink>
               </ListItem>
-            ))}
+            ))
+          : weekData.length !== 0
+            ? weekData.map((concert, index) => (
+                <ListItem key={index}>
+                  <StyleLink to={`/concert?concert=${concert.id}`}>
+                    <ImageBox>
+                      <Image src={concert.poster ? concert.poster : concertImg} />
+                    </ImageBox>
+                    <Detail>
+                      <DetailName>{concert.concertName}</DetailName>
+                      {concert.date && Array.from({ length: concert.date.length }).map((_, index) => <DetailItem key={index}>{concert.date[index]}</DetailItem>)}
+
+                      <DetailPlace>{concert.place}</DetailPlace>
+                    </Detail>
+                  </StyleLink>
+                </ListItem>
+              ))
+            : concertData &&
+              concertData.map((concert, index) => (
+                <ListItem key={index}>
+                  <StyleLink to={`/concert?concert=${concert.id}`}>
+                    {isLoaded ? (
+                      <ImageBox>
+                        <Image src={concert.poster ? concert.poster : concertImg} />
+                      </ImageBox>
+                    ) : (
+                      <Skeleton height="240px" line-height="inherit" containerClassName="avatar-skeleton" baseColor="#c3c3c3" borderRadius="20px 20px 0 0 " />
+                    )}
+
+                    <Detail>
+                      <DetailName>{concert.concertName}</DetailName>
+                      {concert.date && Array.from({ length: concert.date.length }).map((_, index) => <DetailItem key={index}>{concert.date[index]}</DetailItem>)}
+
+                      <DetailPlace>{concert.place}</DetailPlace>
+                    </Detail>
+                  </StyleLink>
+                </ListItem>
+              ))}
       </AllList>
     </Container>
   );

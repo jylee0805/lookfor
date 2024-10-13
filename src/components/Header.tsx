@@ -7,7 +7,7 @@ import { AuthContext } from "../utils/AuthContextProvider";
 import { MdMenu } from "react-icons/md";
 import { MdOutlineClose } from "react-icons/md";
 import { IoMdNotifications } from "react-icons/io";
-import Profile from "../pages/Profile";
+import { Personal, Notify } from "../types";
 
 const StyleClose = styled(MdOutlineClose)`
   font-size: 24px;
@@ -273,15 +273,7 @@ interface State {
   isMenuOpen: boolean;
   isNotifyOpen: boolean;
 }
-export interface Notify {
-  message: string;
-  createdTime: { seconds: number };
-  isRead: boolean;
-  title: string;
-  id?: string;
-  postId: string;
-  concertId: string;
-}
+
 type Action =
   | { type: "toggleIsPersonalClick" }
   | { type: "toggleIsMenuOpen"; payload: { isMenuOpen: boolean } }
@@ -374,7 +366,7 @@ function Header() {
   const handlerLogout = async () => {
     const loginState = await api.userLogOut();
     authContext?.setLoginState(loginState as string);
-    authContext?.setUser({} as Profile);
+    authContext?.setUser({} as Personal);
     dispatch({ type: "toggleIsPersonalClick" });
   };
 

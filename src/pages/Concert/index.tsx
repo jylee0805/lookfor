@@ -3,6 +3,7 @@ import api from "../../utils/api";
 import { ConcertContext } from "../../utils/ConcertContextProvider";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
+import { Detail } from "../../types";
 
 const Container = styled.div`
   margin: 0 auto;
@@ -129,12 +130,6 @@ const WebLink = styled.a`
   }
 `;
 
-export interface Detail {
-  ticketPrice: string;
-  ticketSaleTime: string[];
-  ticketSaleWebsite: string;
-  images: string;
-}
 function Concert() {
   const navigate = useNavigate();
   const concertContext = useContext(ConcertContext);

@@ -32,13 +32,7 @@ import {
   Timestamp,
   DocumentSnapshot,
 } from "../utils/firebase";
-import { Comment, OriginView } from "../pages/View";
-import { Concerts } from "../pages/ConcertList";
-import { Detail } from "../pages/Concert";
-import { MerchPost } from "../pages/FansSupport";
-import { Place, PlaceAvailable } from "../pages/TransportationDriving";
-import Profile from "../pages/Profile";
-import { Notify } from "../components/Header";
+import { Notify, OriginView, Comment, MerchPost, Personal, Concerts, Detail, PlaceInfo, PlaceAvailable } from "../types";
 
 interface Data {
   content: string;
@@ -73,14 +67,14 @@ const api = {
   async getUsers() {
     const q = query(collection(db, "users"));
     const querySnapshot = await getDocs(q);
-    const list: Profile[] = [];
-    querySnapshot.forEach((doc) => list.push({ id: doc.id, ...doc.data() } as Profile));
+    const list: Personal[] = [];
+    querySnapshot.forEach((doc) => list.push({ id: doc.id, ...doc.data() } as Personal));
     return list;
   },
   async getUser(id: string) {
     const q = query(collection(db, "users"), where("UID", "==", id));
     const querySnapshot = await getDocs(q);
-    const list: Profile = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Profile;
+    const list: Personal = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Personal;
     return list;
   },
 
@@ -380,7 +374,7 @@ const api = {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const updatedComments: Comment[] = [];
       querySnapshot.forEach((doc) => {
-        updatedComments.push({ id: doc.id, ...doc.data() });
+        updatedComments.push({ id: doc.id, ...doc.data() } as Comment);
       });
 
       onUpdate(updatedComments);
@@ -548,7 +542,7 @@ const api = {
       console.error("Error deleting document: ", e);
     }
   },
-  async getParkAvailable(places: Place[]) {
+  async getParkAvailable(places: PlaceInfo[]) {
     try {
       const park = await fetch("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json");
 

@@ -6,13 +6,13 @@ import FanPost from "./FanPost";
 import { AuthContext } from "../../utils/AuthContextProvider";
 import { FaSort } from "react-icons/fa";
 import { MdOutlineAdd, MdOutlineBookmarkBorder, MdOutlineBookmark, MdOutlineMoreVert } from "react-icons/md";
-import { Profile } from "../../utils/AuthContextProvider";
 import { Concerts } from "../ConcertList";
 import { ConcertContext } from "../../utils/ConcertContextProvider";
 import "react-photo-view/dist/react-photo-view.css";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import Dialog from "../../components/Dialog";
 import { useDialog } from "../../utils/useDialog";
+import { MerchPost, Personal } from "../../types";
 
 const StyleSort = styled(FaSort)`
   font-size: 1.5rem;
@@ -263,23 +263,6 @@ const Hint = styled.p`
   text-align: center;
   margin-top: 60px;
 `;
-export interface MerchPost {
-  concertId: string;
-  content: string;
-  passDay: string;
-  passPlace: string;
-  passState: string;
-  passTime: string;
-  qualify: string;
-  userUID: string;
-  image: string[];
-  createdTime: { seconds: number; nanoseconds: number };
-  userName?: string;
-  concertName?: string;
-  id?: string;
-  avatar?: string;
-  item: string;
-}
 
 export interface State {
   postData: MerchPost[];
@@ -357,7 +340,7 @@ function FansSupport() {
 
   const [state, dispatch] = useReducer(reducer, initial);
   const [isMoreClick, setIsMoreClick] = useState<string>("");
-  const [users, setUsers] = useState<Profile[]>([]);
+  const [users, setUsers] = useState<Personal[]>([]);
   const targetRef = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
@@ -421,7 +404,6 @@ function FansSupport() {
       }
     };
 
-    // 在初始哈希值檢查後進行滾動
     if (location.hash) {
       handleScroll();
     }
@@ -432,7 +414,6 @@ function FansSupport() {
       }
     }, 1000);
     document.body.style.overflow = "auto";
-    // 清理計時器
     return () => clearTimeout(timeoutId);
   }, [location, state.postData]);
 
@@ -503,7 +484,7 @@ function FansSupport() {
       });
       setUsers(updateUser);
     } else if (authContext?.user.keepIds === undefined || authContext?.user.keepIds?.includes(id) === false) {
-      authContext?.setUser((prev: Profile) => {
+      authContext?.setUser((prev: Personal) => {
         const updatedKeepIds = prev.keepIds ? [...prev.keepIds, id] : [id];
         api.setKeepPost(authContext?.loginState as string, id);
         return { ...prev, keepIds: updatedKeepIds };

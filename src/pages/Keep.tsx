@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { AuthContext } from "../utils/AuthContextProvider";
 import { useContext, useEffect, useState } from "react";
 import api from "../utils/api";
-import { MerchPost } from "../pages/FansSupport";
+import { MerchPost, Personal } from "../types";
 import { Link } from "react-router-dom";
 import { MdOutlineBookmarkBorder } from "react-icons/md";
 import { MdOutlineBookmark } from "react-icons/md";
@@ -150,7 +150,7 @@ function Keep() {
       });
       console.log(authContext.user);
     } else if (authContext?.user.keepIds === undefined || authContext?.user.keepIds?.includes(id) === false) {
-      authContext?.setUser((prev: Profile) => {
+      authContext?.setUser((prev: Personal) => {
         const updatedKeepIds = prev.keepIds ? [...prev.keepIds, id] : [id];
         api.setKeepPost(authContext?.loginState as string, id);
         return { ...prev, keepIds: updatedKeepIds };

@@ -1,26 +1,20 @@
 import { createContext, useEffect, useState } from "react";
+import { Personal } from "../types";
+
 import api from "./api";
 
 export interface AuthContextType {
   loginState: string;
   setLoginState: React.Dispatch<React.SetStateAction<string>>;
-  user: Profile;
-  setUser: React.Dispatch<React.SetStateAction<Profile>>;
-}
-
-export interface Profile {
-  avatar: string;
-  userName: string;
-  UID: string;
-  id: string;
-  keepIds?: string[];
+  user: Personal;
+  setUser: React.Dispatch<React.SetStateAction<Personal>>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthContextProvider({ children }: { children: React.ReactNode }) {
   const [loginState, setLoginState] = useState<string>("");
-  const [user, setUser] = useState<Profile>({} as Profile);
+  const [user, setUser] = useState<Personal>({} as Personal);
 
   useEffect(() => {
     const getAuth = async () => {

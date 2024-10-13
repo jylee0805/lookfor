@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import { Action, OriginView } from ".";
+import { Action, State } from ".";
+import { OriginView } from "../../types";
 import { useEffect, useState } from "react";
 import { darken } from "polished";
-import { State } from "./index";
 
 const RowSection = styled.div<{ isSelectSection: boolean; col: boolean }>`
   display: ${(props) => (props.isSelectSection ? "grid" : "none")};
@@ -69,30 +69,30 @@ function Rows({ state, dispatch }: Props) {
   const [color, setColor] = useState("");
 
   useEffect(() => {
-    dispatch({ type: "setAllRowPost", payload: { allRowPost: state.allSectionPost?.filter((item) => item.section === state.section) as OriginView[] } });
+    dispatch({ type: "setAllRowPost", payload: { allRowPost: state.allPost?.filter((item) => item.section === state.selectedSection) as OriginView[] } });
 
-    if (state.section.includes("VIP")) {
+    if (state.selectedSection.includes("VIP")) {
       setColor("#f1b3ff");
-    } else if (state.section.includes("2")) {
+    } else if (state.selectedSection.includes("2")) {
       setColor("#ffb3b3");
-    } else if (state.section.includes("3")) {
+    } else if (state.selectedSection.includes("3")) {
       setColor("#fff1b3");
     }
-  }, [state.section, state.row, state.seat]);
+  }, [state.viewPosts, state.selectedSection, state.selectedRow, state.selectedSeat]);
 
   return (
-    state.section !== "" && (
+    state.selectedSection !== "" && (
       <RowSection isSelectSection={state.isSelectSection} col={state.rowSeats.length > 10}>
-        <Title>{state.section}區</Title>
+        <Title>{state.selectedSection}區</Title>
         {Array.from({ length: state.rowSeats.length }).map((_, index) => (
           <RowBtn
             key={index}
             col={state.rowSeats.length > 10}
             color={color}
             haveData={state.allRowPost?.some((item) => item.row === index + 1) ?? false}
-            isSelect={state.row === index && state.isSelectRow === true}
+            isSelect={state.selectedRow === index && state.isSelectRow === true}
             onClick={() => {
-              dispatch({ type: "selectRow", payload: { row: index, isSelectRow: true, seat: 0 } });
+              dispatch({ type: "selectRow", payload: { selectedRow: index, isSelectRow: true, selectedSeat: 0 } });
             }}
           >
             {index + 1}排

@@ -2,9 +2,10 @@ import styled from "styled-components";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
 import { TimePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
-import { Concerts } from "../ConcertList";
+import { Concerts } from "../../types";
 import api from "../../utils/api";
-import { State, Action, MerchPost } from "./index";
+import { State, Action } from "./index";
+import { MerchPost } from "../../types";
 import { useEffect } from "react";
 import { MdOutlineClose } from "react-icons/md";
 

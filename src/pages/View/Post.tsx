@@ -5,7 +5,7 @@ import useGoogleVisionAPI from "../../utils/useGoogleVisionAPI";
 import { Action, State } from ".";
 import loading from "../../images/loading.gif";
 import { useEffect, useContext } from "react";
-import { PostState } from "./index";
+import { ViewPost } from "../../types";
 import { AuthContext } from "../../utils/AuthContextProvider";
 import { MdOutlineClose } from "react-icons/md";
 import imageLoading from "../../images/imageLoading.gif";
@@ -258,18 +258,18 @@ function Post({ state, dispatch, sendImage }: Props) {
   const rowValue = parseInt(watch("row"));
 
   useEffect(() => {
-    if (state.isPostEditMode?.section) {
+    if (state.postEdit?.section) {
       const values = {
-        section: state.isPostEditMode.section,
-        row: state.isPostEditMode.row?.toString(),
-        seat: state.isPostEditMode.seat?.toString(),
-        concert: state.isPostEditMode.concert,
-        note: state.isPostEditMode.note,
-        content: state.isPostEditMode.content,
+        section: state.postEdit.section,
+        row: state.postEdit.row?.toString(),
+        seat: state.postEdit.seat?.toString(),
+        concert: state.postEdit.concert,
+        note: state.postEdit.note,
+        content: state.postEdit.content,
       };
       reset(values);
     }
-  }, [state.isPostEditMode]);
+  }, [state.postEdit]);
 
   const filteredSeats = state.allSeats.filter((item) => item.sectionName === sectionValue);
   const uniqueRows = filteredSeats.length > 0 && Array.isArray(filteredSeats[0].row) ? filteredSeats[0].row : [];
@@ -280,15 +280,15 @@ function Post({ state, dispatch, sendImage }: Props) {
     console.log(state.isLoading);
     dispatch({ type: "setLoading", payload: { isLoading: true } });
 
-    if (state.isPostEditMode?.image) {
+    if (state.postEdit?.image) {
       const formValues = getValues();
-      await handleAnalyzeImage(state.isPostEditMode.image);
+      await handleAnalyzeImage(state.postEdit.image);
 
-      dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: state.isPostEditMode.image } });
-      await api.updateViewPost(state.isPostEditMode.id, formValues, state.uploadPhotoUrl);
+      dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: state.postEdit.image } });
+      await api.updateViewPost(state.postEdit.id, formValues, state.uploadPhotoUrl);
 
       const update = state.viewPosts?.map((post) => {
-        if (post.id === state.isPostEditMode?.id) {
+        if (post.id === state.postEdit?.id) {
           return {
             ...post,
             content: formValues.content,
@@ -302,8 +302,7 @@ function Post({ state, dispatch, sendImage }: Props) {
         }
         return post;
       });
-      dispatch({ type: "setViewPosts", payload: { viewPosts: update as PostState[] } });
-      dispatch({ type: "setLoading", payload: { isLoading: false } });
+      dispatch({ type: "editPost", payload: { viewPosts: update as ViewPost[], isLoading: false, isPostClick: false, isShowMask: false, selectPhoto: null, localPhotoUrl: "" } });
       reset({
         section: "",
         row: "",
@@ -312,9 +311,6 @@ function Post({ state, dispatch, sendImage }: Props) {
         note: "",
         content: "",
       });
-
-      dispatch({ type: "togglePostClick", payload: { isPostClick: false, isShowMask: false } });
-      dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
 
       document.body.style.overflow = "auto";
     } else if (state.selectPhoto) {
@@ -345,11 +341,11 @@ function Post({ state, dispatch, sendImage }: Props) {
         if (formValues) {
           console.log(formValues);
 
-          if (state.isPostEditMode?.id) {
-            await api.updateViewPost(state.isPostEditMode.id, formValues, state.uploadPhotoUrl);
+          if (state.postEdit?.id) {
+            await api.updateViewPost(state.postEdit.id, formValues, state.uploadPhotoUrl);
 
             const update = state.viewPosts?.map((post) => {
-              if (post.id === state.isPostEditMode?.id) {
+              if (post.id === state.postEdit?.id) {
                 return {
                   ...post,
                   content: formValues.content,
@@ -363,7 +359,7 @@ function Post({ state, dispatch, sendImage }: Props) {
               }
               return post;
             });
-            dispatch({ type: "setViewPosts", payload: { viewPosts: update as PostState[] } });
+            dispatch({ type: "setViewPosts", payload: { viewPosts: update as ViewPost[] } });
           } else {
             await api.setViewPost(formValues, state.uploadPhotoUrl, authContext?.loginState as string);
           }
@@ -371,11 +367,25 @@ function Post({ state, dispatch, sendImage }: Props) {
 
         const rows = await api.getRows(formValues.section);
         const sectionAry: number[] = Array.isArray(rows) ? rows : [];
-        dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, section: formValues.section, isSelectRow: false } });
-        dispatch({ type: "selectRow", payload: { row: parseInt(formValues.row) - 1, isSelectRow: true, seat: 0 } });
-        dispatch({ type: "selectSeat", payload: { seat: parseInt(formValues.seat) - 1 } });
+        dispatch({
+          type: "resetPost",
+          payload: {
+            rowSeats: sectionAry,
+            selectedSection: formValues.section,
+            selectedRow: parseInt(formValues.row) - 1,
+            isSelectRow: true,
+            selectedSeat: parseInt(formValues.seat) - 1,
+            isLoading: false,
+            isPostClick: false,
+            isShowMask: false,
+            selectPhoto: null,
+            localPhotoUrl: "",
+          },
+        });
+        // dispatch({ type: "selectRow", payload: { selectedRow: parseInt(formValues.row) - 1, isSelectRow: true, selectedSeat: 0 } });
+        // dispatch({ type: "selectSeat", payload: { selectedSeat: parseInt(formValues.seat) - 1 } });
 
-        dispatch({ type: "setLoading", payload: { isLoading: false } });
+        // dispatch({ type: "setLoading", payload: { isLoading: false } });
         reset({
           section: "",
           row: "",
@@ -386,8 +396,8 @@ function Post({ state, dispatch, sendImage }: Props) {
           image: undefined,
         });
 
-        dispatch({ type: "togglePostClick", payload: { isPostClick: false, isShowMask: false } });
-        dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
+        // dispatch({ type: "togglePostClick", payload: { isPostClick: false, isShowMask: false } });
+        // dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
         document.body.style.overflow = "auto";
       }
     };
@@ -410,18 +420,18 @@ function Post({ state, dispatch, sendImage }: Props) {
       content: "",
     });
 
-    dispatch({ type: "setPostMode", payload: { isPostEditMode: {} as PostState, isPostClick: false, isShowMask: false } });
-    dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
+    dispatch({ type: "cancelPost", payload: { postEdit: {} as ViewPost, isPostClick: false, isShowMask: false, selectPhoto: null, localPhotoUrl: "" } });
+
     document.body.style.overflow = "auto";
   };
 
   const handleDeletePreview = () => {
     if (state.selectPhoto) {
       dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
-    } else if (state.isPostEditMode?.image) {
-      const update = JSON.parse(JSON.stringify(state.isPostEditMode));
+    } else if (state.postEdit?.image) {
+      const update = JSON.parse(JSON.stringify(state.postEdit));
       update.image = "";
-      dispatch({ type: "updatePostMode", payload: { isPostEditMode: update } });
+      dispatch({ type: "updatePostMode", payload: { postEdit: update } });
     }
   };
   return (
@@ -433,7 +443,7 @@ function Post({ state, dispatch, sendImage }: Props) {
         </LoadingContainer>
       )}
 
-      <PostTitle>{state.isPostEditMode?.section ? "更新視角" : "發布視角"}</PostTitle>
+      <PostTitle>{state.postEdit?.section ? "更新視角" : "發佈視角"}</PostTitle>
       <Btn onClick={() => handlerCancel()}>
         <StyleClose />
       </Btn>
@@ -490,12 +500,12 @@ function Post({ state, dispatch, sendImage }: Props) {
           <Input type="text" defaultValue="" {...register("note")} placeholder="會被欄杆擋住、冷氣很冷..." />
           <Content defaultValue="" {...register("content")} placeholder="演唱會心得或是視角感受分享..."></Content>
         </FormContainer>
-        <ImagePreviewBox show={!!state.selectPhoto || !!state.isPostEditMode?.image}>
+        <ImagePreviewBox show={!!state.selectPhoto || !!state.postEdit?.image}>
           <ImagePreviewDelete onClick={() => handleDeletePreview()}>
             <StyleClose />
           </ImagePreviewDelete>
           {state.selectPhoto && <ImagePreview src={state.localPhotoUrl} />}
-          {state.isPostEditMode?.image && <ImagePreview src={state.isPostEditMode?.image} />}
+          {state.postEdit?.image && <ImagePreview src={state.postEdit?.image} />}
         </ImagePreviewBox>
       </ContentContainer>
       <PostFooter>
@@ -503,7 +513,7 @@ function Post({ state, dispatch, sendImage }: Props) {
         <BtnBox>
           <SelectPhotoBtn>
             選擇照片
-            <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" {...register("image", { required: state.isPostEditMode?.image ? false : "請選擇照片" })} onChange={sendImage} />
+            <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" {...register("image", { required: state.postEdit?.image ? false : "請選擇照片" })} onChange={sendImage} />
           </SelectPhotoBtn>
           {errors.image && <Error>{errors.image.message}</Error>}
 

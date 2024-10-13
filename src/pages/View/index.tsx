@@ -9,6 +9,7 @@ import Rows from "./Rows";
 import Seat from "./Seat";
 import api from "../../utils/api";
 import Loading from "../../components/Loading";
+import { OriginView, ViewPost, Comment } from "../../types";
 import { useDialog } from "../../utils/useDialog";
 import { useEffect, useReducer, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContextProvider";
@@ -52,7 +53,7 @@ const Main = styled.main`
 `;
 const SectionHeader = styled.div`
   width: 100%;
-  max-width: 100vw; /* 確保容器寬度不超出螢幕 */
+  max-width: 100vw;
   position: relative;
   display: flex;
   justify-content: space-between;
@@ -104,41 +105,6 @@ const PostVieBtnText = styled.span`
   padding: 8px 20px 8px 0;
 `;
 
-export interface Comment {
-  content?: string;
-  userUID?: string;
-  createdTime?: string;
-  id: string;
-  userName?: string;
-  avatar?: string;
-}
-export interface PostState {
-  image: string;
-  note: string;
-  content: string;
-  id: string;
-  comment: Comment[];
-  concert: string;
-  createdTime: string;
-  row: number;
-  seat: number;
-  section: string;
-  userUID: string;
-  userName: string | undefined;
-  avatar: string | undefined;
-}
-export interface OriginView {
-  image: string;
-  note: string;
-  content: string;
-  id: string;
-  concert: string;
-  createdTime: string;
-  row: number;
-  seat: number;
-  section: string;
-  userUID: string;
-}
 interface Seats {
   sectionName: string;
   row: number[];
@@ -147,18 +113,18 @@ interface Seats {
 export interface State {
   allSeats: Seats[];
   rowSeats: number[];
-  section: string;
-  row: number;
-  seat: number;
-  setDeleteViewId: string;
-  viewPosts: PostState[];
+  selectedSection: string;
+  selectedRow: number;
+  selectedSeat: number;
+  deleteViewId: string;
+  viewPosts: ViewPost[];
   selectPhoto: File | null;
   localPhotoUrl: string;
   uploadPhotoUrl: string;
   comment: { [key: string]: string };
-  isCommentEditMode: string;
-  isPostEditMode: PostState;
-  allSectionPost: OriginView[];
+  commentEdit: string;
+  postEdit: ViewPost;
+  allPost: OriginView[];
   allRowPost: OriginView[];
   color: string;
   viewId: string;
@@ -169,55 +135,67 @@ export interface State {
   isPostClick: boolean;
   isShowMask: boolean;
 }
-export interface AllPost {
-  row: number;
-  seat: number;
-  section: string;
-  img: string;
-}
 
 export type Action =
   | { type: "getAllSeats"; payload: { allSeats: Seats[] } }
-  | { type: "selectSection"; payload: { section: string; rowSeats: number[]; isSelectRow: boolean } }
-  | { type: "selectRow"; payload: { row: number; isSelectRow: boolean; seat: number } }
-  | { type: "selectSeat"; payload: { seat: number } }
-  | { type: "setViewPosts"; payload: { viewPosts: PostState[] } }
+  | { type: "selectSection"; payload: { selectedSection: string; rowSeats: number[]; isSelectRow: boolean } }
+  | { type: "selectRow"; payload: { selectedRow: number; isSelectRow: boolean; selectedSeat: number } }
+  | { type: "selectSeat"; payload: { selectedSeat: number } }
+  | { type: "setViewPosts"; payload: { viewPosts: ViewPost[] } }
   | { type: "togglePostClick"; payload: { isPostClick: boolean; isShowMask: boolean } }
   | { type: "setSelectPhoto"; payload: { selectPhoto: File | null; localPhotoUrl: string } }
   | { type: "setUploadPhotoUrl"; payload: { uploadPhotoUrl: string } }
   | { type: "setComment"; payload: { commentText: string; id: string } }
   | { type: "isSelectRow" }
   | { type: "setLoading"; payload: { isLoading: boolean } }
-  | { type: "toggleCommentMode"; payload: { isCommentEditMode: string } }
-  | { type: "setPostMode"; payload: { isPostEditMode: PostState; isPostClick: boolean; isShowMask: boolean } }
-  | { type: "updatePostMode"; payload: { isPostEditMode: PostState } }
-  | { type: "setAllSectionPost"; payload: { allSectionPost: OriginView[] } }
+  | { type: "setCommentMode"; payload: { commentEdit: string } }
+  | { type: "setPostMode"; payload: { postEdit: ViewPost; isPostClick: boolean; isShowMask: boolean } }
+  | { type: "updatePostMode"; payload: { postEdit: ViewPost } }
+  | { type: "setAllSectionPost"; payload: { allPost: OriginView[] } }
   | { type: "setAllRowPost"; payload: { allRowPost: OriginView[] } }
   | { type: "setColor"; payload: { color: string } }
-  | { type: "toggleDeleteDialog"; payload: { setDeleteViewId: string } }
+  | { type: "setDeleteViewId"; payload: { deleteViewId: string } }
   | { type: "setDeleteComment"; payload: { viewId: string; deleteCommentId: string } }
-  | { type: "setDefaultSeat"; payload: { rowSeats: number[]; section: string; isSelectSection: boolean; isSelectRow: boolean; row: number; seat: number } };
+  | { type: "setDefaultSeat"; payload: { rowSeats: number[]; selectedSection: string; isSelectSection: boolean; isSelectRow: boolean; selectedRow: number; selectedSeat: number } }
+  | { type: "deletePost"; payload: { viewPosts: ViewPost[]; deleteViewId: string } }
+  | { type: "editPost"; payload: { viewPosts: ViewPost[]; isLoading: boolean; isPostClick: boolean; isShowMask: boolean; selectPhoto: File | null; localPhotoUrl: string } }
+  | {
+      type: "resetPost";
+      payload: {
+        selectedSection: string;
+        rowSeats: number[];
+        isSelectRow: boolean;
+        selectedRow: number;
+        selectedSeat: number;
+        isLoading: boolean;
+        isPostClick: boolean;
+        isShowMask: boolean;
+        selectPhoto: File | null;
+        localPhotoUrl: string;
+      };
+    }
+  | { type: "cancelPost"; payload: { postEdit: ViewPost; isPostClick: boolean; isShowMask: boolean; selectPhoto: File | null; localPhotoUrl: string } };
 
 const initial: State = {
   allSeats: [],
   rowSeats: [],
-  section: "0",
-  row: 0,
-  seat: 0,
+  selectedSection: "0",
+  selectedRow: 0,
+  selectedSeat: 0,
   isSelectRow: false,
   isSelectSection: false,
   viewPosts: [],
   isPostClick: false,
-  setDeleteViewId: "",
+  deleteViewId: "",
   isShowMask: false,
   selectPhoto: null,
   localPhotoUrl: "",
   uploadPhotoUrl: "",
   comment: {},
   isLoading: false,
-  isCommentEditMode: "",
-  isPostEditMode: {} as PostState,
-  allSectionPost: [],
+  commentEdit: "",
+  postEdit: {} as ViewPost,
+  allPost: [],
   allRowPost: [],
   color: "",
   viewId: "",
@@ -230,20 +208,20 @@ const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         rowSeats: action.payload.rowSeats,
-        section: action.payload.section,
+        selectedSection: action.payload.selectedSection,
         isSelectSection: action.payload.isSelectSection,
         isSelectRow: action.payload.isSelectRow,
-        row: action.payload.row,
-        seat: action.payload.seat,
+        selectedRow: action.payload.selectedRow,
+        selectedSeat: action.payload.selectedSeat,
       };
     case "getAllSeats":
       return { ...state, allSeats: action.payload.allSeats };
     case "selectSection":
-      return { ...state, section: action.payload.section, rowSeats: action.payload.rowSeats, isSelectRow: action.payload.isSelectRow, isSelectSection: true };
+      return { ...state, selectedSection: action.payload.selectedSection, rowSeats: action.payload.rowSeats, isSelectRow: action.payload.isSelectRow, isSelectSection: true };
     case "selectRow":
-      return { ...state, row: action.payload.row, isSelectRow: action.payload.isSelectRow, seat: action.payload.seat };
+      return { ...state, selectedRow: action.payload.selectedRow, isSelectRow: action.payload.isSelectRow, selectedSeat: action.payload.selectedSeat };
     case "selectSeat":
-      return { ...state, seat: action.payload.seat };
+      return { ...state, selectedSeat: action.payload.selectedSeat };
     case "setViewPosts":
       return { ...state, viewPosts: action.payload.viewPosts };
     case "isSelectRow":
@@ -260,17 +238,17 @@ const reducer = (state: State, action: Action): State => {
     case "setLoading": {
       return { ...state, isLoading: action.payload.isLoading };
     }
-    case "toggleCommentMode": {
-      return { ...state, isCommentEditMode: action.payload.isCommentEditMode };
+    case "setCommentMode": {
+      return { ...state, commentEdit: action.payload.commentEdit };
     }
     case "setPostMode": {
-      return { ...state, isPostEditMode: action.payload.isPostEditMode, isPostClick: action.payload.isPostClick, isShowMask: action.payload.isShowMask };
+      return { ...state, postEdit: action.payload.postEdit, isPostClick: action.payload.isPostClick, isShowMask: action.payload.isShowMask };
     }
     case "updatePostMode": {
-      return { ...state, isPostEditMode: action.payload.isPostEditMode };
+      return { ...state, postEdit: action.payload.postEdit };
     }
     case "setAllSectionPost": {
-      return { ...state, allSectionPost: action.payload.allSectionPost };
+      return { ...state, allPost: action.payload.allPost };
     }
     case "setAllRowPost": {
       return { ...state, allRowPost: action.payload.allRowPost };
@@ -278,11 +256,47 @@ const reducer = (state: State, action: Action): State => {
     case "setColor": {
       return { ...state, color: action.payload.color };
     }
-    case "toggleDeleteDialog": {
-      return { ...state, setDeleteViewId: action.payload.setDeleteViewId };
+    case "setDeleteViewId": {
+      return { ...state, deleteViewId: action.payload.deleteViewId };
     }
     case "setDeleteComment": {
       return { ...state, viewId: action.payload.viewId, deleteCommentId: action.payload.deleteCommentId };
+    }
+    case "editPost": {
+      return {
+        ...state,
+        viewPosts: action.payload.viewPosts,
+        isLoading: action.payload.isLoading,
+        isPostClick: action.payload.isPostClick,
+        isShowMask: action.payload.isShowMask,
+        selectPhoto: action.payload.selectPhoto,
+        localPhotoUrl: action.payload.localPhotoUrl,
+      };
+    }
+    case "resetPost": {
+      return {
+        ...state,
+        rowSeats: action.payload.rowSeats,
+        selectedSection: action.payload.selectedSection,
+        selectedRow: action.payload.selectedRow,
+        isSelectRow: action.payload.isSelectRow,
+        selectedSeat: action.payload.selectedSeat,
+        isLoading: action.payload.isLoading,
+        isPostClick: action.payload.isPostClick,
+        isShowMask: action.payload.isShowMask,
+        selectPhoto: action.payload.selectPhoto,
+        localPhotoUrl: action.payload.localPhotoUrl,
+      };
+    }
+    case "cancelPost": {
+      return {
+        ...state,
+        postEdit: action.payload.postEdit,
+        isPostClick: action.payload.isPostClick,
+        isShowMask: action.payload.isShowMask,
+        selectPhoto: action.payload.selectPhoto,
+        localPhotoUrl: action.payload.localPhotoUrl,
+      };
     }
     default:
       return state;
@@ -299,87 +313,91 @@ function View() {
 
   useEffect(() => {
     const loadViewPosts = async () => {
-      const unsubscribesPost: (() => void)[] = [];
       const unsubscribes: (() => void)[] = [];
-      let posts: PostState[] = [];
+      let posts: ViewPost[] = [];
 
-      const unsubscribePost = api.getViewPosts(state.section, state.row + 1, state.seat + 1, async (updatedPosts: OriginView[]) => {
-        posts = JSON.parse(JSON.stringify(updatedPosts));
-
-        const fetchUserNames = async () => {
-          const userNamesPromises = posts.map(async (post) => {
-            if (post.userUID) {
-              const user = await api.getUser(post.userUID);
-
-              return { userName: user.userName, avatar: user.avatar };
-            }
-            return null;
-          });
-          const userNames = await Promise.all(userNamesPromises);
-
-          return userNames;
-        };
-        fetchUserNames().then((userNames) => {
-          posts.forEach((post, index) => {
-            post.userName = userNames[index]?.userName;
-            post.avatar = userNames[index]?.avatar;
-          });
-        });
-        await Promise.all(
-          posts.map(async (post) => {
-            const unsubscribe = api.getViewComments(post.id, (updatedComments: Comment[]) => {
-              console.log(updatedComments);
-              const comments = JSON.parse(JSON.stringify(updatedComments));
-
-              const fetchUserNames = async () => {
-                const userNamesPromises = comments.map(async (comment: Comment) => {
-                  if (comment.userUID) {
-                    const user = await api.getUser(comment.userUID);
-
-                    return { userName: user.userName, avatar: user.avatar };
-                  }
-                  return null;
-                });
-
-                const userNames = await Promise.all(userNamesPromises);
-                return userNames;
-              };
-
-              fetchUserNames().then((userNames) => {
-                comments.forEach((comment: Comment, index: number) => {
-                  if (userNames[index]) {
-                    comment.userName = userNames[index]?.userName || comment.userName;
-                    comment.avatar = userNames[index]?.avatar || comment.avatar;
-                  }
-                });
-                post.comment = comments;
-                dispatch({ type: "setViewPosts", payload: { viewPosts: [...posts] } });
-              });
-            });
-
-            unsubscribes.push(await unsubscribe);
+      posts = JSON.parse(
+        JSON.stringify(
+          state.allPost.filter((post) => {
+            console.log(post.section, state.selectedSection, post.row, state.selectedRow, post.seat, state.selectedSeat);
+            return post.section === state.selectedSection && post.row - 1 === state.selectedRow && post.seat - 1 === state.selectedSeat;
           })
-        );
+        )
+      );
+      console.log(posts);
 
-        dispatch({ type: "setViewPosts", payload: { viewPosts: posts } });
+      const fetchUserNames = async () => {
+        const userNamesPromises = posts.map(async (post) => {
+          if (post.userUID) {
+            const user = await api.getUser(post.userUID);
+
+            return { userName: user.userName, avatar: user.avatar };
+          }
+          return null;
+        });
+        const userNames = await Promise.all(userNamesPromises);
+
+        return userNames;
+      };
+
+      fetchUserNames().then((userNames) => {
+        posts.forEach((post, index) => {
+          post.userName = userNames[index]?.userName;
+          post.avatar = userNames[index]?.avatar;
+        });
       });
 
-      unsubscribesPost.push(await unsubscribePost);
+      await Promise.all(
+        posts.map(async (post) => {
+          const unsubscribe = api.getViewComments(post.id, (updatedComments: Comment[]) => {
+            console.log(updatedComments);
+            const comments = JSON.parse(JSON.stringify(updatedComments));
+
+            const fetchUserNames = async () => {
+              const userNamesPromises = comments.map(async (comment: Comment) => {
+                if (comment.userUID) {
+                  const user = await api.getUser(comment.userUID);
+
+                  return { userName: user.userName, avatar: user.avatar };
+                }
+                return null;
+              });
+
+              const userNames = await Promise.all(userNamesPromises);
+              return userNames;
+            };
+
+            fetchUserNames().then((userNames) => {
+              comments.forEach((comment: Comment, index: number) => {
+                if (userNames[index]) {
+                  comment.userName = userNames[index]?.userName || comment.userName;
+                  comment.avatar = userNames[index]?.avatar || comment.avatar;
+                }
+              });
+              post.comment = comments;
+              dispatch({ type: "setViewPosts", payload: { viewPosts: [...posts] } });
+            });
+          });
+
+          unsubscribes.push(await unsubscribe);
+        })
+      );
+
+      dispatch({ type: "setViewPosts", payload: { viewPosts: posts } });
 
       return () => {
-        unsubscribesPost.forEach((unsubscribe) => unsubscribe());
         unsubscribes.forEach((unsubscribe) => unsubscribe());
       };
     };
 
     loadViewPosts();
-  }, [state.section, state.row, state.seat]);
+  }, [state.selectedSection, state.selectedRow, state.selectedSeat]);
 
   useEffect(() => {
     const getSeat = async () => {
       const rows = await api.getRows(section);
       const sectionAry: number[] = Array.isArray(rows) ? rows : [];
-      dispatch({ type: "setDefaultSeat", payload: { rowSeats: sectionAry, section: section, isSelectSection: true, isSelectRow: true, row: row - 1, seat: seat - 1 } });
+      dispatch({ type: "setDefaultSeat", payload: { rowSeats: sectionAry, selectedSection: section, isSelectSection: true, isSelectRow: true, selectedRow: row - 1, selectedSeat: seat - 1 } });
     };
     const timer = setTimeout(() => {
       document.body.style.overflowY = "auto";
@@ -407,13 +425,12 @@ function View() {
         const unsubscribesPost: (() => void)[] = [];
 
         const unsubscribePost = api.getAllSectionViewPost(async (updatedPosts: OriginView[]) => {
-          dispatch({ type: "setAllSectionPost", payload: { allSectionPost: updatedPosts as OriginView[] } });
+          dispatch({ type: "setAllSectionPost", payload: { allPost: updatedPosts as OriginView[] } });
           console.log(updatedPosts);
         });
 
         unsubscribesPost.push(await unsubscribePost);
 
-        // 清除訂閱
         return () => {
           unsubscribesPost.forEach((unsubscribe) => unsubscribe());
         };
@@ -422,16 +439,16 @@ function View() {
       }
     };
     getAllSeats();
-  }, [state.viewPosts, state.section, state.row, state.seat]);
+  }, [state.viewPosts]);
 
   const handlerSection = async (section: string) => {
     const rows = await api.getRows(section);
     const sectionAry: number[] = Array.isArray(rows) ? rows : [];
 
-    if (section === state.section) {
-      dispatch({ type: "selectSection", payload: { rowSeats: [], section: "", isSelectRow: false } });
+    if (section === state.selectedSection) {
+      dispatch({ type: "selectSection", payload: { rowSeats: [], selectedSection: "", isSelectRow: false } });
     } else {
-      dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, section: section, isSelectRow: false } });
+      dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, selectedSection: section, isSelectRow: false } });
     }
   };
 
@@ -441,6 +458,7 @@ function View() {
     await api.setComment(id, state.comment[id], response, userName.userName);
     dispatch({ type: "setComment", payload: { id: id, commentText: "" } });
   };
+
   const sendImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target as HTMLInputElement;
 
@@ -454,10 +472,10 @@ function View() {
       setIsOpen(true);
       return;
     }
-
     dispatch({ type: "togglePostClick", payload: { isPostClick: true, isShowMask: true } });
     document.body.style.overflowY = "hidden";
   };
+
   const handleConfirm = () => {
     navigate("/login");
     closeDialog();
