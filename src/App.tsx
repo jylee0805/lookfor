@@ -5,12 +5,9 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AuthContextProvider } from "./utils/AuthContextProvider";
 import { ComponentContextProvider } from "./utils/ComponentContextProvider";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConcertContextProvider } from "./utils/ConcertContextProvider";
 import { useEffect, useState } from "react";
 import Loading from "./components/Loading";
-
-const queryClient = new QueryClient();
 
 function App() {
   const [loaded, setLoaded] = useState(false);
@@ -25,20 +22,18 @@ function App() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthContextProvider>
-        <ConcertContextProvider>
-          <ComponentContextProvider>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <GlobalStyle />
-              {!loaded && <Loading />}
-              <Header />
-              <Outlet />
-            </LocalizationProvider>
-          </ComponentContextProvider>
-        </ConcertContextProvider>
-      </AuthContextProvider>
-    </QueryClientProvider>
+    <AuthContextProvider>
+      <ConcertContextProvider>
+        <ComponentContextProvider>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <GlobalStyle />
+            {!loaded && <Loading />}
+            <Header />
+            <Outlet />
+          </LocalizationProvider>
+        </ComponentContextProvider>
+      </ConcertContextProvider>
+    </AuthContextProvider>
   );
 }
 

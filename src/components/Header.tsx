@@ -156,12 +156,14 @@ const Nav = styled.ul<{ isMenuOpen: boolean }>`
   align-items: center;
   z-index: 5;
   position: relative;
+
   @media (max-width: 575px) {
     flex-direction: column;
     position: fixed;
     height: 100vh;
     background: #1e1e1e;
     top: 0;
+    width: 50%;
     right: ${(props) => (props.isMenuOpen ? "0" : " -100%")};
     transition: right 500ms ease-out;
   }
@@ -198,7 +200,7 @@ const StyleLink = styled(Link)`
   padding: 20px 24px;
   color: #ffffff;
   @media (max-width: 768px) {
-    padding: 10px 20px;
+    padding: 10px 15px;
   }
   @media (max-width: 575px) {
     display: block;

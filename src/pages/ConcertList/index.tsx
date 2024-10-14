@@ -45,20 +45,26 @@ const Header = styled.div`
   align-items: center;
   margin-bottom: 40px;
   justify-content: space-between;
-  @media (max-width: 575px) {
+  @media (max-width: 768px) {
     display: block;
   }
 `;
 const Title = styled.h3`
   font-size: 1.96rem;
   font-weight: 700;
-  @media (max-width: 575px) {
+  @media (max-width: 768px) {
+    display: inline-block;
     margin-bottom: 20px;
+  }
+  @media (max-width: 575px) {
   }
 `;
 const FilterContainer = styled.div`
   margin-right: auto;
   margin-left: 15px;
+  @media (max-width: 768px) {
+    display: inline-block;
+  }
 `;
 const FilterBtn = styled.button`
   background: transparent;
@@ -91,7 +97,7 @@ const SearchInput = styled.input`
   box-shadow: none;
   border: none;
   outline: none;
-  @media (max-width: 575px) {
+  @media (max-width: 768px) {
     flex-grow: 1;
   }
 `;
@@ -171,7 +177,7 @@ const Hint = styled.p`
 const options = {
   keys: ["concertName", "place"],
   threshold: 0.8,
-  includeScore: false, // 是否包含匹配分數
+  includeScore: false,
 };
 
 function ConcertList() {
@@ -183,7 +189,7 @@ function ConcertList() {
   const [startAt, setStartAt] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [nextLoad, setNextLoad] = useState(false);
-  const scrollRef = useRef<HTMLDivElement | null>(null); // 創建 ref
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -205,7 +211,7 @@ function ConcertList() {
       const data = await api.getNextConcerts(startAt);
       console.log(data);
       if (data.data.length === 0) {
-        setNextLoad(false); // 停止加載
+        setNextLoad(false);
         return;
       }
       setConcertData((prev) => [...prev, ...data.data]);
@@ -244,7 +250,7 @@ function ConcertList() {
     } else {
       setSearchHint(false);
     }
-    setSearchData(search);
+    setSearchData(search.sort());
   };
 
   const handleAll = () => {

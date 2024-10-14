@@ -165,10 +165,7 @@ html{
   @media (max-width: 768px) {
     font-size: 14px;
   }
-  @media (max-width: 575px) {
-    font-size: 12px;
-
-  }
+ 
 }
 body {
  
@@ -206,7 +203,16 @@ body {
       -45vw -30vh 0 25vw #181818,
       -90vw 20vh 0 20vw #ff5213,
       -10vw -10vh 0 25vw #ff3714,20vw 80vh 0 100vw #000000;
-    filter: blur(12rem);
+      filter: blur(8rem);
+
+    @media (max-width: 575px) {
+      box-shadow:
+      -50vw 20vh 0 0 #1b1a1a,
+      90vw 0vh 0 55vw #ffe600,
+      -55vw -20vh 0 25vw #181818,
+      -90vw 20vh 0 5vw #ff5213,
+      -10vw -10vh 0 15vw #ff3714,20vw 80vh 0 100vw #000000; filter: blur(6rem);
+  }
   }
 }
 a {

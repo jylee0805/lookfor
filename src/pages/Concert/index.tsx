@@ -6,17 +6,17 @@ import { useContext, useEffect, useState } from "react";
 import { Detail } from "../../types";
 
 const Container = styled.div`
-  margin: 0 auto;
-  padding: 60px 60px;
+  width: 80%;
+  margin: 60px auto;
   @media (max-width: 992px) {
-    padding: 0 40px;
+    width: 100%;
   }
-  @media (max-width: 575px) {
-    padding: 0 30px;
+  @media (max-width: 768px) {
+    width: 90%;
   }
 `;
 const ConcertName = styled.h3`
-  font-size: 2.2rem;
+  font-size: 2rem;
   margin-bottom: 40px;
   font-weight: 700;
   text-align: center;
@@ -31,7 +31,7 @@ const BtnBox = styled.div`
   border: 2px solid #fff;
 
   @media (max-width: 575px) {
-    width: 320px;
+    width: 100%;
     padding: 6px 10px;
   }
 `;
@@ -63,15 +63,19 @@ const PosterBox = styled.div`
   text-align: center;
   margin-bottom: 40px;
   @media (max-width: 992px) {
-    width: 100%;
+    margin-bottom: 0px;
+  }
+  @media (max-width: 575px) {
+    width: 80%;
   }
 `;
 const Poster = styled.img`
-  max-width: 320px;
   border: 5px solid #fff;
 `;
 const InfoContainer = styled.div`
+  width: 70%;
   @media (max-width: 768px) {
+    width: 100%;
     padding: 0 20px;
   }
 `;
@@ -93,16 +97,17 @@ const Title = styled.h4`
 `;
 const InfoItem = styled.div`
   display: flex;
+  column-gap: 10px;
   margin-bottom: 5px;
 `;
 const SubTitle = styled.p`
   font-size: 1.2rem;
-  letter-spacing: 4px;
   line-height: 1.5;
-
+  width: 96px;
+  flex-shrink: 0;
   @media (max-width: 768px) {
     font-size: 1rem;
-    letter-spacing: 5px;
+    width: 70px;
   }
 `;
 

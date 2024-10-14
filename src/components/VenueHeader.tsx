@@ -30,7 +30,7 @@ const VenueTitle = styled.h2`
     letter-spacing: 0.1rem;
   }
   @media (max-width: 575px) {
-    font-size: 4rem;
+    font-size: 3.5rem;
   }
 `;
 const VenueSubTitle = styled.h3`
@@ -44,7 +44,7 @@ const VenueSubTitle = styled.h3`
     font-size: 3.6rem;
   }
   @media (max-width: 575px) {
-    font-size: 2.8rem;
+    font-size: 2.4rem;
     letter-spacing: 0.2rem;
   }
 `;
@@ -90,7 +90,7 @@ const StyleLink = styled(Link)`
     font-size: 1.1rem;
   }
   @media (max-width: 575px) {
-    padding: 8px 10px;
+    padding: 8px 5px;
     font-size: 1rem;
   }
 `;

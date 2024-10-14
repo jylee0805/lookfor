@@ -137,7 +137,7 @@ function TransportationDriving() {
   const [selectedMarker, setSelectedMarker] = useState<PlaceInfo | null>(null);
 
   const tw97 = "+proj=tmerc +lat_0=0 +lon_0=121 +k=1 +x_0=250000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
-  const wgs84 = "EPSG:4326"; // WGS84 坐标系
+  const wgs84 = "EPSG:4326";
 
   const center = { lat: 25.052391331855265, lng: 121.59855174326229 };
   const wgs84Min = [121.59412155976037, 25.048075142191188];
@@ -170,7 +170,7 @@ function TransportationDriving() {
 
       console.log(result);
 
-      setPlaces(all); // 更新 places 狀態
+      setPlaces(all);
     } catch (error) {
       console.error("Error loading park info:", error);
     }

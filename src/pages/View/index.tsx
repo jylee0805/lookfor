@@ -1,6 +1,4 @@
 import styled from "styled-components";
-import leftEyes from "../../images/leftEyes.png";
-import rightEyes from "../../images/rightEyes.png";
 import Dialog from "../../components/Dialog";
 import VenueHeader from "../../components/VenueHeader";
 import Post from "./Post";
@@ -9,18 +7,26 @@ import Rows from "./Rows";
 import Seat from "./Seat";
 import api from "../../utils/api";
 import Loading from "../../components/Loading";
+import { MdOutlineAdd } from "react-icons/md";
 import { OriginView, ViewPost, Comment } from "../../types";
 import { useDialog } from "../../utils/useDialog";
-import { useEffect, useReducer, useContext } from "react";
+import { useEffect, useReducer, useContext, useRef } from "react";
 import { AuthContext } from "../../utils/AuthContextProvider";
 import { ComponentContext } from "../../utils/ComponentContextProvider";
 import { useLocation, useNavigate } from "react-router-dom";
+
+const StyleAdd = styled(MdOutlineAdd)`
+  font-size: 1.5rem;
+  margin-right: 4px;
+  @media (max-width: 575px) {
+  }
+`;
 
 const Container = styled.div`
   width: 100%;
   max-width: 100vw;
   position: relative;
-  padding: 0 30px;
+  /* padding: 0 30px; */
 `;
 const Mask = styled.div<{ postClick: boolean }>`
   display: ${(props) => (props.postClick ? "block" : "none")};
@@ -75,35 +81,24 @@ const PostViewBtn = styled.button`
   display: flex;
   align-items: center;
   height: 45px;
-  width: 160px;
+  width: 140px;
   font-size: 1.2rem;
   font-weight: 600;
   padding: 0 15px;
-  background: #fff8d6;
+  background: #ffffff;
   color: #000;
-  background-image: url("${leftEyes}");
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: 90% 0;
-
-  &:hover {
-    background-image: url("${rightEyes}");
-  }
+  justify-content: center;
   @media (max-width: 768px) {
     padding: 0 12px;
     height: 40px;
     width: 140px;
   }
   @media (max-width: 575px) {
-    padding: 0 10px;
-    height: 28px;
-    width: 110px;
+    height: 36px;
+    width: 120px;
   }
 `;
-const PostVieBtnText = styled.span`
-  display: block;
-  padding: 8px 20px 8px 0;
-`;
+const PostVieBtnText = styled.span``;
 
 interface Seats {
   sectionName: string;
@@ -165,6 +160,7 @@ export type Action =
         selectedSection: string;
         rowSeats: number[];
         isSelectRow: boolean;
+        isSelectSection: boolean;
         selectedRow: number;
         selectedSeat: number;
         isLoading: boolean;
@@ -262,6 +258,9 @@ const reducer = (state: State, action: Action): State => {
     case "setDeleteComment": {
       return { ...state, viewId: action.payload.viewId, deleteCommentId: action.payload.deleteCommentId };
     }
+    case "deletePost": {
+      return { ...state, viewPosts: action.payload.viewPosts, deleteViewId: action.payload.deleteViewId };
+    }
     case "editPost": {
       return {
         ...state,
@@ -280,6 +279,7 @@ const reducer = (state: State, action: Action): State => {
         selectedSection: action.payload.selectedSection,
         selectedRow: action.payload.selectedRow,
         isSelectRow: action.payload.isSelectRow,
+        isSelectSection: action.payload.isSelectSection,
         selectedSeat: action.payload.selectedSeat,
         isLoading: action.payload.isLoading,
         isPostClick: action.payload.isPostClick,
@@ -310,6 +310,7 @@ function View() {
   const authContext = useContext(AuthContext);
   const componentContext = useContext(ComponentContext);
   const [state, dispatch] = useReducer(reducer, initial);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadViewPosts = async () => {
@@ -319,12 +320,10 @@ function View() {
       posts = JSON.parse(
         JSON.stringify(
           state.allPost.filter((post) => {
-            console.log(post.section, state.selectedSection, post.row, state.selectedRow, post.seat, state.selectedSeat);
             return post.section === state.selectedSection && post.row - 1 === state.selectedRow && post.seat - 1 === state.selectedSeat;
           })
         )
       );
-      console.log(posts);
 
       const fetchUserNames = async () => {
         const userNamesPromises = posts.map(async (post) => {
@@ -382,7 +381,7 @@ function View() {
           unsubscribes.push(await unsubscribe);
         })
       );
-
+      console.log(posts);
       dispatch({ type: "setViewPosts", payload: { viewPosts: posts } });
 
       return () => {
@@ -391,7 +390,7 @@ function View() {
     };
 
     loadViewPosts();
-  }, [state.selectedSection, state.selectedRow, state.selectedSeat]);
+  }, [state.selectedSection, state.selectedRow, state.selectedSeat, state.deleteViewId]);
 
   useEffect(() => {
     const getSeat = async () => {
@@ -426,8 +425,8 @@ function View() {
 
         const unsubscribePost = api.getAllSectionViewPost(async (updatedPosts: OriginView[]) => {
           dispatch({ type: "setAllSectionPost", payload: { allPost: updatedPosts as OriginView[] } });
-          console.log(updatedPosts);
         });
+        console.log("query");
 
         unsubscribesPost.push(await unsubscribePost);
 
@@ -439,11 +438,20 @@ function View() {
       }
     };
     getAllSeats();
-  }, [state.viewPosts]);
+  }, [state.viewPosts, state.deleteViewId]);
 
   const handlerSection = async (section: string) => {
     const rows = await api.getRows(section);
     const sectionAry: number[] = Array.isArray(rows) ? rows : [];
+
+    setTimeout(() => {
+      if (sectionRef.current) {
+        sectionRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100);
 
     if (section === state.selectedSection) {
       dispatch({ type: "selectSection", payload: { rowSeats: [], selectedSection: "", isSelectRow: false } });
@@ -461,6 +469,7 @@ function View() {
 
   const sendImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target as HTMLInputElement;
+    console.log(event);
 
     if (target.files && target.files.length > 0) {
       dispatch({ type: "setSelectPhoto", payload: { selectPhoto: target.files[0], localPhotoUrl: URL.createObjectURL(target.files[0]) } });
@@ -495,11 +504,12 @@ function View() {
         <SectionHeader>
           <Title>區域選擇</Title>
           <PostViewBtn onClick={() => handlePostClick()}>
+            <StyleAdd />
             <PostVieBtnText>發佈視角</PostVieBtnText>
           </PostViewBtn>
         </SectionHeader>
         <Sections handlerSection={handlerSection} state={state} />
-        <Rows state={state} dispatch={dispatch} />
+        <Rows state={state} dispatch={dispatch} sectionRef={sectionRef} />
         <Seat state={state} handlerComment={handlerComment} dispatch={dispatch} />
       </Main>
     </Container>

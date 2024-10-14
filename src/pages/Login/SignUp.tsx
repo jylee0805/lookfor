@@ -132,7 +132,7 @@ function SignUp({ isLogin }: Props) {
               type: "manual",
               message: "請輸入有效的電子郵件",
             });
-            return; // Exit if validation fails
+            return;
           }
           clearErrors("email");
           setFocus(nextFieldName);

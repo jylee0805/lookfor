@@ -117,6 +117,7 @@ const PostImgBox = styled.div`
   height: 150px;
   text-align: center;
   margin-top: 20px;
+  margin: 0 auto;
   @media (max-width: 992px) {
     width: 150px;
     height: 120px;
@@ -209,7 +210,6 @@ function Profile() {
   const [state, dispatch] = useReducer(reducer, initial);
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
-    // 假设在一开始或某个资源加载完成后我们设置 loaded 状态
     setTimeout(() => {
       setLoaded(true);
       document.body.style.overflowY = "auto";

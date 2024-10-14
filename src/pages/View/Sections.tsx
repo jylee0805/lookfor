@@ -17,7 +17,7 @@ import ThirdCPhoto from "../../images/Vector 9-11.svg";
 import ThirdBPhoto from "../../images/Vector 9-12.svg";
 import ThirdAPhoto from "../../images/Vector 9-13.svg";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { State } from ".";
 import { motion } from "framer-motion";
 
@@ -39,7 +39,7 @@ const SelectSection = styled.div`
   @media (max-width: 575px) {
     width: 360px;
     padding: 0;
-    font-size: 1rem;
+    font-size: 0.8rem;
   }
 `;
 
@@ -69,28 +69,28 @@ const VipAMain = styled.div<{ x: number; y: number }>`
   top: ${(props) => `${props.y}px`};
   left: ${(props) => `${props.x}px`};
   transform: translate(-100%, -100%);
-  background-color: #ffffff; /* 初始顏色 */
+  background-color: #ffffff;
   padding: 5px;
   border-radius: 10px;
 `;
 
-const VipA = styled(motion.div)`
+const VipA = styled(motion.div)<{ windowWidth: number }>`
   width: 19.6%;
   height: 160px;
   position: absolute;
   top: 0;
   left: 16%;
-  background-color: #f1b3ff; /* 初始顏色 */
+  background-color: #ffe6cf;
   mask-image: url("${VIPAPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   cursor: pointer;
   &:hover {
-    background-color: #ca70de; /* hover 狀態變色 */
+    background-color: #ff9318;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -103,45 +103,45 @@ const VipMainImg = styled.img`
   object-fit: cover;
   border-radius: 10px;
 `;
-const VipB = styled(motion.div)`
+const VipB = styled(motion.div)<{ windowWidth: number }>`
   width: 21%;
   height: 161px;
   position: absolute;
   top: 0;
   left: 38%;
-  background-color: #f1b3ff; /* 初始顏色 */
+  background-color: #ffe6cf;
   mask-image: url("${VIPBPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   cursor: pointer;
   &:hover {
-    background-color: #ca70de; /* hover 狀態變色 */
+    background-color: #ff9318;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
   @media (max-width: 575px) {
     height: 100%;
   }
 `;
-const VipC = styled(motion.div)`
+const VipC = styled(motion.div)<{ windowWidth: number }>`
   width: 19.5%;
   height: 160px;
   position: absolute;
   top: 0;
   left: 62%;
-  background-color: #f1b3ff; /* 初始顏色 */
+  background-color: #ffe6cf;
   mask-image: url("${VIPCPhoto}");
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   cursor: pointer;
   &:hover {
-    background-color: #ca70de; /* hover 狀態變色 */
+    background-color: #ff9318;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
   @media (max-width: 575px) {
     height: 100%;
@@ -149,129 +149,147 @@ const VipC = styled(motion.div)`
 `;
 const Second = styled.div`
   position: relative;
-  height: 180px;
+  height: 200px;
   color: #000;
+
   @media (max-width: 768px) {
     height: 140px;
   }
   @media (max-width: 575px) {
-    height: 80px;
+    height: 100px;
   }
 `;
 const SecondDiv = styled(motion.div)`
   position: absolute;
-  background-color: #ffb3b3;
+  background-color: #ffc27d;
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   cursor: pointer;
+
   &:hover {
-    background-color: #f57f7f; /* hover 狀態變色 */
+    background-color: #ff9318;
   }
 `;
 
-const SecondA = styled(SecondDiv)`
+const SecondA = styled(SecondDiv)<{ windowWidth: number }>`
   width: 14.5%;
   height: 150px;
-  top: 0;
+  top: -10px;
   left: 5%;
   mask-image: url("${SecondAPhoto}");
-
+  @media (max-width: 768px) {
+    height: 190px;
+    top: -50px;
+  }
   @media (max-width: 575px) {
+    top: -20px;
     height: 100%;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-const SecondB = styled(SecondDiv)`
+const SecondB = styled(SecondDiv)<{ windowWidth: number }>`
   width: 13.2%;
   height: 165px;
-  top: 48px;
+  top: 38px;
   left: 16.5%;
   mask-image: url("${SecondBPhoto}");
-
+  @media (max-width: 768px) {
+    top: 0px;
+  }
   @media (max-width: 575px) {
+    top: 5px;
     height: 100%;
-    top: 28px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-
-const SecondC = styled(SecondDiv)`
+const SecondC = styled(SecondDiv)<{ windowWidth: number }>`
   width: 11.9%;
   height: 156px;
-  top: 72px;
+  top: 62px;
   left: 28.5%;
   mask-image: url("${SecondCPhoto}");
-
+  @media (max-width: 768px) {
+    top: 15px;
+  }
   @media (max-width: 575px) {
+    top: 15px;
     height: 100%;
-    top: 38px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-const SecondD = styled(SecondDiv)`
+const SecondD = styled(SecondDiv)<{ windowWidth: number }>`
   width: 14.1%;
   height: 148px;
-  top: 82px;
+  top: 72px;
   left: 42%;
   mask-image: url("${SecondDPhoto}");
-
+  @media (max-width: 768px) {
+    top: 28px;
+  }
   @media (max-width: 575px) {
+    top: 17px;
     height: 100%;
-    top: 42px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-const SecondE = styled(SecondDiv)`
+const SecondE = styled(SecondDiv)<{ windowWidth: number }>`
   width: 11.9%;
   height: 156px;
-  top: 74px;
+  top: 64px;
   left: 57.5%;
   mask-image: url("${SecondEPhoto}");
-
+  @media (max-width: 768px) {
+    top: 14px;
+  }
   @media (max-width: 575px) {
+    top: 15px;
     height: 100%;
-    top: 38px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-const SecondF = styled(SecondDiv)`
+const SecondF = styled(SecondDiv)<{ windowWidth: number }>`
   width: 13.2%;
   height: 165px;
-  top: 47px;
+  top: 37px;
   left: 68%;
   mask-image: url("${SecondFPhoto}");
-
+  @media (max-width: 768px) {
+    top: -7px;
+  }
   @media (max-width: 575px) {
+    top: 5px;
     height: 100%;
-    top: 25px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-const SecondG = styled(SecondDiv)`
+const SecondG = styled(SecondDiv)<{ windowWidth: number }>`
   width: 15%;
   height: 150px;
-  top: 0px;
+  top: -10px;
   left: 77.5%;
   mask-image: url("${SecondGPhoto}");
-
+  @media (max-width: 768px) {
+    top: -35px;
+  }
   @media (max-width: 575px) {
     height: 100%;
+    top: -20px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
 
@@ -280,126 +298,140 @@ const Third = styled.div`
   position: relative;
   color: #000;
   @media (max-width: 768px) {
-    height: 200px;
+    height: 180px;
   }
   @media (max-width: 575px) {
-    height: 150px;
+    height: 120px;
   }
 `;
 const ThirdDiv = styled(motion.div)`
-  background-color: #fff1b3;
+  background-color: #ffac4d;
   position: absolute;
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
   cursor: pointer;
   &:hover {
-    background-color: #ffe77b;
+    background-color: #ff8800;
   }
 `;
-const ThirdA = styled(ThirdDiv)`
+const ThirdA = styled(ThirdDiv)<{ windowWidth: number }>`
   width: 14.1%;
   height: 151px;
-  top: 0;
+  top: -10px;
   left: 4.5%;
   mask-image: url("${ThirdAPhoto}");
-
+  @media (max-width: 768px) {
+    top: -35px;
+  }
   @media (max-width: 575px) {
     height: 100%;
+    top: -25px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-
-const ThirdB = styled(ThirdDiv)`
+const ThirdB = styled(ThirdDiv)<{ windowWidth: number }>`
   width: 15%;
   height: 176px;
-  top: 50px;
+  top: 40px;
   left: 15%;
   mask-image: url("${ThirdBPhoto}");
-
+  @media (max-width: 768px) {
+    top: -5px;
+  }
   @media (max-width: 575px) {
     height: 100%;
-    top: 32px;
+    top: 5px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-const ThirdC = styled(ThirdDiv)`
+const ThirdC = styled(ThirdDiv)<{ windowWidth: number }>`
   width: 11.4%;
   height: 185px;
-  top: 80px;
+  top: 70px;
   left: 28%;
   mask-image: url("${ThirdCPhoto}");
-
+  @media (max-width: 768px) {
+    top: 15px;
+  }
   @media (max-width: 575px) {
     height: 100%;
-    top: 48px;
+    top: 20px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-const ThirdD = styled(ThirdDiv)`
+const ThirdD = styled(ThirdDiv)<{ windowWidth: number }>`
   width: 14.1%;
   height: 176px;
-  top: 95px;
+  top: 85px;
   left: 42.5%;
   mask-image: url("${ThirdDPhoto}");
-
+  @media (max-width: 768px) {
+    top: 30px;
+  }
   @media (max-width: 575px) {
     height: 100%;
-    top: 52px;
+    top: 25px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-const ThirdE = styled(ThirdDiv)`
+const ThirdE = styled(ThirdDiv)<{ windowWidth: number }>`
   width: 11.4%;
   height: 185px;
-  top: 80px;
+  top: 70px;
   left: 60%;
   mask-image: url("${ThirdEPhoto}");
-
+  @media (max-width: 768px) {
+    top: 15px;
+  }
   @media (max-width: 575px) {
     height: 100%;
-    top: 48px;
+    top: 20px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-const ThirdF = styled(ThirdDiv)`
+const ThirdF = styled(ThirdDiv)<{ windowWidth: number }>`
   width: 15.1%;
   height: 176px;
-  top: 50px;
+  top: 40px;
   left: 69%;
   mask-image: url("${ThirdFPhoto}");
-
+  @media (max-width: 768px) {
+    top: -5px;
+  }
   @media (max-width: 575px) {
     height: 100%;
-    top: 32px;
+    top: 5px;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
-
-const ThirdG = styled(ThirdDiv)`
+const ThirdG = styled(ThirdDiv)<{ windowWidth: number }>`
   width: 14.1%;
   height: 150px;
-  top: 0;
+  top: -10px;
   left: 80.5%;
   mask-image: url("${ThirdGPhoto}");
-
+  @media (max-width: 768px) {
+    top: -35px;
+  }
   @media (max-width: 575px) {
+    top: -25px;
     height: 100%;
   }
   &:hover + ${VipAMain} {
-    display: block;
+    display: ${(props) => (props.windowWidth <= 992 ? "none" : "block")};
   }
 `;
 const Text = styled.p<{ haveData: boolean; color: string }>`
@@ -411,15 +443,28 @@ const Text = styled.p<{ haveData: boolean; color: string }>`
 
 interface Props {
   handlerSection: (section: string) => void;
+
   state: State;
 }
 function Sections({ handlerSection, state }: Props) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    console.log(e.clientX, e.clientY);
     setMousePosition({ x: e.clientX, y: e.clientY });
   };
+
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <SelectSection
@@ -433,6 +478,7 @@ function Sections({ handlerSection, state }: Props) {
     >
       <Vip>
         <VipA
+          windowWidth={windowWidth}
           data-section="VIPA"
           whileTap={{ scale: 1 }}
           animate={{
@@ -451,6 +497,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <VipB
+          windowWidth={windowWidth}
           data-section="VIPB"
           whileTap={{ scale: 1 }}
           animate={{
@@ -469,6 +516,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <VipC
+          windowWidth={windowWidth}
           data-section="VIPC"
           whileTap={{ scale: 1 }}
           animate={{
@@ -489,6 +537,7 @@ function Sections({ handlerSection, state }: Props) {
       </Vip>
       <Second>
         <SecondA
+          windowWidth={windowWidth}
           data-section="2A"
           whileTap={{ scale: 1 }}
           animate={{
@@ -507,6 +556,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <SecondB
+          windowWidth={windowWidth}
           data-section="2B"
           whileTap={{ scale: 1 }}
           animate={{
@@ -525,6 +575,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <SecondC
+          windowWidth={windowWidth}
           data-section="2C"
           whileTap={{ scale: 1 }}
           animate={{
@@ -543,6 +594,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <SecondD
+          windowWidth={windowWidth}
           data-section="2D"
           whileTap={{ scale: 1 }}
           animate={{
@@ -561,6 +613,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <SecondE
+          windowWidth={windowWidth}
           data-section="2E"
           whileTap={{ scale: 1 }}
           animate={{
@@ -579,6 +632,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <SecondF
+          windowWidth={windowWidth}
           data-section="2F"
           whileTap={{ scale: 1 }}
           animate={{
@@ -597,6 +651,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <SecondG
+          windowWidth={windowWidth}
           data-section="2G"
           whileTap={{ scale: 1 }}
           animate={{
@@ -617,6 +672,7 @@ function Sections({ handlerSection, state }: Props) {
       </Second>
       <Third>
         <ThirdA
+          windowWidth={windowWidth}
           data-section="3A"
           whileTap={{ scale: 1 }}
           animate={{
@@ -635,6 +691,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <ThirdB
+          windowWidth={windowWidth}
           data-section="3B"
           whileTap={{ scale: 1 }}
           animate={{
@@ -653,6 +710,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <ThirdC
+          windowWidth={windowWidth}
           data-section="3C"
           whileTap={{ scale: 1 }}
           animate={{
@@ -671,6 +729,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <ThirdD
+          windowWidth={windowWidth}
           data-section="3D"
           whileTap={{ scale: 1 }}
           animate={{
@@ -689,6 +748,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <ThirdE
+          windowWidth={windowWidth}
           data-section="3E"
           whileTap={{ scale: 1 }}
           animate={{
@@ -707,6 +767,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <ThirdF
+          windowWidth={windowWidth}
           data-section="3F"
           whileTap={{ scale: 1 }}
           animate={{
@@ -725,6 +786,7 @@ function Sections({ handlerSection, state }: Props) {
           </VipAMain>
         )}
         <ThirdG
+          windowWidth={windowWidth}
           data-section="3G"
           whileTap={{ scale: 1 }}
           animate={{

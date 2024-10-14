@@ -367,6 +367,8 @@ function Post({ state, dispatch, sendImage }: Props) {
 
         const rows = await api.getRows(formValues.section);
         const sectionAry: number[] = Array.isArray(rows) ? rows : [];
+        console.log(sectionAry, formValues.section);
+
         dispatch({
           type: "resetPost",
           payload: {
@@ -374,6 +376,7 @@ function Post({ state, dispatch, sendImage }: Props) {
             selectedSection: formValues.section,
             selectedRow: parseInt(formValues.row) - 1,
             isSelectRow: true,
+            isSelectSection: true,
             selectedSeat: parseInt(formValues.seat) - 1,
             isLoading: false,
             isPostClick: false,
@@ -382,10 +385,7 @@ function Post({ state, dispatch, sendImage }: Props) {
             localPhotoUrl: "",
           },
         });
-        // dispatch({ type: "selectRow", payload: { selectedRow: parseInt(formValues.row) - 1, isSelectRow: true, selectedSeat: 0 } });
-        // dispatch({ type: "selectSeat", payload: { selectedSeat: parseInt(formValues.seat) - 1 } });
 
-        // dispatch({ type: "setLoading", payload: { isLoading: false } });
         reset({
           section: "",
           row: "",
@@ -396,8 +396,6 @@ function Post({ state, dispatch, sendImage }: Props) {
           image: undefined,
         });
 
-        // dispatch({ type: "togglePostClick", payload: { isPostClick: false, isShowMask: false } });
-        // dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });
         document.body.style.overflow = "auto";
       }
     };

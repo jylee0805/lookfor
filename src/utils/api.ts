@@ -54,81 +54,6 @@ interface ParkData {
   id: string;
 }
 const api = {
-  async findUser(name: string) {
-    const q = query(collection(db, "users"), where("userName", "==", name));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs;
-  },
-  async findUserUid(uid: string) {
-    const q = query(collection(db, "users"), where("UID", "==", uid));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs;
-  },
-  async getUsers() {
-    const q = query(collection(db, "users"));
-    const querySnapshot = await getDocs(q);
-    const list: Personal[] = [];
-    querySnapshot.forEach((doc) => list.push({ id: doc.id, ...doc.data() } as Personal));
-    return list;
-  },
-  async getUser(id: string) {
-    const q = query(collection(db, "users"), where("UID", "==", id));
-    const querySnapshot = await getDocs(q);
-    const list: Personal = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Personal;
-    return list;
-  },
-
-  async setNotify(postId: string, concertId: string, state: string, item: string) {
-    const q = query(collection(db, "users"), where("keepIds", "array-contains", postId));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(async (doc) => {
-      console.log(doc.data());
-      const notifyRef = collection(db, "users", doc.id, "notify");
-      await addDoc(notifyRef, {
-        title: `${item}的發放資訊已更新`,
-        message: `${state}`,
-        createdTime: serverTimestamp(),
-        isRead: false,
-        postId: postId,
-        concertId: concertId,
-      });
-    });
-  },
-
-  async getNotify(userId: string, onUpdate: (notify: Notify[]) => void) {
-    const id = await this.getUser(userId);
-    const q = query(collection(db, `users/${id.id}/notify`));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const notifyList: Notify[] = [];
-      querySnapshot.forEach((doc) => {
-        notifyList.push({ ...doc.data(), id: doc.id } as Notify);
-      });
-      console.log(notifyList);
-
-      onUpdate(notifyList);
-    });
-    return unsubscribe;
-  },
-
-  async deleteNotify(id: string, notifyId: string) {
-    try {
-      const notifyDoc = doc(db, "users", id, "notify", notifyId);
-      await deleteDoc(notifyDoc);
-      console.log("Document deleted with ID: ", id);
-    } catch (e) {
-      console.error("Error deleting document: ", e);
-    }
-  },
-
-  async updateUser(id: string, update: object) {
-    try {
-      const postDoc = doc(db, "users", id);
-      await updateDoc(postDoc, update);
-      console.log("Document updated with ID: ", id);
-    } catch (e) {
-      console.error("Error updating document: ", e);
-    }
-  },
   async userSignUp(email: string, password: string) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -193,21 +118,11 @@ const api = {
   async getLoginState() {
     return new Promise((resolve) => {
       onAuthStateChanged(auth, () => {
-        resolve(auth.currentUser?.uid); // 轉換為 boolean
+        resolve(auth.currentUser?.uid);
       });
     });
   },
 
-  async uploadImage(photo: File) {
-    const storageRef = ref(storage, `images/${photo.name}`);
-    const uploadTask = await uploadBytes(storageRef, photo);
-    console.log(photo);
-
-    const downloadURL = await getDownloadURL(uploadTask.ref);
-    console.log(downloadURL);
-
-    return downloadURL;
-  },
   async setUser(name: string, uid: string, avatar: string) {
     await addDoc(collection(db, "users"), {
       userName: name,
@@ -217,37 +132,68 @@ const api = {
     return;
   },
 
-  async getKeepPost(uid: string) {
+  async getUsers() {
+    const q = query(collection(db, "users"));
+    const querySnapshot = await getDocs(q);
+    const list: Personal[] = [];
+    querySnapshot.forEach((doc) => list.push({ id: doc.id, ...doc.data() } as Personal));
+    return list;
+  },
+
+  async getUser(id: string) {
+    const q = query(collection(db, "users"), where("UID", "==", id));
+    const querySnapshot = await getDocs(q);
+    const list: Personal = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Personal;
+    return list;
+  },
+
+  async findUser(name: string) {
+    const q = query(collection(db, "users"), where("userName", "==", name));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs;
+  },
+
+  async findUserUid(uid: string) {
+    const q = query(collection(db, "users"), where("UID", "==", uid));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs;
+  },
+
+  async updateUser(id: string, update: object) {
     try {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("UID", "==", uid));
-      const querySnapshot = await getDocs(q);
-      console.log(querySnapshot.docs[0].data());
+      const postDoc = doc(db, "users", id);
+      await updateDoc(postDoc, update);
+      console.log("Document updated with ID: ", id);
     } catch (e) {
       console.error("Error updating document: ", e);
     }
   },
 
-  async setKeepPost(uid: string, keepId: string) {
-    console.log(uid);
-    try {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("UID", "==", uid));
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach(async (docSnapshot) => {
-        await updateDoc(docSnapshot.ref, {
-          keepIds: arrayUnion(keepId),
-        });
-      });
+  async getSections() {
+    const q = query(collection(db, "sections"), orderBy("sectionName"));
+    const querySnapshot = await getDocs(q);
+    const section: object[] = [];
+    querySnapshot.forEach((doc) => {
+      section.push(doc.data());
+    });
+    return section;
+  },
 
-      if (querySnapshot.empty) {
-        console.log("No matching documents.");
-      } else {
-        console.log("KeepId added to user's keepIds array");
-      }
-    } catch (e) {
-      console.error("Error updating document: ", e);
-    }
+  async getRows(section: string) {
+    const q = query(collection(db, "sections"), where("sectionName", "==", section));
+    const querySnapshot = await getDocs(q);
+    let row;
+    querySnapshot.forEach((doc) => {
+      row = doc.get("row");
+    });
+    return row;
+  },
+
+  async uploadImage(photo: File) {
+    const storageRef = ref(storage, `images/${photo.name}`);
+    const uploadTask = await uploadBytes(storageRef, photo);
+    const downloadURL = await getDownloadURL(uploadTask.ref);
+    return downloadURL;
   },
 
   async setViewPost(data: Data, image: string, uid: string) {
@@ -267,6 +213,18 @@ const api = {
     return;
   },
 
+  async getAllSectionViewPost(onUpdate: (post: OriginView[]) => void) {
+    const q = query(collection(db, "viewPosts"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const updatedPosts: OriginView[] = [];
+      querySnapshot.forEach((doc) => {
+        updatedPosts.push({ id: doc.id, ...doc.data() } as OriginView);
+      });
+      onUpdate(updatedPosts);
+    });
+    return unsubscribe;
+  },
+
   async getUserViewPosts(uid: string) {
     const q = query(collection(db, "viewPosts"), where("userUID", "==", uid));
 
@@ -279,20 +237,6 @@ const api = {
     return list;
   },
 
-  async getViewPosts(section: string, row: number, seat: number, onUpdate: (post: OriginView[]) => void) {
-    const q = query(collection(db, "viewPosts"), where("section", "==", section), where("row", "==", row), where("seat", "==", seat));
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const updatedPosts: OriginView[] = [];
-      querySnapshot.forEach((doc) => {
-        updatedPosts.push({ id: doc.id, ...doc.data() } as OriginView);
-      });
-      console.log(updatedPosts);
-
-      onUpdate(updatedPosts);
-    });
-    return unsubscribe;
-  },
   async getNewestViewPosts(onUpdate: (post: OriginView[]) => void) {
     const q = query(collection(db, "viewPosts"), orderBy("createdTime", "asc"), limit(6));
 
@@ -301,25 +245,12 @@ const api = {
       querySnapshot.forEach((doc) => {
         updatedPosts.push({ id: doc.id, ...doc.data() } as OriginView);
       });
-      console.log(updatedPosts);
 
       onUpdate(updatedPosts);
     });
     return unsubscribe;
   },
-  async getAllSectionViewPost(onUpdate: (post: OriginView[]) => void) {
-    const q = query(collection(db, "viewPosts"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const updatedPosts: OriginView[] = [];
-      querySnapshot.forEach((doc) => {
-        updatedPosts.push({ id: doc.id, ...doc.data() } as OriginView);
-      });
-      console.log(updatedPosts);
 
-      onUpdate(updatedPosts);
-    });
-    return unsubscribe;
-  },
   async deleteViewPost(id: string) {
     try {
       const postDoc = doc(db, "viewPosts", id);
@@ -329,6 +260,7 @@ const api = {
       console.error("Error deleting document: ", e);
     }
   },
+
   async updateViewPost(id: string, data: Data, image: string) {
     try {
       const postDoc = doc(db, "viewPosts", id);
@@ -392,27 +324,6 @@ const api = {
     }
   },
 
-  async getSections() {
-    const q = query(collection(db, "sections"), orderBy("sectionName"));
-    const querySnapshot = await getDocs(q);
-    const section: object[] = [];
-    querySnapshot.forEach((doc) => {
-      section.push(doc.data());
-    });
-
-    return section;
-  },
-
-  async getRows(section: string) {
-    const q = query(collection(db, "sections"), where("sectionName", "==", section));
-    const querySnapshot = await getDocs(q);
-    let row;
-    querySnapshot.forEach((doc) => {
-      row = doc.get("row");
-    });
-    return row;
-  },
-
   async getNextConcerts(lastDoc: DocumentSnapshot | null) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -433,7 +344,6 @@ const api = {
 
     const lastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
 
-    console.log(data);
     return { data, lastVisibleDoc };
   },
 
@@ -441,9 +351,9 @@ const api = {
     const q = doc(db, "concerts", `${id}`);
     const querySnapshot = await getDoc(q);
     const data = { ...querySnapshot.data(), id: querySnapshot.id } as Concerts;
-    console.log(data);
     return data;
   },
+
   async getConcertDetail(concert: string) {
     const q = query(collection(db, `concerts/${concert}/details`));
     const querySnapshot = await getDocs(q);
@@ -451,9 +361,15 @@ const api = {
     querySnapshot.forEach((doc) => {
       detail = doc.data() as Detail;
     });
-    console.log(detail);
-
     return detail;
+  },
+
+  async setMerchPost(merch: object) {
+    await addDoc(collection(db, "merchPost"), {
+      ...merch,
+      createdTime: serverTimestamp(),
+    });
+    return;
   },
 
   async getUserMerchPosts(uid: string) {
@@ -466,14 +382,6 @@ const api = {
     });
 
     return list;
-  },
-
-  async setMerchPost(merch: object) {
-    await addDoc(collection(db, "merchPost"), {
-      ...merch,
-      createdTime: serverTimestamp(),
-    });
-    return;
   },
 
   async getMerchPost(concertId: string, onUpdate: (post: MerchPost[]) => void) {
@@ -489,6 +397,29 @@ const api = {
     });
     return unsubscribe;
   },
+
+  async setKeepPost(uid: string, keepId: string) {
+    console.log(uid);
+    try {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("UID", "==", uid));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (docSnapshot) => {
+        await updateDoc(docSnapshot.ref, {
+          keepIds: arrayUnion(keepId),
+        });
+      });
+
+      if (querySnapshot.empty) {
+        console.log("No matching documents.");
+      } else {
+        console.log("KeepId added to user's keepIds array");
+      }
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  },
+
   async getKeepMerchPost(idArray: string[]) {
     const q = query(collection(db, "merchPost"), where(documentId(), "in", idArray));
     const querySnapshot = await getDocs(q);
@@ -520,10 +451,50 @@ const api = {
       console.error("Error deleting document: ", e);
     }
   },
+
+  async setNotify(postId: string, concertId: string, state: string, item: string) {
+    const q = query(collection(db, "users"), where("keepIds", "array-contains", postId));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (doc) => {
+      const notifyRef = collection(db, "users", doc.id, "notify");
+      await addDoc(notifyRef, {
+        title: `${item}的發放資訊已更新`,
+        message: `${state}`,
+        createdTime: serverTimestamp(),
+        isRead: false,
+        postId: postId,
+        concertId: concertId,
+      });
+    });
+  },
+
+  async getNotify(userId: string, onUpdate: (notify: Notify[]) => void) {
+    const id = await this.getUser(userId);
+    const q = query(collection(db, `users/${id.id}/notify`));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const notifyList: Notify[] = [];
+      querySnapshot.forEach((doc) => {
+        notifyList.push({ ...doc.data(), id: doc.id } as Notify);
+      });
+
+      onUpdate(notifyList);
+    });
+    return unsubscribe;
+  },
+
+  async deleteNotify(id: string, notifyId: string) {
+    try {
+      const notifyDoc = doc(db, "users", id, "notify", notifyId);
+      await deleteDoc(notifyDoc);
+      console.log("Document deleted with ID: ", id);
+    } catch (e) {
+      console.error("Error deleting document: ", e);
+    }
+  },
+
   async getParkInfo(max: number[], min: number[]) {
     try {
       const parkInfo = await fetch("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json");
-      console.log(max, min);
 
       if (parkInfo.ok) {
         const data = await parkInfo.json();
@@ -542,6 +513,7 @@ const api = {
       console.error("Error deleting document: ", e);
     }
   },
+
   async getParkAvailable(places: PlaceInfo[]) {
     try {
       const park = await fetch("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json");
@@ -551,8 +523,6 @@ const api = {
         const need = data.data.park.filter((item: PlaceAvailable) => {
           return places.some((place) => place.placeId === item.id);
         });
-        console.log(need);
-
         return need;
       }
     } catch (e) {

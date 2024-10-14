@@ -90,14 +90,14 @@ const QualifyInput = styled(Input)`
 `;
 const CustomTimePicker = styled(TimePicker)({
   "& .MuiInputBase-root": {
-    backgroundColor: "#ffffff", // 修改輸入框的背景顏色
-    borderRadius: "5px", // 修改邊框圓角
-    padding: "0px", // 調整內距
+    backgroundColor: "#ffffff",
+    borderRadius: "5px",
+    padding: "0px",
     fontSize: "14px",
     height: "30px",
   },
   "& .MuiOutlinedInput-notchedOutline": {
-    borderColor: "#d2d2d2", // 修改邊框顏色
+    borderColor: "#d2d2d2",
   },
 
   "& .MuiIconButton-root": {
@@ -195,7 +195,7 @@ interface Props {
 function FanPost({ concert, state, dispatch }: Props) {
   const { register, handleSubmit, control, reset } = useForm<FormInputs>({
     defaultValues: {
-      time: dayjs(), // 預設值為當前時間
+      time: dayjs(),
     },
   });
   console.log((state.selectPhotos?.length !== 0 || state.isEditMode.image?.length !== 0) && state.selectPhotos);
@@ -210,7 +210,6 @@ function FanPost({ concert, state, dispatch }: Props) {
         place: state.isEditMode.passPlace,
         qualify: state.isEditMode.qualify,
         more: state.isEditMode.content,
-
         // image: state.isEditMode.image,
       };
       reset(values);
@@ -236,13 +235,12 @@ function FanPost({ concert, state, dispatch }: Props) {
             return url;
           })
         );
-        console.log(urls); // 這裡會是所有上傳後的網址
+        console.log(urls);
       } else {
         urls = [];
       }
     } catch (error) {
       console.error("上傳圖片時出錯:", error);
-      // 如果有必要，你可以返回或處理錯誤
     }
 
     const time = data.time;
@@ -330,16 +328,7 @@ function FanPost({ concert, state, dispatch }: Props) {
             {concert?.date && day.map((item) => <option value={item}>{item}</option>)}
           </Select>
           <Label>時間</Label>
-          <Controller
-            name="time"
-            control={control}
-            render={({ field }) => (
-              <CustomTimePicker
-                value={field.value}
-                onChange={(newValue) => field.onChange(newValue)} // 更新時間
-              />
-            )}
-          />
+          <Controller name="time" control={control} render={({ field }) => <CustomTimePicker value={field.value} onChange={(newValue) => field.onChange(newValue)} />} />
           <Label>狀態</Label>
           <Select {...register("status", { required: true })}>
             <option value="0">未發放</option>

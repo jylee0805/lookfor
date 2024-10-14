@@ -15,7 +15,7 @@ import Dialog from "../../components/Dialog";
 import { useDialog } from "../../utils/useDialog";
 
 const StyleClose = styled(MdOutlineClose)`
-  font-size: 1.5rem;
+  font-size: 2rem;
   margin-right: 4px;
 `;
 const StyleMore = styled(MdOutlineMoreVert)`
@@ -49,7 +49,7 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
     top: auto;
     bottom: ${(props) => (props.rowSelect ? "0" : "-100%")};
     left: 0;
-    height: 85vh;
+    height: 90vh;
     z-index: 10;
     width: 100vw;
     transition: bottom ease 1s;
@@ -63,12 +63,12 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
     width: 5px;
   }
   &::-webkit-scrollbar-track {
-    background-color: #fff3e7;
+    background-color: #000000;
     border-radius: 10px;
   }
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: #3f3f3f;
+    background-color: #fff3e7;
   }
 
   &::before {
@@ -91,7 +91,7 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
     filter: blur(12rem);
     transition:
       left ease 1s,
-      opacity ease 0.5s; /* 添加過渡 */
+      opacity ease 0.5s;
     opacity: ${(props) => (props.rowSelect ? 1 : 0)};
     transition-delay: ${(props) => (props.rowSelect ? "0.2s" : "0s")};
 
@@ -127,12 +127,12 @@ const Seats = styled.div`
     height: 8px;
   }
   &::-webkit-scrollbar-track {
-    background-color: #fff3e7;
+    background-color: #3f3f3f;
     border-radius: 10px;
   }
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: #3f3f3f;
+    background-color: #fff3e7;
   }
 
   @media (max-width: 992px) {
@@ -209,7 +209,7 @@ const Card = styled.div`
   column-gap: 35px;
   padding: 15px 15px;
   box-shadow: 3px 3px 3px #000000;
-  height: 420px;
+  height: 360px;
   background: #ffffff50;
   margin-bottom: 25px;
 
@@ -244,6 +244,9 @@ const ContentBox = styled.div`
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 const ContentContainer = styled.div`
   overflow-y: auto;
@@ -254,12 +257,12 @@ const ContentContainer = styled.div`
     width: 5px;
   }
   &::-webkit-scrollbar-track {
-    background-color: #fff3e7;
+    background-color: #3f3f3f;
     border-radius: 10px;
   }
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: #3f3f3f;
+    background-color: #fff3e7;
   }
 `;
 const PostContainer = styled.div`
@@ -326,12 +329,12 @@ const CommentSection = styled.div`
     width: 8px;
   }
   &::-webkit-scrollbar-track {
-    background-color: #fff3e7;
+    background-color: #363636;
     border-radius: 10px;
   }
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: #3f3f3f;
+    background-color: #fff3e7;
   }
   @media (max-width: 768px) {
     max-height: 150px;
@@ -375,6 +378,12 @@ const Type = styled.input`
   flex-grow: 1;
   border-radius: 10px;
   border: 1px solid #d2d2d2;
+  @media (max-width: 768px) {
+    padding: 8px 15px;
+  }
+  @media (max-width: 575px) {
+    padding: 6px 15px;
+  }
 `;
 const NoView = styled.p`
   font-size: 1.5rem;
@@ -448,13 +457,19 @@ function Seat({ state, handlerComment, dispatch }: Props) {
   const deleteComment = async () => {
     await api.deleteComment(state.viewId, state.deleteCommentId);
     dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts?.map((post) => ({ ...post, comment: post.comment?.filter((comment) => comment.id !== state.deleteCommentId) })) } });
-    setIsOpen(false);
+    closeDialog();
   };
 
   const deletePost = async () => {
     await api.deleteViewPost(state.deleteViewId);
+    console.log(
+      state.deleteViewId,
+      state.viewPosts?.filter((post) => post.id !== state.deleteViewId)
+    );
+
     dispatch({ type: "deletePost", payload: { viewPosts: state.viewPosts?.filter((post) => post.id !== state.deleteViewId), deleteViewId: "" } });
-    setIsOpen(false);
+
+    closeDialog();
   };
   const handleCancel = () => {
     if (state.deleteViewId !== "") {
@@ -467,7 +482,7 @@ function Seat({ state, handlerComment, dispatch }: Props) {
   return (
     <SeatSection rowSelect={state.isSelectRow}>
       {state.deleteViewId && (
-        <Dialog isOpen={isOpen} title="刪除視角貼文" onConfirm={deletePost} onCancel={handleCancel} confirmText="刪除">
+        <Dialog isOpen={isOpen} title="刪除視角貼文" onConfirm={deletePost} onCancel={handleCancel} confirmText="刪除1">
           確定刪除該篇視角貼文?
         </Dialog>
       )}

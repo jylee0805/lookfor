@@ -6,7 +6,7 @@ import FanPost from "./FanPost";
 import { AuthContext } from "../../utils/AuthContextProvider";
 import { FaSort } from "react-icons/fa";
 import { MdOutlineAdd, MdOutlineBookmarkBorder, MdOutlineBookmark, MdOutlineMoreVert } from "react-icons/md";
-import { Concerts } from "../ConcertList";
+import { Concerts } from "../../types";
 import { ConcertContext } from "../../utils/ConcertContextProvider";
 import "react-photo-view/dist/react-photo-view.css";
 import { PhotoProvider, PhotoView } from "react-photo-view";
@@ -31,11 +31,11 @@ const StyleKeep = styled(MdOutlineBookmarkBorder)`
   margin-right: 4px;
 `;
 const StyleKeepFill = styled(MdOutlineBookmark)`
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   margin-right: 4px;
 `;
 const StyleMore = styled(MdOutlineMoreVert)`
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   margin-right: 4px;
 `;
 const Container = styled.div`
@@ -49,7 +49,7 @@ const Container = styled.div`
   }
 `;
 const ConcertName = styled.h3`
-  font-size: 2.2rem;
+  font-size: 2rem;
   margin-bottom: 40px;
   font-weight: 700;
   text-align: center;
@@ -105,11 +105,10 @@ const Content = styled.div`
 const FeatureBox = styled.div`
   display: flex;
   justify-content: end;
-  margin-bottom: 20px;
   margin-left: auto;
   @media (max-width: 575px) {
-    justify-content: start;
-    margin: 0 auto 20px;
+    justify-content: center;
+    margin: 0 auto;
   }
 `;
 const ActionBtn = styled.button`
@@ -126,6 +125,7 @@ const ActionBtn = styled.button`
 const PostList = styled.ul``;
 const PostItem = styled.li`
   position: relative;
+  display: flex;
   padding: 30px 0;
   & + &::before {
     content: "";
@@ -137,10 +137,7 @@ const PostItem = styled.li`
     left: 0;
   }
 `;
-const PostHeader = styled.div`
-  display: flex;
-  align-items: flex-start;
-`;
+
 const HeadShot = styled.img`
   width: 40px;
   height: 40px;
@@ -155,6 +152,7 @@ const HeadShot = styled.img`
 const UserName = styled.p`
   font-size: 1.2rem;
   font-weight: 700;
+  margin-bottom: 8px;
   @media (max-width: 575px) {
     font-size: 1rem;
   }
@@ -162,6 +160,9 @@ const UserName = styled.p`
 const MoreContainer = styled.div`
   position: relative;
   margin-left: 10px;
+  position: absolute;
+  right: 0;
+  top: 25px;
 `;
 const MoreBtn = styled.button`
   padding: 0;
@@ -190,9 +191,7 @@ const FeatureBtn = styled.button`
     transition: none;
   }
 `;
-const PostContent = styled.div`
-  margin-left: 50px;
-`;
+const PostContent = styled.div``;
 const ImportInfo = styled.div`
   display: grid;
   grid-template-columns: 100px auto;
@@ -216,9 +215,13 @@ const ImportInfo = styled.div`
 `;
 const ImportInfoContent = styled.p`
   font-size: 1.1rem;
+  @media (max-width: 575px) {
+    font-size: 1rem;
+  }
 `;
+
 const InfoContent = styled.div`
-  font-size: 20px;
+  font-size: 1.1rem;
   margin-bottom: 20px;
 `;
 
@@ -379,7 +382,6 @@ function FansSupport() {
 
       unsubscribesPost.push(await unsubscribePost);
 
-      // 清除訂閱
       return () => {
         unsubscribesPost.forEach((unsubscribe) => unsubscribe());
       };
@@ -544,30 +546,10 @@ function FansSupport() {
           {state.postData &&
             state.postData.map((item, index) => (
               <PostItem key={item.id} id={item.id} ref={(el) => (targetRef.current[index] = el)}>
-                <PostHeader>
-                  <HeadShot src={item.avatar} />
-                  <UserName>{item.userName}</UserName>
+                <HeadShot src={item.avatar} />
 
-                  {authContext?.loginState === item.userUID && (
-                    <MoreContainer>
-                      <MoreBtn onClick={() => setIsMoreClick((prev) => (prev === item.id ? "" : (item.id as string)))}>
-                        <StyleMore />
-                      </MoreBtn>
-                      <FeatureBtnContainer open={isMoreClick === item.id}>
-                        <FeatureBtn
-                          onClick={() => {
-                            dispatch({ type: "toggleIsEditMode", payload: { isEditMode: item, isPostClick: true } });
-                            setIsMoreClick("");
-                          }}
-                        >
-                          編輯
-                        </FeatureBtn>
-                        <FeatureBtn onClick={() => handlerDeleteClick(item.id ? item.id : "")}>刪除</FeatureBtn>
-                      </FeatureBtnContainer>
-                    </MoreContainer>
-                  )}
-                </PostHeader>
                 <PostContent>
+                  <UserName>{item.userName}</UserName>
                   <ImportInfo>
                     <ImportInfoContent>應援物品</ImportInfoContent>
                     <ImportInfoContent>{`${item.item}`}</ImportInfoContent>
@@ -598,6 +580,24 @@ function FansSupport() {
                     <KeepNumber>{users.filter((user) => user.keepIds?.includes(item.id as string)).length}</KeepNumber>
                   </KeepContainer>
                 </PostContent>
+                {authContext?.loginState === item.userUID && (
+                  <MoreContainer>
+                    <MoreBtn onClick={() => setIsMoreClick((prev) => (prev === item.id ? "" : (item.id as string)))}>
+                      <StyleMore />
+                    </MoreBtn>
+                    <FeatureBtnContainer open={isMoreClick === item.id}>
+                      <FeatureBtn
+                        onClick={() => {
+                          dispatch({ type: "toggleIsEditMode", payload: { isEditMode: item, isPostClick: true } });
+                          setIsMoreClick("");
+                        }}
+                      >
+                        編輯
+                      </FeatureBtn>
+                      <FeatureBtn onClick={() => handlerDeleteClick(item.id ? item.id : "")}>刪除</FeatureBtn>
+                    </FeatureBtnContainer>
+                  </MoreContainer>
+                )}
               </PostItem>
             ))}
           {state.postData.length === 0 && <Hint>目前沒有應援物發放資訊</Hint>}

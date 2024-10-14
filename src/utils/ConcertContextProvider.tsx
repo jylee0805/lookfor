@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import api from "./api";
-import { Concerts } from "../pages/ConcertList";
+import { Concerts } from "../types";
 import { useNavigate } from "react-router-dom";
 
 export interface ConcertContextType {

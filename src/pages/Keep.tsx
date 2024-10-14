@@ -4,17 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import api from "../utils/api";
 import { MerchPost, Personal } from "../types";
 import { Link } from "react-router-dom";
-import { MdOutlineBookmarkBorder } from "react-icons/md";
-import { MdOutlineBookmark } from "react-icons/md";
 
-const StyleKeep = styled(MdOutlineBookmarkBorder)`
-  font-size: 1.5em;
-  margin-right: 4px;
-`;
-const StyleKeepFill = styled(MdOutlineBookmark)`
-  font-size: 1.5rem;
-  margin-right: 4px;
-`;
 const Container = styled.div`
   padding: 20px 80px;
   margin: 0 auto;
@@ -34,83 +24,93 @@ const Title = styled.h3`
   line-height: 2;
   margin-bottom: 20px;
 `;
-const Articles = styled.ul``;
+const Articles = styled.ul`
+  display: flex;
+  column-gap: 20px;
+  flex-wrap: wrap;
+`;
 const ArticleItem = styled.li`
-  background: #bdbdbd6f;
-  color: #fff;
+  background: #fcfcfc;
+  color: #000;
   border-radius: 15px;
   padding: 15px 20px;
   margin-bottom: 20px;
-  display: flex;
-  align-items: start;
+  width: 48%;
+  @media (max-width: 1280px) {
+    width: 98%;
+  }
   @media (max-width: 768px) {
   }
   @media (max-width: 575px) {
     flex-direction: column;
   }
 `;
-const KeepBtn = styled.button`
-  padding: 0;
-  color: #fff;
-  background: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  z-index: 10;
-`;
+
 const StyleLink = styled(Link)`
-  color: #fff;
+  color: #000;
   display: flex;
   justify-content: space-between;
   column-gap: 10px;
-  @media (max-width: 575px) {
+  flex-grow: 1;
+  @media (max-width: 500px) {
     flex-direction: column;
   }
 `;
 const ArticleContent = styled.div`
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 `;
 const ArticleTitle = styled.div`
   font-weight: 700;
   font-size: 1.2rem;
+  @media (max-width: 575px) {
+    font-size: 1.1rem;
+  }
 `;
 const ArticlePassBox = styled.div`
-  display: grid;
-  grid-template-columns: auto auto;
-  margin: 5px 0;
-  @media (max-width: 768px) {
-    grid-template-columns: auto;
+  margin: 10px 0;
+  @media (max-width: 575px) {
+    margin: 0;
   }
 `;
 const ArticlePass = styled.p`
-  color: #ffffff;
+  color: #000;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
+  margin: 8px 0;
   @media (max-width: 575px) {
+    margin: 3px 0;
   }
 `;
-const ArticleText = styled.p`
-  color: #ffffff;
-  font-size: 1.1rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  @media (max-width: 575px) {
-    font-size: 1rem;
+
+const KeepBtn = styled.button`
+  padding: 0;
+  color: #fff;
+  background: none;
+  border: none;
+  z-index: 10;
+  background: #000;
+  width: 100px;
+  padding: 5px;
+  &:hover {
+    background: #383838;
   }
 `;
 const ImgBox = styled.div`
-  width: 30%;
+  width: 200px;
+  height: auto;
+  text-align: right;
   border-radius: 15px;
   @media (max-width: 768px) {
     width: 40%;
-    margin-top: 10px;
+    height: 150px;
+    align-self: center;
   }
-  @media (max-width: 575px) {
-    width: 100%;
-    margin-top: 10px;
+  @media (max-width: 500px) {
+    width: 150px;
+    margin: 5px 0 10px;
+    text-align: center;
   }
 `;
 const Img = styled.img`
@@ -166,25 +166,24 @@ function Keep() {
         {keepPosts.length > 0 ? (
           keepPosts.map((item) => (
             <ArticleItem key={item.id}>
-              <KeepBtn onClick={() => handleKeep(item.id as string)}>
-                {Array.isArray(authContext?.user.keepIds) && authContext.user.keepIds.includes(item.id as string) ? <StyleKeepFill /> : <StyleKeep />}
-              </KeepBtn>
               <StyleLink to={`/fanssupport?concert=${item.concertId}#${item.id}`}>
                 <ArticleContent>
                   <ArticleTitle>{item.concertName}</ArticleTitle>
                   <ArticlePassBox>
-                    <ArticlePass>發放日期：{item.passDay}</ArticlePass>
-                    <ArticlePass>發放時間：{item.passTime}</ArticlePass>
-                    <ArticlePass>發放地點：{item.passPlace}</ArticlePass>
-                    <ArticlePass>發放狀態：{item.passState}</ArticlePass>
+                    <ArticlePass>應援物：{item.item}</ArticlePass>
+                    <ArticlePass>
+                      時間：{item.passDay}
+                      &nbsp; {item.passTime}
+                    </ArticlePass>
+                    <ArticlePass>地點：{item.passPlace}</ArticlePass>
+                    <ArticlePass>狀態：{item.passState}</ArticlePass>
                   </ArticlePassBox>
-                  <ArticleText dangerouslySetInnerHTML={{ __html: item.content.replace(/\n/g, "<br />") }}></ArticleText>
                 </ArticleContent>
                 <ImgBox>
-                  {" "}
                   <Img src={item.image ? item.image[0] : ""} />
                 </ImgBox>
               </StyleLink>
+              <KeepBtn onClick={() => handleKeep(item.id as string)}>取消收藏</KeepBtn>
             </ArticleItem>
           ))
         ) : (

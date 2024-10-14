@@ -48,7 +48,7 @@ const Container = styled.div`
 `;
 const Title = styled.p`
   color: #373535;
-  font-size: 6rem;
+  font-size: 5.5rem;
   height: 72px;
   font-family: "Kalam", cursive;
   font-weight: 700;
