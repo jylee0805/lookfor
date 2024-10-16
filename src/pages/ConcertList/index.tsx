@@ -1,13 +1,13 @@
-import styled from "styled-components";
-import api from "../../utils/api";
-import { useEffect, useRef, useReducer } from "react";
-import "react-loading-skeleton/dist/skeleton.css";
-import { QueryDocumentSnapshot } from "../../utils/firebase";
 import { DocumentData } from "firebase/firestore";
+import { useEffect, useReducer, useRef, useState } from "react";
+import "react-loading-skeleton/dist/skeleton.css";
+import styled from "styled-components";
 import { Concerts } from "../../types";
+import api from "../../utils/api";
+import { QueryDocumentSnapshot } from "../../utils/firebase";
+import Filter from "./Filter";
 import ListItem from "./ListItem";
 import Search from "./Search";
-import Filter from "./Filter";
 
 const Container = styled.div`
   margin: 60px auto;
@@ -66,45 +66,33 @@ export interface State {
   concertData: Concerts[];
   searchData: Concerts[];
   weekData: Concerts[];
-  searchValue: string;
   searchHint: boolean;
-  startAt: QueryDocumentSnapshot<DocumentData> | null;
   isLoaded: boolean;
-  nextLoad: boolean;
 }
 export type Action =
-  | { type: "setConcertData"; payload: { concertData: Concerts[]; startAt: QueryDocumentSnapshot<DocumentData> | null; nextLoad: boolean } }
+  | { type: "setConcertData"; payload: { concertData: Concerts[] } }
   | { type: "setSearchData"; payload: { searchData: Concerts[] } }
-  | { type: "setSearchValue"; payload: { searchValue: string } }
   | { type: "toggleSearchHint"; payload: { searchHint: boolean } }
   | { type: "toggleIsLoaded"; payload: { isLoaded: boolean } }
-  | { type: "toggleNextLoad"; payload: { nextLoad: boolean } }
   | { type: "setFilterData"; payload: { searchData: Concerts[]; weekData: Concerts[] } };
 
 const initial: State = {
   concertData: [],
   searchData: [],
   weekData: [],
-  searchValue: "",
   searchHint: false,
-  startAt: null,
   isLoaded: false,
-  nextLoad: false,
 };
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "setConcertData":
-      return { ...state, concertData: action.payload.concertData, startAt: action.payload.startAt, nextLoad: action.payload.nextLoad };
+      return { ...state, concertData: action.payload.concertData };
     case "setSearchData":
       return { ...state, searchData: action.payload.searchData };
-    case "setSearchValue":
-      return { ...state, searchValue: action.payload.searchValue };
     case "toggleSearchHint":
       return { ...state, searchHint: action.payload.searchHint };
     case "toggleIsLoaded":
       return { ...state, isLoaded: action.payload.isLoaded };
-    case "toggleNextLoad":
-      return { ...state, nextLoad: action.payload.nextLoad };
     case "setFilterData":
       return { ...state, searchData: action.payload.searchData, weekData: action.payload.weekData };
     default:
@@ -113,6 +101,8 @@ const reducer = (state: State, action: Action): State => {
 };
 function ConcertList() {
   const [state, dispatch] = useReducer(reducer, initial);
+  const [startAt, setStartAt] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [nextLoad, setNextLoad] = useState<boolean>(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -121,7 +111,7 @@ function ConcertList() {
       document.body.style.overflowY = "auto";
     }, 2000);
     window.addEventListener("scroll", handleScroll);
-    dispatch({ type: "toggleNextLoad", payload: { nextLoad: true } });
+    setNextLoad(true);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -131,17 +121,19 @@ function ConcertList() {
 
   useEffect(() => {
     const getConcert = async () => {
-      const data = await api.getNextConcerts(state.startAt);
+      const data = await api.getNextConcerts(startAt);
       if (data.data.length === 0) {
-        dispatch({ type: "toggleNextLoad", payload: { nextLoad: false } });
+        setNextLoad(false);
         return;
       }
-      dispatch({ type: "setConcertData", payload: { concertData: [...state.concertData, ...data.data], startAt: data.lastVisibleDoc, nextLoad: false } });
+      dispatch({ type: "setConcertData", payload: { concertData: [...state.concertData, ...data.data] } });
+      setNextLoad(false);
+      setStartAt(data.lastVisibleDoc);
     };
-    if (state.nextLoad) {
+    if (nextLoad) {
       getConcert();
     }
-  }, [state.nextLoad]);
+  }, [nextLoad]);
 
   const handleScroll = () => {
     const windowHeight = window.innerHeight;
@@ -149,7 +141,7 @@ function ConcertList() {
 
     if (documentHeight) {
       if (window.scrollY + windowHeight - 150 >= documentHeight) {
-        dispatch({ type: "toggleNextLoad", payload: { nextLoad: true } });
+        setNextLoad(true);
       }
     }
   };

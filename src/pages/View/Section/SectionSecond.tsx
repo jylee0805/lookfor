@@ -1,13 +1,13 @@
 import styled from "styled-components";
-import SecondAPhoto from "../../images/Vector 9-6.svg";
-import SecondBPhoto from "../../images/Vector 9-5.svg";
-import SecondCPhoto from "../../images/Vector 9-4.svg";
-import SecondDPhoto from "../../images/Vector 9-3.svg";
-import SecondEPhoto from "../../images/Vector 9-2.svg";
-import SecondFPhoto from "../../images/Vector 9-1.svg";
-import SecondGPhoto from "../../images/Vector 9.svg";
-import { State } from ".";
-import Section from "../../components/Section";
+import { State } from "..";
+import SecondFPhoto from "../../../assets/Vector 9-1.svg";
+import SecondEPhoto from "../../../assets/Vector 9-2.svg";
+import SecondDPhoto from "../../../assets/Vector 9-3.svg";
+import SecondCPhoto from "../../../assets/Vector 9-4.svg";
+import SecondBPhoto from "../../../assets/Vector 9-5.svg";
+import SecondAPhoto from "../../../assets/Vector 9-6.svg";
+import SecondGPhoto from "../../../assets/Vector 9.svg";
+import Section from "../../../components/Section";
 
 const Second = styled.div`
   position: relative;

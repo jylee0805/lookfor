@@ -1,14 +1,13 @@
-import styled from "styled-components";
-import { Link, useLocation } from "react-router-dom";
-import api from "../../utils/api";
-import { useEffect, useReducer, useContext, useRef } from "react";
-import FanPost from "./FanPost";
-import { Concerts } from "../../types";
-import { ConcertContext } from "../../utils/ConcertContextProvider";
+import { useContext, useEffect, useReducer, useRef } from "react";
 import "react-photo-view/dist/react-photo-view.css";
-import { MerchPost, Personal } from "../../types";
-import PostList from "./PostList";
+import { Link, useLocation } from "react-router-dom";
+import styled from "styled-components";
+import { Concerts, MerchPost, Personal } from "../../types";
+import api from "../../utils/api";
+import { ConcertContext } from "../../utils/ConcertContextProvider";
+import FanPost from "./FanPost";
 import PostFeature from "./PostFeature";
+import PostList from "./PostList";
 
 const Container = styled.div`
   width: 80%;
@@ -76,36 +75,20 @@ const Content = styled.div`
 
 export interface State {
   postData: MerchPost[];
-  localPhotoUrl: string[];
-  upLoadPhotoUrl: string[];
-  selectPhotos: File[] | null;
-  sort: string;
   isEditMode: MerchPost;
   isPostClick: boolean;
-  uploadUrl: string[];
-  deleteId: string;
   users: Personal[];
 }
 export type Action =
   | { type: "setPostData"; payload: { postData: MerchPost[] } }
-  | { type: "setLocalPhotoUrl"; payload: { localPhotoUrl: string[]; selectPhotos: File[] } }
-  | { type: "setUpLoadPhotoUrl"; payload: { upLoadPhotoUrl: string[] } }
-  | { type: "setSort"; payload: { sort: string; postData: MerchPost[] } }
   | { type: "toggleIsPostClick"; payload: { isPostClick: boolean } }
   | { type: "toggleIsEditMode"; payload: { isEditMode: MerchPost; isPostClick: boolean } }
-  | { type: "setDeleteId"; payload: { deleteId: string } }
   | { type: "setUsers"; payload: { users: Personal[] } };
 
 const initial: State = {
   postData: [],
-  localPhotoUrl: [],
-  upLoadPhotoUrl: [],
-  selectPhotos: null,
-  sort: "createdTime",
   isEditMode: {} as MerchPost,
   isPostClick: false,
-  uploadUrl: [],
-  deleteId: "",
   users: [],
 };
 
@@ -113,18 +96,10 @@ const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "setPostData":
       return { ...state, postData: action.payload.postData };
-    case "setLocalPhotoUrl":
-      return { ...state, localPhotoUrl: action.payload.localPhotoUrl, selectPhotos: action.payload.selectPhotos };
-    case "setUpLoadPhotoUrl":
-      return { ...state, upLoadPhotoUrl: action.payload.upLoadPhotoUrl };
-    case "setSort":
-      return { ...state, sort: action.payload.sort, postData: action.payload.postData };
     case "toggleIsPostClick":
       return { ...state, isPostClick: action.payload.isPostClick };
     case "toggleIsEditMode":
       return { ...state, isEditMode: action.payload.isEditMode, isPostClick: action.payload.isPostClick };
-    case "setDeleteId":
-      return { ...state, deleteId: action.payload.deleteId };
     case "setUsers":
       return { ...state, users: action.payload.users };
     default:

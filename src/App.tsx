@@ -1,13 +1,13 @@
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import GlobalStyle from "./GlobalStyle";
 import Header from "./components/Header";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import Loading from "./components/Loading";
 import { AuthContextProvider } from "./utils/AuthContextProvider";
 import { ComponentContextProvider } from "./utils/ComponentContextProvider";
 import { ConcertContextProvider } from "./utils/ConcertContextProvider";
-import { useEffect, useState } from "react";
-import Loading from "./components/Loading";
 
 function App() {
   const [loaded, setLoaded] = useState(false);

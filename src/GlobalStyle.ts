@@ -1,7 +1,7 @@
 import { createGlobalStyle } from "styled-components";
-import swei500 from "./utils/SweiGothicCJKtc-Regular.ttf";
-import swei600 from "./utils/SweiGothicCJKtc-Medium.ttf";
-import swei700 from "./utils/SweiGothicCJKtc-Bold.ttf";
+import swei700 from "./assets/SweiGothicCJKtc-Bold.ttf";
+import swei600 from "./assets/SweiGothicCJKtc-Medium.ttf";
+import swei500 from "./assets/SweiGothicCJKtc-Regular.ttf";
 
 const GlobalStyle = createGlobalStyle`
 

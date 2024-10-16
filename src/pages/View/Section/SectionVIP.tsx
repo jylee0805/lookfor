@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import VIPAPhoto from "../../images/Vector 7.svg";
-import VIPBPhoto from "../../images/Vector 8.svg";
-import VIPCPhoto from "../../images/Vector 7-2.svg";
-import { State } from ".";
-import Section from "../../components/Section";
+import { State } from "..";
+import VIPCPhoto from "../../../assets/Vector 7-2.svg";
+import VIPAPhoto from "../../../assets/Vector 7.svg";
+import VIPBPhoto from "../../../assets/Vector 8.svg";
+import Section from "../../../components/Section";
 
 const Vip = styled.div`
   position: relative;

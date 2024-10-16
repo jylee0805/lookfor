@@ -1,14 +1,14 @@
+import { useContext, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import styled from "styled-components";
-import api from "../../utils/api";
-import useGoogleVisionAPI from "../../utils/useGoogleVisionAPI";
-import { Action, State } from ".";
-import loading from "../../images/loading.gif";
-import { useEffect, useContext } from "react";
-import { ViewPost } from "../../types";
-import { AuthContext } from "../../utils/AuthContextProvider";
 import { MdOutlineClose } from "react-icons/md";
-import imageLoading from "../../images/imageLoading.gif";
+import styled from "styled-components";
+import { Action, State } from ".";
+import imageLoading from "../../assets/imageLoading.gif";
+import loading from "../../assets/loading.gif";
+import { ViewPost } from "../../types";
+import api from "../../utils/api";
+import { AuthContext } from "../../utils/AuthContextProvider";
+import handleAnalyzeImage from "../../utils/handleAnalyzeImage";
 
 const StyleClose = styled(MdOutlineClose)`
   font-size: 24px;
@@ -226,11 +226,28 @@ const Error = styled.span`
   margin-left: 15px;
 `;
 
+const Mask = styled.div<{ postClick: boolean }>`
+  display: ${(props) => (props.postClick ? "block" : "none")};
+  background: #3e3e3e99;
+  width: 100%;
+  height: auto;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 15;
+  backdrop-filter: blur(10px);
+`;
+
 interface Props {
   state: State;
   dispatch: React.Dispatch<Action>;
 }
-
+interface Seats {
+  sectionName: string;
+  row: number[];
+}
 interface FormInputs {
   section: string;
   row: string;
@@ -241,9 +258,20 @@ interface FormInputs {
   image: object;
 }
 
+const seatOptions = ["VIPA", "VIPB", "VIPC", "2A", "2B", "2C", "2D", "2E", "2F", "2G", "3A", "3B", "3C", "3D", "3E", "3F", "3G"];
+
+const resetValue = {
+  section: "",
+  row: "",
+  seat: "",
+  concert: "",
+  note: "",
+  content: "",
+  image: undefined,
+};
 function Post({ state, dispatch }: Props) {
   const authContext = useContext(AuthContext);
-  const { labels, handleAnalyzeImage } = useGoogleVisionAPI();
+  const [allSeats, setAllSeats] = useState<Seats[]>([]);
   const {
     register,
     handleSubmit,
@@ -279,28 +307,35 @@ function Post({ state, dispatch }: Props) {
     }
   }, [state.postEdit]);
 
-  const filteredSeats = state.allSeats.filter((item) => item.sectionName === sectionValue);
+  useEffect(() => {
+    const getAllSeats = async () => {
+      try {
+        const allSection = (await api.getSections()) as Seats[];
+        setAllSeats(allSection);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
+    getAllSeats();
+  }, [state.viewPosts]);
+
+  const filteredSeats = allSeats.filter((item) => item.sectionName === sectionValue);
   const uniqueRows = filteredSeats.length > 0 && Array.isArray(filteredSeats[0].row) ? filteredSeats[0].row : [];
   const seats = uniqueRows[rowValue - 1];
 
   const onSubmit: SubmitHandler<FormInputs> = async () => {
-    let url;
+    let url = "";
     dispatch({ type: "setLoading", payload: { isLoading: true } });
+    const formValues = getValues();
 
     if (state.postEdit?.image) {
-      const formValues = getValues();
-      await handleAnalyzeImage(state.postEdit.image);
-
-      dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: state.postEdit.image } });
-      await api.updateViewPost(state.postEdit.id, formValues, state.uploadPhotoUrl);
-
       const update = state.viewPosts?.map((post) => {
         if (post.id === state.postEdit?.id) {
           return {
             ...post,
             content: formValues.content,
             concert: formValues.concert,
-            image: state.uploadPhotoUrl,
+            image: state.postEdit.image,
             note: formValues.note,
             row: parseInt(formValues.row),
             seat: parseInt(formValues.seat),
@@ -309,43 +344,14 @@ function Post({ state, dispatch }: Props) {
         }
         return post;
       });
-      dispatch({ type: "editPost", payload: { viewPosts: update as ViewPost[], isLoading: false, isPostClick: false, isShowMask: false, selectPhoto: null, localPhotoUrl: "" } });
-      reset({
-        section: "",
-        row: "",
-        seat: "",
-        concert: "",
-        note: "",
-        content: "",
-      });
-
-      document.body.style.overflow = "auto";
+      dispatch({ type: "setViewPosts", payload: { viewPosts: update as ViewPost[] } });
     } else if (state.selectPhoto) {
       url = await api.uploadImage(state.selectPhoto);
-      await handleAnalyzeImage(url);
-      dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: url } });
-    }
-  };
-
-  useEffect(() => {
-    let ignore = false;
-
-    const handlerPost = async () => {
-      const formValues = getValues();
-      if (labels.includes("Person") && labels.includes("Clothing") && labels.includes("Pants")) {
-        setError("image", {
-          type: "manual",
-          message: "請確認圖片不包含人物",
-        });
-
-        dispatch({ type: "setLoading", payload: { isLoading: false } });
-        return;
-      } else if (labels === "") {
-        return;
-      } else {
+      const result = await handleAnalyzeImage(url);
+      if (result) {
         if (formValues) {
           if (state.postEdit?.id) {
-            await api.updateViewPost(state.postEdit.id, formValues, state.uploadPhotoUrl);
+            await api.updateViewPost(state.postEdit.id, formValues, url);
 
             const update = state.viewPosts?.map((post) => {
               if (post.id === state.postEdit?.id) {
@@ -353,7 +359,7 @@ function Post({ state, dispatch }: Props) {
                   ...post,
                   content: formValues.content,
                   concert: formValues.concert,
-                  image: state.uploadPhotoUrl,
+                  image: url,
                   note: formValues.note,
                   row: parseInt(formValues.row),
                   seat: parseInt(formValues.seat),
@@ -364,61 +370,46 @@ function Post({ state, dispatch }: Props) {
             });
             dispatch({ type: "setViewPosts", payload: { viewPosts: update as ViewPost[] } });
           } else {
-            await api.setViewPost(formValues, state.uploadPhotoUrl, authContext?.loginState as string);
+            await api.setViewPost(formValues, url, authContext?.loginState as string);
           }
         }
-
-        const rows = await api.getRows(formValues.section);
-        const sectionAry: number[] = Array.isArray(rows) ? rows : [];
-
-        dispatch({
-          type: "resetPost",
-          payload: {
-            rowSeats: sectionAry,
-            selectedSection: formValues.section,
-            selectedRow: parseInt(formValues.row) - 1,
-            isSelectRow: true,
-            isSelectSection: true,
-            selectedSeat: parseInt(formValues.seat) - 1,
-            isLoading: false,
-            isPostClick: false,
-            isShowMask: false,
-            selectPhoto: null,
-            localPhotoUrl: "",
-          },
+      } else {
+        setError("image", {
+          type: "manual",
+          message: "請確認圖片不包含人物",
         });
 
-        reset({
-          section: "",
-          row: "",
-          seat: "",
-          concert: "",
-          note: "",
-          content: "",
-          image: undefined,
-        });
-
-        document.body.style.overflow = "auto";
+        dispatch({ type: "setLoading", payload: { isLoading: false } });
+        return;
       }
-    };
-    if (!ignore) {
-      handlerPost();
     }
+    const rows = await api.getRows(formValues.section);
+    const sectionAry: number[] = Array.isArray(rows) ? rows : [];
 
-    return () => {
-      ignore = true;
-    };
-  }, [labels, state.uploadPhotoUrl]);
+    dispatch({
+      type: "resetPost",
+      payload: {
+        rowSeats: sectionAry,
+        selectedSection: formValues.section,
+        selectedRow: parseInt(formValues.row) - 1,
+        isSelectRow: true,
+        isSelectSection: true,
+        selectedSeat: parseInt(formValues.seat) - 1,
+        isLoading: false,
+        isPostClick: false,
+        isShowMask: false,
+        selectPhoto: null,
+        localPhotoUrl: "",
+      },
+    });
+
+    document.body.style.overflow = "auto";
+
+    reset(resetValue);
+  };
 
   const handlerCancel = () => {
-    reset({
-      section: "",
-      row: "",
-      seat: "",
-      concert: "",
-      note: "",
-      content: "",
-    });
+    reset(resetValue);
 
     dispatch({ type: "cancelPost", payload: { postEdit: {} as ViewPost, isPostClick: false, isShowMask: false, selectPhoto: null, localPhotoUrl: "" } });
 
@@ -434,7 +425,7 @@ function Post({ state, dispatch }: Props) {
       dispatch({ type: "updatePostMode", payload: { postEdit: update } });
     }
   };
-  const sendImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const selectImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target as HTMLInputElement;
 
     if (target.files && target.files.length > 0) {
@@ -442,95 +433,91 @@ function Post({ state, dispatch }: Props) {
     }
   };
   return (
-    <PostContainer show={state.isPostClick} loading={state.isLoading}>
-      {state.isLoading && (
-        <LoadingContainer>
-          <ImageLoading src={imageLoading} alt="" />
-          發佈中
-        </LoadingContainer>
-      )}
+    <>
+      <Mask postClick={state.isShowMask} />
 
-      <PostTitle>{state.postEdit?.section ? "更新視角" : "發佈視角"}</PostTitle>
-      <Btn onClick={() => handlerCancel()}>
-        <StyleClose />
-      </Btn>
-      <ContentContainer>
-        <FormContainer>
-          <Label>位置</Label>
-          <FormRow>
-            <Select {...register("section", { required: true })}>
-              <option value="">請選擇區域</option>
-              <option value="VIPA">VIPA</option>
-              <option value="VIPB">VIPB</option>
-              <option value="VIPC">VIPC</option>
-              <option value="2A">2A</option>
-              <option value="2B">2B</option>
-              <option value="2C">2C</option>
-              <option value="2D">2D</option>
-              <option value="2E">2E</option>
-              <option value="2F">2F</option>
-              <option value="2G">2G</option>
-              <option value="3A">3A</option>
-              <option value="3B">3B</option>
-              <option value="3C">3C</option>
-              <option value="3D">3D</option>
-              <option value="3E">3E</option>
-              <option value="3F">3F</option>
-              <option value="3G">3G</option>
-            </Select>
-            <Label>區</Label>
+      <PostContainer show={state.isPostClick} loading={state.isLoading}>
+        {state.isLoading && (
+          <LoadingContainer>
+            <ImageLoading src={imageLoading} alt="" />
+            發佈中
+          </LoadingContainer>
+        )}
 
-            <Select {...register("row", { required: true })}>
-              <option value="">請選擇排數</option>
-              {uniqueRows.map((_, index) => (
-                <option value={index + 1} key={index}>
-                  {index + 1}
-                </option>
-              ))}
-            </Select>
-            <Label>排</Label>
-            <Select {...register("seat", { required: true })}>
-              <option value="">請選擇座位</option>
-              {Array.from({ length: seats }).map((_, index) => (
-                <option value={index + 1} key={index}>
-                  {index + 1}
-                </option>
-              ))}
-            </Select>
-            <Label>號</Label>
-          </FormRow>
+        <PostTitle>{state.postEdit?.section ? "更新視角" : "發佈視角"}</PostTitle>
 
-          <Label>觀看場次</Label>
+        <Btn onClick={() => handlerCancel()}>
+          <StyleClose />
+        </Btn>
 
-          <Input type="text" defaultValue="" {...register("concert", { required: true })} placeholder="2024 SUPER JUNIOR <SUPER SHOW SPIN-OFF : Halftime>" />
-          <Label>備註</Label>
-          <Input type="text" defaultValue="" {...register("note")} placeholder="會被欄杆擋住、冷氣很冷..." />
-          <Content defaultValue="" {...register("content")} placeholder="演唱會心得或是視角感受分享..."></Content>
-        </FormContainer>
-        <ImagePreviewBox show={!!state.selectPhoto || !!state.postEdit?.image}>
-          <ImagePreviewDelete onClick={() => handleDeletePreview()}>
-            <StyleClose />
-          </ImagePreviewDelete>
-          {state.selectPhoto && <ImagePreview src={state.localPhotoUrl} />}
-          {state.postEdit?.image && <ImagePreview src={state.postEdit?.image} />}
-        </ImagePreviewBox>
-      </ContentContainer>
-      <PostFooter>
-        <Hint>僅限一張照片</Hint>
-        <BtnBox>
-          <SelectPhotoBtn>
-            選擇照片
-            <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" {...register("image", { required: state.postEdit?.image ? false : "請選擇照片" })} onChange={sendImage} />
-          </SelectPhotoBtn>
-          {errors.image && <Error>{errors.image.message}</Error>}
+        <ContentContainer>
+          <FormContainer>
+            <Label>位置</Label>
+            <FormRow>
+              <Select {...register("section", { required: true })}>
+                <option value="">請選擇區域</option>
+                {seatOptions.map((seat) => (
+                  <option key={seat} value={seat}>
+                    {seat}
+                  </option>
+                ))}
+              </Select>
+              <Label>區</Label>
 
-          <Submit onClick={handleSubmit(onSubmit)} load={state.isLoading}>
-            送出
-            {state.isLoading && <Loading src={loading} />}
-          </Submit>
-        </BtnBox>
-      </PostFooter>
-    </PostContainer>
+              <Select {...register("row", { required: true })}>
+                <option value="">請選擇排數</option>
+                {uniqueRows.map((_, index) => (
+                  <option value={index + 1} key={index}>
+                    {index + 1}
+                  </option>
+                ))}
+              </Select>
+              <Label>排</Label>
+
+              <Select {...register("seat", { required: true })}>
+                <option value="">請選擇座位</option>
+                {Array.from({ length: seats }).map((_, index) => (
+                  <option value={index + 1} key={index}>
+                    {index + 1}
+                  </option>
+                ))}
+              </Select>
+              <Label>號</Label>
+            </FormRow>
+
+            <Label>觀看場次</Label>
+            <Input type="text" defaultValue="" {...register("concert", { required: true })} placeholder="2024 SUPER JUNIOR <SUPER SHOW SPIN-OFF : Halftime>" />
+
+            <Label>備註</Label>
+            <Input type="text" defaultValue="" {...register("note")} placeholder="會被欄杆擋住、冷氣很冷..." />
+
+            <Content defaultValue="" {...register("content")} placeholder="演唱會心得或是視角感受分享..."></Content>
+          </FormContainer>
+          <ImagePreviewBox show={!!state.selectPhoto || !!state.postEdit?.image}>
+            <ImagePreviewDelete onClick={() => handleDeletePreview()}>
+              <StyleClose />
+            </ImagePreviewDelete>
+            {state.selectPhoto && <ImagePreview src={state.localPhotoUrl} />}
+            {state.postEdit?.image && <ImagePreview src={state.postEdit?.image} />}
+          </ImagePreviewBox>
+        </ContentContainer>
+        <PostFooter>
+          <Hint>僅限一張照片</Hint>
+          <BtnBox>
+            <SelectPhotoBtn>
+              選擇照片
+              <FileBtn type="file" accept="image/jpg,image/jpeg,image/png,image/gif" {...register("image", { required: state.postEdit?.image ? false : "請選擇照片" })} onChange={selectImage} />
+            </SelectPhotoBtn>
+            {errors.image && <Error>{errors.image.message}</Error>}
+
+            <Submit onClick={handleSubmit(onSubmit)} load={state.isLoading}>
+              送出
+              {state.isLoading && <Loading src={loading} />}
+            </Submit>
+          </BtnBox>
+        </PostFooter>
+      </PostContainer>
+    </>
   );
 }
 

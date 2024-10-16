@@ -47,10 +47,6 @@ export interface Comment {
   userName?: string;
   avatar?: string;
 }
-export interface Seats {
-  sectionName: string;
-  row: number[];
-}
 
 export interface PlaceInfo {
   lat: number | string;
@@ -87,7 +83,7 @@ export interface MerchPost {
   createdTime: { seconds: number; nanoseconds: number };
   userName?: string;
   concertName?: string;
-  id?: string;
+  id: string;
   avatar?: string;
   item: string;
 }

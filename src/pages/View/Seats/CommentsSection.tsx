@@ -1,18 +1,13 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IoSend } from "react-icons/io5";
-import { MdOutlineMoreVert } from "react-icons/md";
 import styled from "styled-components";
-import { Action, State } from ".";
-import Dialog from "../../components/Dialog";
-import { ViewPost } from "../../types";
-import api from "../../utils/api";
-import { AuthContext } from "../../utils/AuthContextProvider";
-import { useDialog } from "../../utils/useDialog";
-
-const StyleMore = styled(MdOutlineMoreVert)`
-  font-size: 1.5rem;
-`;
+import { Action, State } from "..";
+import Dialog from "../../../components/Dialog";
+import MoreFeatures from "../../../components/MoreFeatures";
+import { useDialog } from "../../../hooks/useDialog";
+import { ViewPost } from "../../../types";
+import api from "../../../utils/api";
 
 const Avatar = styled.img`
   border-radius: 20px;
@@ -27,38 +22,6 @@ const PosterContent = styled.div`
   flex-grow: 1;
 `;
 const UserName = styled.p``;
-const FeatureBox = styled.div<{ show: boolean }>`
-  margin-left: auto;
-  position: relative;
-  display: ${(props) => (props.show ? "block" : "none")};
-  z-index: 5;
-`;
-
-const FeatureBtn = styled.button`
-  padding: 0;
-  color: #fff;
-  background: none;
-  border: none;
-`;
-
-const FeatureList = styled.ul<{ open: boolean }>`
-  display: ${(props) => (props.open ? "block" : "none")};
-  position: absolute;
-  background: #fff;
-  width: 70px;
-  right: 0;
-  border-radius: 8px;
-`;
-const FeatureItem = styled.li`
-  padding: 0;
-`;
-const FeatureInnerBtn = styled(FeatureBtn)`
-  display: block;
-  margin: 0 auto;
-  padding: 10px 18px;
-  color: #000;
-`;
-
 const CommentSection = styled.div`
   overflow-y: auto;
   margin-bottom: 15px;
@@ -95,9 +58,6 @@ const EditCommentText = styled.input`
   border: 1px solid #d2d2d2;
 `;
 const CommentText = styled.p``;
-const MoreBtn = styled(FeatureBtn)`
-  margin-right: 10px;
-`;
 
 const Send = styled.button`
   color: #fff;
@@ -117,15 +77,14 @@ interface Props {
 
 function CommentsSection({ state, dispatch, post }: Props) {
   const { register: registerEditComment, setValue, handleSubmit: handlerEditComment } = useForm<CommentEdit>();
-  const [isMoreClick, setIsMoreClick] = useState<string>("");
   const { isOpen, setIsOpen, closeDialog } = useDialog();
-  const authContext = useContext(AuthContext);
+  const [commentEdit, setCommentEdit] = useState<string>("");
+  const [deleteCommentId, setDeleteComment] = useState({ viewId: "", commentId: "" });
 
   const createSubmitHandler = (postId: string, commentId: string): SubmitHandler<CommentEdit> => {
     const onSubmitEditComment: SubmitHandler<CommentEdit> = async (data) => {
       await api.updateComment(postId, commentId, data.comment);
-      dispatch({ type: "setCommentMode", payload: { commentEdit: "" } });
-
+      setCommentEdit("");
       const update = state.viewPosts?.map((item) => {
         if (item.id == postId) {
           const updatedComments = item.comment?.map((comment) => {
@@ -143,32 +102,27 @@ function CommentsSection({ state, dispatch, post }: Props) {
     return onSubmitEditComment;
   };
   const handleComment = (id: string, content: string) => {
-    setIsMoreClick("");
-    dispatch({ type: "setCommentMode", payload: { commentEdit: id } });
+    setCommentEdit(id);
     setValue("comment", content);
   };
 
   const handlerClickCommentDelete = (post: string, id: string) => {
-    dispatch({ type: "setDeleteComment", payload: { viewId: post, deleteCommentId: id } });
+    setDeleteComment({ viewId: post, commentId: id });
     setIsOpen(true);
   };
   const deleteComment = async () => {
-    await api.deleteComment(state.viewId, state.deleteCommentId);
-    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts?.map((post) => ({ ...post, comment: post.comment?.filter((comment) => comment.id !== state.deleteCommentId) })) } });
+    await api.deleteComment(deleteCommentId.viewId, deleteCommentId.commentId);
+    dispatch({ type: "setViewPosts", payload: { viewPosts: state.viewPosts?.map((post) => ({ ...post, comment: post.comment?.filter((comment) => comment.id !== deleteCommentId.commentId) })) } });
     closeDialog();
   };
 
   const handleCancel = () => {
-    if (state.deleteViewId !== "") {
-      dispatch({ type: "setDeleteViewId", payload: { deleteViewId: "" } });
-    } else if (state.deleteCommentId !== "") {
-      dispatch({ type: "setDeleteComment", payload: { viewId: "", deleteCommentId: "" } });
-    }
+    setDeleteComment({ viewId: "", commentId: "" });
     closeDialog();
   };
   return (
     <CommentSection>
-      {state.deleteCommentId && (
+      {deleteCommentId.commentId && (
         <Dialog isOpen={isOpen} title="刪除留言" onConfirm={deleteComment} onCancel={handleCancel} confirmText="刪除">
           確定刪除留言?
         </Dialog>
@@ -179,7 +133,7 @@ function CommentsSection({ state, dispatch, post }: Props) {
             <Avatar src={comment.avatar} />
             <PosterContent>
               <UserName>{comment.userName}</UserName>
-              {state.commentEdit === comment.id ? (
+              {commentEdit === comment.id ? (
                 <EditContainer>
                   <EditCommentText type="text" {...registerEditComment("comment")} />
                   <Send onClick={handlerEditComment(createSubmitHandler(post.id, comment.id))}>
@@ -190,19 +144,13 @@ function CommentsSection({ state, dispatch, post }: Props) {
                 <CommentText>{comment.content}</CommentText>
               )}
             </PosterContent>
-            <FeatureBox show={authContext?.loginState === comment.userUID}>
-              <MoreBtn onClick={() => setIsMoreClick((prev) => (prev === comment.id ? "" : (comment.id as string)))}>
-                <StyleMore />
-              </MoreBtn>
-              <FeatureList open={isMoreClick === comment.id}>
-                <FeatureItem>
-                  <FeatureInnerBtn onClick={() => handleComment(comment.id, comment.content as string)}>編輯</FeatureInnerBtn>
-                </FeatureItem>
-                <FeatureItem>
-                  <FeatureInnerBtn onClick={() => handlerClickCommentDelete(post.id, comment.id)}>刪除</FeatureInnerBtn>
-                </FeatureItem>
-              </FeatureList>
-            </FeatureBox>
+
+            <MoreFeatures
+              itemID={comment.id}
+              onEdit={() => handleComment(comment.id, comment.content as string)}
+              onDelete={() => handlerClickCommentDelete(post.id, comment.id)}
+              itemUID={comment.userUID}
+            />
           </CommentContainer>
         ))}
     </CommentSection>

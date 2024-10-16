@@ -1,13 +1,13 @@
 import styled from "styled-components";
-import ThirdAPhoto from "../../images/Vector 9-13.svg";
-import ThirdBPhoto from "../../images/Vector 9-12.svg";
-import ThirdCPhoto from "../../images/Vector 9-11.svg";
-import ThirdDPhoto from "../../images/Vector 9-10.svg";
-import ThirdEPhoto from "../../images/Vector 9-9.svg";
-import ThirdFPhoto from "../../images/Vector 9-8.svg";
-import ThirdGPhoto from "../../images/Vector 9-7.svg";
-import { State } from ".";
-import Section from "../../components/Section";
+import { State } from "..";
+import ThirdDPhoto from "../../../assets/Vector 9-10.svg";
+import ThirdCPhoto from "../../../assets/Vector 9-11.svg";
+import ThirdBPhoto from "../../../assets/Vector 9-12.svg";
+import ThirdAPhoto from "../../../assets/Vector 9-13.svg";
+import ThirdGPhoto from "../../../assets/Vector 9-7.svg";
+import ThirdFPhoto from "../../../assets/Vector 9-8.svg";
+import ThirdEPhoto from "../../../assets/Vector 9-9.svg";
+import Section from "../../../components/Section";
 
 const Third = styled.div`
   height: 300px;

@@ -1,9 +1,9 @@
+import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { Detail } from "../../types";
 import api from "../../utils/api";
 import { ConcertContext } from "../../utils/ConcertContextProvider";
-import { Link, useNavigate } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
-import { Detail } from "../../types";
 
 const Container = styled.div`
   width: 80%;
@@ -50,20 +50,24 @@ const PageBtn = styled(Link)`
 const Content = styled.div`
   display: flex;
   flex: auto;
-  column-gap: 30px;
+  column-gap: 10%;
   justify-content: center;
   @media (max-width: 992px) {
     align-items: center;
     flex-direction: column;
     row-gap: 25px;
+    column-gap: 10px;
   }
 `;
 const PosterBox = styled.div`
-  width: 50%;
+  width: 35%;
   text-align: center;
   margin-bottom: 40px;
+  margin-left: 10%;
   @media (max-width: 992px) {
+    width: 50%;
     margin-bottom: 0px;
+    margin-left: 0;
   }
   @media (max-width: 575px) {
     width: 80%;
@@ -71,9 +75,14 @@ const PosterBox = styled.div`
 `;
 const Poster = styled.img`
   border: 5px solid #fff;
+  object-fit: cover;
 `;
 const InfoContainer = styled.div`
-  width: 70%;
+  width: 50%;
+  @media (max-width: 992px) {
+    width: 80%;
+    padding: 0 20px;
+  }
   @media (max-width: 768px) {
     width: 100%;
     padding: 0 20px;

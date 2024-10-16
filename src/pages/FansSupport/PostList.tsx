@@ -1,10 +1,12 @@
-import styled from "styled-components";
-import { useContext } from "react";
-import { AuthContext } from "../../utils/AuthContextProvider";
+import { useState } from "react";
 import "react-photo-view/dist/react-photo-view.css";
+import styled from "styled-components";
 import { Action, State } from ".";
+import Dialog from "../../components/Dialog";
+import MoreFeatures from "../../components/MoreFeatures";
+import { useDialog } from "../../hooks/useDialog";
+import api from "../../utils/api";
 import PostContent from "./PostContent";
-import MoreFeature from "./MoreFeature";
 
 const List = styled.ul``;
 const PostItem = styled.li`
@@ -45,10 +47,32 @@ interface Props {
 }
 
 function PostList({ state, dispatch, targetRef }: Props) {
-  const authContext = useContext(AuthContext);
+  const { isOpen, setIsOpen, closeDialog } = useDialog();
+  const [deleteId, setDeleteId] = useState<string>("");
+  const handlerDeleteClick = async (id: string) => {
+    setDeleteId(id);
+    setIsOpen(true);
+  };
+  const handleCancel = () => {
+    setDeleteId("");
+    closeDialog();
+  };
 
+  const deleteMerchPost = async () => {
+    if (deleteId) {
+      await api.deleteMerchPost(deleteId);
+    }
+    dispatch({ type: "setPostData", payload: { postData: state.postData.filter((post) => post.id != deleteId) } });
+    setDeleteId("");
+    closeDialog();
+  };
   return (
     <List>
+      {deleteId !== "" && (
+        <Dialog isOpen={isOpen} title="刪除應援物發放貼文" onConfirm={deleteMerchPost} onCancel={handleCancel} confirmText="刪除">
+          確認刪除該篇應援物發放貼文?
+        </Dialog>
+      )}
       {state.postData &&
         state.postData.map((item, index) => (
           <PostItem
@@ -62,7 +86,15 @@ function PostList({ state, dispatch, targetRef }: Props) {
           >
             <HeadShot src={item.avatar} />
             <PostContent dispatch={dispatch} state={state} item={item} />
-            {authContext?.loginState === item.userUID && <MoreFeature dispatch={dispatch} state={state} item={item} />}
+
+            <MoreFeatures
+              itemID={item.id}
+              onEdit={() => {
+                dispatch({ type: "toggleIsEditMode", payload: { isEditMode: item, isPostClick: true } });
+              }}
+              onDelete={() => handlerDeleteClick(item.id)}
+              itemUID={item.userUID}
+            />
           </PostItem>
         ))}
       {state.postData.length === 0 && <Hint>目前沒有應援物發放資訊</Hint>}

@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import { Action, State } from ".";
-import api from "../../utils/api";
-import SectionVIP from "./SectionVIP";
+import { Action, State } from "..";
+import api from "../../../utils/api";
 import SectionSecond from "./SectionSecond";
 import SectionThird from "./SectionThird";
+import SectionVIP from "./SectionVIP";
 
 const SelectSection = styled.div`
   width: 65%;

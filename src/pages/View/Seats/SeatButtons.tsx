@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import { Action, State } from ".";
-import defaultSeat from "../../images/defaultSeat.png";
-import dataSeat from "../../images/dataSeat.png";
+import { Action, State } from "..";
+import dataSeat from "../../../assets/dataSeat.png";
+import defaultSeat from "../../../assets/defaultSeat.png";
 
 import { motion } from "framer-motion";
 

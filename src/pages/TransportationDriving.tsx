@@ -1,14 +1,14 @@
-import styled from "styled-components";
-import { useLoadScript, GoogleMap, MarkerF } from "@react-google-maps/api";
-import { useEffect, useState } from "react";
-import pin from "../images/pin.png";
-import selectPin from "../images/selectPin.png";
-import api from "../utils/api";
+import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
 import proj4 from "proj4";
-import VenueHeader from "../components/VenueHeader";
+import { useEffect, useState } from "react";
+import styled from "styled-components";
+import pin from "../assets/pin.png";
+import selectPin from "../assets/selectPin.png";
 import CustomMarkerLabel from "../components/CustomLabel";
 import Loading from "../components/Loading";
-import { PlaceInfo, PlaceAvailable } from "../types";
+import VenueHeader from "../components/VenueHeader";
+import { PlaceAvailable, PlaceInfo } from "../types";
+import api from "../utils/api";
 
 const Container = styled.div`
   padding: 0 30px;

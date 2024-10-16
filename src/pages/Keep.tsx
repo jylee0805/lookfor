@@ -1,9 +1,9 @@
-import styled from "styled-components";
-import { AuthContext } from "../utils/AuthContextProvider";
 import { useContext, useEffect, useState } from "react";
-import api from "../utils/api";
-import { MerchPost, Personal } from "../types";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
+import { MerchPost, Personal } from "../types";
+import api from "../utils/api";
+import { AuthContext } from "../utils/AuthContextProvider";
 
 const Container = styled.div`
   padding: 20px 80px;
@@ -173,7 +173,7 @@ function Keep() {
                       &nbsp; {item.passTime}
                     </ArticlePass>
                     <ArticlePass>地點：{item.passPlace}</ArticlePass>
-                    <ArticlePass>狀態：{item.passState}</ArticlePass>
+                    <ArticlePass>狀態：{item.passState === "0" ? "尚未發放" : item.passState === "1" ? "發放中" : "發放完畢"}</ArticlePass>
                   </ArticlePassBox>
                 </ArticleContent>
                 <ImgBox>

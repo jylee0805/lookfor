@@ -1,13 +1,12 @@
-import styled from "styled-components";
-import { SubmitHandler, useForm, Controller } from "react-hook-form";
 import { TimePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
-import { Concerts } from "../../types";
-import api from "../../utils/api";
-import { State, Action } from "./index";
-import { MerchPost } from "../../types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { MdOutlineClose } from "react-icons/md";
+import styled from "styled-components";
+import { Concerts, MerchPost } from "../../types";
+import api from "../../utils/api";
+import { Action, State } from "./index";
 
 const StyleClose = styled(MdOutlineClose)`
   font-size: 24px;
@@ -204,6 +203,8 @@ function FanPost({ concert, state, dispatch }: Props) {
       more: "大家好！這裡是咪咪貓貓和黑糖饅頭演唱會倒數不到一個月ㄌ好期待好期待😣\n我們兩個這次一起準備了一些應援來和stay們分享～～～\n· 應援物內容：SKZOO糰子壓克力鑰匙圈+小零食幸運餅乾雙面壓克力吊飾圈（兩面的圖案是不一樣的✨）\n· 數量：約15-20份左右（如果有想要交換的朋友可以來私訊我！我們會幫你預留♥♡♥）\n-為了配合ATE的概念（？這次做了食物類的吊飾往後滑有實體照！threads的流量好像會比較好 嗎\n總之來借助串的力量了再請大家分享給你身邊的stay們啦～到時候見！🤤",
     },
   });
+  const [localPhotoUrl, setLocalPhotoUrl] = useState<string[]>([]);
+  const [selectPhotos, setSelectPhotos] = useState<File[] | null>([]);
 
   useEffect(() => {
     if (state.isEditMode.passDay) {
@@ -216,6 +217,7 @@ function FanPost({ concert, state, dispatch }: Props) {
         qualify: state.isEditMode.qualify,
         more: state.isEditMode.content,
       };
+
       reset(values);
     }
   }, [state.isEditMode]);
@@ -230,9 +232,9 @@ function FanPost({ concert, state, dispatch }: Props) {
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     let urls: string[] = [];
     try {
-      if (state.selectPhotos) {
+      if (selectPhotos) {
         urls = await Promise.all(
-          state.selectPhotos.map(async (item: File) => {
+          selectPhotos.map(async (item: File) => {
             const url = await api.uploadImage(item);
             return url;
           })
@@ -245,12 +247,11 @@ function FanPost({ concert, state, dispatch }: Props) {
     }
 
     const time = data.time;
-
     const hours = time.hour();
     const minutes = String(time.minute()).padStart(2, "0");
     const total = hours.toString() + ":" + minutes;
-    const response = (await api.getLoginState()) as string;
 
+    const response = (await api.getLoginState()) as string;
     const UID = state.isEditMode.userUID === undefined || state.isEditMode.userUID === "" ? response : state.isEditMode.userUID;
 
     const allData = {
@@ -265,6 +266,7 @@ function FanPost({ concert, state, dispatch }: Props) {
       image: state.isEditMode.content ? state.isEditMode.image.concat(urls) : urls,
       userUID: UID,
     };
+
     if (state.isEditMode.id) {
       if (state.isEditMode.passState !== data.status) {
         const stateText = data.status === "0" ? "尚未發放" : data.status === "1" ? "發放中" : "發放完畢";
@@ -280,13 +282,15 @@ function FanPost({ concert, state, dispatch }: Props) {
     }
     dispatch({ type: "toggleIsEditMode", payload: { isEditMode: {} as MerchPost, isPostClick: false } });
     reset({ day: "", status: "", concert: "", place: "", qualify: "", more: "", item: "" });
-    dispatch({ type: "setLocalPhotoUrl", payload: { localPhotoUrl: [], selectPhotos: [] } });
+    setSelectPhotos([]);
+    setLocalPhotoUrl([]);
   };
   const handlerCancel = () => {
     dispatch({ type: "toggleIsPostClick", payload: { isPostClick: false } });
-    dispatch({ type: "setLocalPhotoUrl", payload: { localPhotoUrl: [], selectPhotos: [] } });
     dispatch({ type: "toggleIsEditMode", payload: { isEditMode: {} as MerchPost, isPostClick: false } });
-    reset({ day: "", status: "0", concert: "", place: "", qualify: "", more: "", image: undefined });
+    setLocalPhotoUrl([]);
+    setSelectPhotos([]);
+    reset({ day: "", status: "", concert: "", place: "", qualify: "", more: "", image: undefined });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -295,13 +299,15 @@ function FanPost({ concert, state, dispatch }: Props) {
       const localUrl = Array.from(target.files).map((item) => {
         return URL.createObjectURL(item);
       });
-      dispatch({ type: "setLocalPhotoUrl", payload: { localPhotoUrl: localUrl, selectPhotos: Array.from(target.files) } });
+      setLocalPhotoUrl(localUrl);
+      setSelectPhotos(Array.from(target.files));
     }
   };
 
   const handleDeletePreview = () => {
-    if (state.selectPhotos) {
-      dispatch({ type: "setLocalPhotoUrl", payload: { localPhotoUrl: [], selectPhotos: [] } });
+    if (selectPhotos) {
+      setLocalPhotoUrl([]);
+      setSelectPhotos([]);
     } else if (state.isEditMode.image) {
       const update = JSON.parse(JSON.stringify(state.isEditMode));
       update.image = "";
@@ -335,11 +341,11 @@ function FanPost({ concert, state, dispatch }: Props) {
           <QualifyInput type="text" {...register("qualify", { required: true })} />
           <MoreContent {...register("more", { required: true })}></MoreContent>
         </InputContainer>
-        <ImagePreviewBox show={state.selectPhotos !== null && (state.selectPhotos?.length > 0 || state.isEditMode?.image?.length > 0)}>
+        <ImagePreviewBox show={selectPhotos !== null && (selectPhotos?.length > 0 || state.isEditMode?.image?.length > 0)}>
           <ImagePreviewDelete onClick={() => handleDeletePreview()}>
             <StyleClose />
           </ImagePreviewDelete>
-          {state.localPhotoUrl && state.localPhotoUrl.map((item: string) => <Image src={item} />)}
+          {localPhotoUrl && localPhotoUrl.map((item: string) => <Image src={item} />)}
           {state.isEditMode.image && state.isEditMode.image.map((item: string) => <Image src={item} />)}
         </ImagePreviewBox>
       </ContentContainer>

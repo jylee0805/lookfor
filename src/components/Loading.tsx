@@ -15,7 +15,7 @@ const spotlight = keyframes`
   }
 `;
 const Container = styled.div`
-  position: absolute;
+  position: fixed;
   width: 100vw;
   height: 100vh;
   top: 0%;

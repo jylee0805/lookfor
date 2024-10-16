@@ -1,7 +1,8 @@
-import styled from "styled-components";
+import Fuse from "fuse.js";
+import { useState } from "react";
 import { IoSearch } from "react-icons/io5";
 import "react-loading-skeleton/dist/skeleton.css";
-import Fuse from "fuse.js";
+import styled from "styled-components";
 import { Action, State } from ".";
 
 const StyleSearch = styled(IoSearch)`
@@ -48,9 +49,10 @@ interface Props {
 }
 
 function Search({ state, dispatch }: Props) {
+  const [searchValue, setSearchValue] = useState<string>("");
   const handleSearch = () => {
     const fuse = new Fuse(state.concertData, options);
-    const result = fuse.search(state.searchValue);
+    const result = fuse.search(searchValue);
     console.log(result);
     const search = result.map((item) => {
       return item.item;
@@ -64,7 +66,7 @@ function Search({ state, dispatch }: Props) {
   };
   return (
     <Container>
-      <SearchInput type="text" value={state.searchValue} onChange={(e) => dispatch({ type: "setSearchValue", payload: { searchValue: e.target.value } })} placeholder="搜尋演唱會、場地" />
+      <SearchInput type="text" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} placeholder="搜尋演唱會、場地" />
       <SearchBtn onClick={() => handleSearch()}>
         <StyleSearch />
       </SearchBtn>

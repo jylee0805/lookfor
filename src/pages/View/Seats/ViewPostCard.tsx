@@ -1,11 +1,11 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { IoSend } from "react-icons/io5";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import styled from "styled-components";
-import { Action, State } from ".";
-import { ViewPost } from "../../types";
-import api from "../../utils/api";
-import { AuthContext } from "../../utils/AuthContextProvider";
+import { Action, State } from "..";
+import { ViewPost } from "../../../types";
+import api from "../../../utils/api";
+import { AuthContext } from "../../../utils/AuthContextProvider";
 import CommentsSection from "./CommentsSection";
 import PostContent from "./PostContent";
 
@@ -113,12 +113,13 @@ interface Props {
 
 function ViewPostCard({ state, dispatch, index, post }: Props) {
   const authContext = useContext(AuthContext);
+  const [commentText, setCommentText] = useState({ id: "", comment: "" });
 
   const handlerComment = async (id: string) => {
     const response = (await api.getLoginState()) as string;
     const userName = await api.getUser(response);
-    await api.setComment(id, state.comment[id], response, userName.userName);
-    dispatch({ type: "setComment", payload: { id: id, commentText: "" } });
+    await api.setComment(id, commentText.comment, response, userName.userName);
+    setCommentText({ id: id, comment: "" });
   };
 
   return (
@@ -138,7 +139,7 @@ function ViewPostCard({ state, dispatch, index, post }: Props) {
         </ContentContainer>
         {authContext?.loginState !== undefined ? (
           <TypeIn>
-            <Type type="text" placeholder="留言..." value={state.comment[post.id]} onChange={(e) => dispatch({ type: "setComment", payload: { id: post.id, commentText: e.target.value } })} />
+            <Type type="text" placeholder="留言..." value={commentText.comment} onChange={(e) => setCommentText({ id: post.id, comment: e.target.value })} />
             <Send onClick={() => handlerComment(post.id)}>
               <IoSend />
             </Send>

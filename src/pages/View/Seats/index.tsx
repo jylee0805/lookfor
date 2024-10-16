@@ -1,10 +1,9 @@
-import styled from "styled-components";
-import { Action, State } from ".";
-import { ViewPost } from "../../types";
-import api from "../../utils/api";
-import { MdOutlineClose } from "react-icons/md";
 import { useEffect } from "react";
-import { Comment } from "../../types";
+import { MdOutlineClose } from "react-icons/md";
+import styled from "styled-components";
+import { Action, State } from "..";
+import { Comment, ViewPost } from "../../../types";
+import api from "../../../utils/api";
 import SeatButtons from "./SeatButtons";
 import ViewPostCard from "./ViewPostCard";
 
@@ -102,6 +101,7 @@ const Header = styled.div`
   position: sticky;
   padding-top: 10px;
   top: 0;
+  z-index: 10;
   background: #121212;
 `;
 const CloseBtn = styled.button`
@@ -123,7 +123,6 @@ const Title = styled.h4`
     font-size: 1.6rem;
   }
 `;
-
 const NoView = styled.p`
   font-size: 1.5rem;
   text-align: center;
@@ -159,7 +158,6 @@ function Seat({ state, dispatch }: Props) {
           return null;
         });
         const userNames = await Promise.all(userNamesPromises);
-
         return userNames;
       };
 
@@ -179,12 +177,10 @@ function Seat({ state, dispatch }: Props) {
               const userNamesPromises = comments.map(async (comment: Comment) => {
                 if (comment.userUID) {
                   const user = await api.getUser(comment.userUID);
-
                   return { userName: user.userName, avatar: user.avatar };
                 }
                 return null;
               });
-
               const userNames = await Promise.all(userNamesPromises);
               return userNames;
             };
@@ -200,7 +196,6 @@ function Seat({ state, dispatch }: Props) {
               dispatch({ type: "setViewPosts", payload: { viewPosts: [...posts] } });
             });
           });
-
           unsubscribes.push(await unsubscribe);
         })
       );
@@ -211,9 +206,8 @@ function Seat({ state, dispatch }: Props) {
         unsubscribes.forEach((unsubscribe) => unsubscribe());
       };
     };
-
     loadViewPosts();
-  }, [state.selectedSection, state.selectedRow, state.selectedSeat, state.deleteViewId]);
+  }, [state.selectedSection, state.selectedRow, state.selectedSeat]);
 
   return (
     <SeatSection rowSelect={state.isSelectRow}>

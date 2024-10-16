@@ -1,7 +1,7 @@
-import styled from "styled-components";
-import useSection from "../utils/useSection";
-import { State } from "../pages/View";
 import { motion } from "framer-motion";
+import styled from "styled-components";
+import useSection from "../hooks/useSection";
+import { State } from "../pages/View";
 
 const Preview = styled.div<{ x: number; y: number }>`
   width: 300px;

@@ -1,13 +1,13 @@
-import styled from "styled-components";
-import { useContext } from "react";
-import { AuthContext } from "../../utils/AuthContextProvider";
+import { useContext, useState } from "react";
 import { FaSort } from "react-icons/fa";
 import { MdOutlineAdd } from "react-icons/md";
 import "react-photo-view/dist/react-photo-view.css";
-import Dialog from "../../components/Dialog";
-import { useDialog } from "../../utils/useDialog";
-import { Action, State } from ".";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { Action, State } from ".";
+import Dialog from "../../components/Dialog";
+import { useDialog } from "../../hooks/useDialog";
+import { AuthContext } from "../../utils/AuthContextProvider";
 
 const StyleSort = styled(FaSort)`
   font-size: 1.5rem;
@@ -51,9 +51,10 @@ function PostFeature({ state, dispatch }: Props) {
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
   const { isOpen, setIsOpen, closeDialog } = useDialog();
+  const [sort, setSort] = useState<string>("createdTime");
   const handleSort = () => {
-    if (state.sort === "createdTime") {
-      const sort = [...state.postData].sort((a, b) => {
+    if (sort === "createdTime") {
+      const sortList = [...state.postData].sort((a, b) => {
         const dayDifference = a.passDay.localeCompare(b.passDay);
 
         if (dayDifference !== 0) {
@@ -61,13 +62,14 @@ function PostFeature({ state, dispatch }: Props) {
         }
         return a.passTime.localeCompare(b.passTime);
       });
-      dispatch({ type: "setSort", payload: { sort: "passTime", postData: sort } });
+      setSort("passTime");
+      dispatch({ type: "setPostData", payload: { postData: sortList } });
     } else {
-      const sort = [...state.postData].sort((a, b) => {
+      const sortList = [...state.postData].sort((a, b) => {
         return b.createdTime.seconds - a.createdTime.seconds;
       });
-
-      dispatch({ type: "setSort", payload: { sort: "createdTime", postData: sort } });
+      setSort("createdTime");
+      dispatch({ type: "setPostData", payload: { postData: sortList } });
     }
   };
   const handleConfirm = () => {
@@ -92,7 +94,7 @@ function PostFeature({ state, dispatch }: Props) {
       )}
       <ActionBtn onClick={() => handleSort()}>
         <StyleSort />
-        {state.sort === "createdTime" ? "依發放時間排序" : "依貼文發布時間排序"}
+        {sort === "createdTime" ? "依發放時間排序" : "依貼文發布時間排序"}
       </ActionBtn>
       <ActionBtn onClick={() => handlePostClick()}>
         <StyleAdd />

@@ -1,10 +1,10 @@
-import styled, { keyframes } from "styled-components";
-import { Link } from "react-router-dom";
-import concertImg from "../../images/concert.jpg";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { Concerts } from "../../types";
+import { Link } from "react-router-dom";
+import styled, { keyframes } from "styled-components";
 import { State } from ".";
+import concertImg from "../../assets/concert.jpg";
+import { Concerts } from "../../types";
 
 const skeletonLoading = keyframes`
   0% {
