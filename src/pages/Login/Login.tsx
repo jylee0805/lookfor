@@ -78,7 +78,7 @@ function LogIn({ isLogin }: Props) {
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     const response = await api.userLogIn(data.email, data.password);
-    console.log(response);
+
     if (response === "Firebase: Error (auth/invalid-credential).") {
       setError("password", {
         type: "manual",
@@ -101,7 +101,6 @@ function LogIn({ isLogin }: Props) {
 
   const handlerKeyDown = (e: React.KeyboardEvent, nextFieldName: keyof FormInputs | null) => {
     const currentValue = getValues();
-    console.log(e.currentTarget);
 
     if (e.keyCode === 13) {
       if (nextFieldName) {

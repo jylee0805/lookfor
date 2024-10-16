@@ -20,16 +20,13 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
     const getAuth = async () => {
       try {
         const response = (await api.getLoginState()) as string;
-        console.log(response);
         if (response !== undefined) {
           const currentUser = await api.getUser(response);
-          console.log(currentUser);
 
           setUser(currentUser);
         }
 
         setLoginState(response);
-        console.log("Login state:", response);
       } catch (error) {
         console.error("Failed to fetch login state:", error);
       }

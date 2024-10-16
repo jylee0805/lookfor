@@ -1,19 +1,19 @@
 # Summary
 
-Date : 2024-10-12 22:53:43
+Date : 2024-10-15 18:26:59
 
 Directory d:\\WEB\\lookfor
 
-Total : 65 files,  13270 codes, 33 comments, 528 blanks, all 13831 lines
+Total : 85 files,  13412 codes, 10 comments, 614 blanks, all 14036 lines
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| TypeScript JSX | 31 | 6,606 | 11 | 390 | 7,007 |
+| TypeScript JSX | 51 | 6,799 | 3 | 491 | 7,293 |
 | JSON | 7 | 5,675 | 4 | 9 | 5,688 |
-| TypeScript | 5 | 832 | 18 | 92 | 942 |
+| TypeScript | 5 | 781 | 3 | 77 | 861 |
 | XML | 18 | 54 | 0 | 18 | 72 |
 | Markdown | 1 | 40 | 0 | 11 | 51 |
 | JavaScript | 1 | 27 | 0 | 2 | 29 |
@@ -23,20 +23,22 @@ Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 65 | 13,270 | 33 | 528 | 13,831 |
+| . | 85 | 13,412 | 10 | 614 | 14,036 |
 | . (Files) | 12 | 5,787 | 5 | 29 | 5,821 |
-| src | 53 | 7,483 | 28 | 499 | 8,010 |
-| src (Files) | 4 | 293 | 2 | 20 | 315 |
-| src\\components | 5 | 823 | 0 | 42 | 865 |
+| src | 73 | 7,625 | 5 | 585 | 8,215 |
+| src (Files) | 4 | 294 | 2 | 19 | 315 |
+| src\\components | 6 | 891 | 0 | 50 | 941 |
 | src\\images | 18 | 54 | 0 | 18 | 72 |
-| src\\pages | 18 | 5,535 | 11 | 305 | 5,851 |
-| src\\pages (Files) | 6 | 1,212 | 2 | 74 | 1,288 |
+| src\\pages | 36 | 5,563 | 3 | 384 | 5,950 |
+| src\\pages (Files) | 4 | 592 | 0 | 36 | 628 |
 | src\\pages\\Concert | 1 | 196 | 0 | 9 | 205 |
-| src\\pages\\ConcertList | 1 | 277 | 0 | 15 | 292 |
-| src\\pages\\FansSupport | 2 | 939 | 6 | 61 | 1,006 |
+| src\\pages\\ConcertList | 4 | 383 | 0 | 33 | 416 |
+| src\\pages\\FansSupport | 7 | 996 | 3 | 80 | 1,079 |
+| src\\pages\\Home | 2 | 346 | 0 | 23 | 369 |
 | src\\pages\\Login | 3 | 458 | 0 | 32 | 490 |
-| src\\pages\\View | 5 | 2,453 | 3 | 114 | 2,570 |
-| src\\types | 1 | 23 | 0 | 2 | 25 |
-| src\\utils | 7 | 755 | 15 | 112 | 882 |
+| src\\pages\\Profile | 4 | 447 | 0 | 33 | 480 |
+| src\\pages\\View | 11 | 2,145 | 0 | 138 | 2,283 |
+| src\\types | 1 | 110 | 0 | 11 | 121 |
+| src\\utils | 8 | 713 | 0 | 103 | 816 |
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)

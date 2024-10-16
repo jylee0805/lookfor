@@ -10,7 +10,7 @@ import View from "./pages/View";
 import TransportationDriving from "./pages/TransportationDriving.tsx";
 import TransportationPublic from "./pages/TransportationPublic.tsx";
 import FansSupport from "./pages/FansSupport/index.tsx";
-import Profile from "./pages/Profile.tsx";
+import Profile from "./pages/Profile";
 import Keep from "./pages/Keep.tsx";
 
 createRoot(document.getElementById("root") as HTMLElement).render(

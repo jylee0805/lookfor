@@ -131,8 +131,6 @@ function Keep() {
   const [keepPosts, setKeepPosts] = useState<MerchPost[]>([]);
 
   useEffect(() => {
-    console.log("sdv");
-
     const getKeep = async () => {
       if (authContext?.user.keepIds) {
         const res = await api.getKeepMerchPost(authContext?.user.keepIds);
@@ -148,7 +146,6 @@ function Keep() {
         api.updateUser(authContext?.user.id, { UID: prev.UID, avatar: prev.avatar, userName: prev.userName, keepIds: prev.keepIds?.filter((item) => item !== id) });
         return { ...prev, keepIds: prev.keepIds?.filter((item) => item !== id) };
       });
-      console.log(authContext.user);
     } else if (authContext?.user.keepIds === undefined || authContext?.user.keepIds?.includes(id) === false) {
       authContext?.setUser((prev: Personal) => {
         const updatedKeepIds = prev.keepIds ? [...prev.keepIds, id] : [id];

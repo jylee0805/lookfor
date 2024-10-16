@@ -1,14 +1,14 @@
 import styled from "styled-components";
 import Dialog from "../../components/Dialog";
 import VenueHeader from "../../components/VenueHeader";
-import Post from "./Post";
+import Post from "./Form";
 import Sections from "./Sections";
 import Rows from "./Rows";
 import Seat from "./Seat";
 import api from "../../utils/api";
 import Loading from "../../components/Loading";
 import { MdOutlineAdd } from "react-icons/md";
-import { OriginView, ViewPost, Comment } from "../../types";
+import { OriginView, ViewPost } from "../../types";
 import { useDialog } from "../../utils/useDialog";
 import { useEffect, useReducer, useContext, useRef } from "react";
 import { AuthContext } from "../../utils/AuthContextProvider";
@@ -18,15 +18,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 const StyleAdd = styled(MdOutlineAdd)`
   font-size: 1.5rem;
   margin-right: 4px;
-  @media (max-width: 575px) {
-  }
 `;
-
 const Container = styled.div`
   width: 100%;
   max-width: 100vw;
   position: relative;
-  /* padding: 0 30px; */
+  padding: 0 20px;
+  @media (max-width: 575px) {
+    padding: 0 10px;
+  }
 `;
 const Mask = styled.div<{ postClick: boolean }>`
   display: ${(props) => (props.postClick ? "block" : "none")};
@@ -313,86 +313,6 @@ function View() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const loadViewPosts = async () => {
-      const unsubscribes: (() => void)[] = [];
-      let posts: ViewPost[] = [];
-
-      posts = JSON.parse(
-        JSON.stringify(
-          state.allPost.filter((post) => {
-            return post.section === state.selectedSection && post.row - 1 === state.selectedRow && post.seat - 1 === state.selectedSeat;
-          })
-        )
-      );
-
-      const fetchUserNames = async () => {
-        const userNamesPromises = posts.map(async (post) => {
-          if (post.userUID) {
-            const user = await api.getUser(post.userUID);
-
-            return { userName: user.userName, avatar: user.avatar };
-          }
-          return null;
-        });
-        const userNames = await Promise.all(userNamesPromises);
-
-        return userNames;
-      };
-
-      fetchUserNames().then((userNames) => {
-        posts.forEach((post, index) => {
-          post.userName = userNames[index]?.userName;
-          post.avatar = userNames[index]?.avatar;
-        });
-      });
-
-      await Promise.all(
-        posts.map(async (post) => {
-          const unsubscribe = api.getViewComments(post.id, (updatedComments: Comment[]) => {
-            console.log(updatedComments);
-            const comments = JSON.parse(JSON.stringify(updatedComments));
-
-            const fetchUserNames = async () => {
-              const userNamesPromises = comments.map(async (comment: Comment) => {
-                if (comment.userUID) {
-                  const user = await api.getUser(comment.userUID);
-
-                  return { userName: user.userName, avatar: user.avatar };
-                }
-                return null;
-              });
-
-              const userNames = await Promise.all(userNamesPromises);
-              return userNames;
-            };
-
-            fetchUserNames().then((userNames) => {
-              comments.forEach((comment: Comment, index: number) => {
-                if (userNames[index]) {
-                  comment.userName = userNames[index]?.userName || comment.userName;
-                  comment.avatar = userNames[index]?.avatar || comment.avatar;
-                }
-              });
-              post.comment = comments;
-              dispatch({ type: "setViewPosts", payload: { viewPosts: [...posts] } });
-            });
-          });
-
-          unsubscribes.push(await unsubscribe);
-        })
-      );
-      console.log(posts);
-      dispatch({ type: "setViewPosts", payload: { viewPosts: posts } });
-
-      return () => {
-        unsubscribes.forEach((unsubscribe) => unsubscribe());
-      };
-    };
-
-    loadViewPosts();
-  }, [state.selectedSection, state.selectedRow, state.selectedSeat, state.deleteViewId]);
-
-  useEffect(() => {
     const getSeat = async () => {
       const rows = await api.getRows(section);
       const sectionAry: number[] = Array.isArray(rows) ? rows : [];
@@ -426,7 +346,6 @@ function View() {
         const unsubscribePost = api.getAllSectionViewPost(async (updatedPosts: OriginView[]) => {
           dispatch({ type: "setAllSectionPost", payload: { allPost: updatedPosts as OriginView[] } });
         });
-        console.log("query");
 
         unsubscribesPost.push(await unsubscribePost);
 
@@ -439,42 +358,6 @@ function View() {
     };
     getAllSeats();
   }, [state.viewPosts, state.deleteViewId]);
-
-  const handlerSection = async (section: string) => {
-    const rows = await api.getRows(section);
-    const sectionAry: number[] = Array.isArray(rows) ? rows : [];
-
-    setTimeout(() => {
-      if (sectionRef.current) {
-        sectionRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }, 100);
-
-    if (section === state.selectedSection) {
-      dispatch({ type: "selectSection", payload: { rowSeats: [], selectedSection: "", isSelectRow: false } });
-    } else {
-      dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, selectedSection: section, isSelectRow: false } });
-    }
-  };
-
-  const handlerComment = async (id: string) => {
-    const response = (await api.getLoginState()) as string;
-    const userName = await api.getUser(response);
-    await api.setComment(id, state.comment[id], response, userName.userName);
-    dispatch({ type: "setComment", payload: { id: id, commentText: "" } });
-  };
-
-  const sendImage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const target = event.target as HTMLInputElement;
-    console.log(event);
-
-    if (target.files && target.files.length > 0) {
-      dispatch({ type: "setSelectPhoto", payload: { selectPhoto: target.files[0], localPhotoUrl: URL.createObjectURL(target.files[0]) } });
-    }
-  };
 
   const handlePostClick = () => {
     if (authContext?.loginState === null || authContext?.loginState === undefined) {
@@ -500,7 +383,7 @@ function View() {
       <VenueHeader />
 
       <Main>
-        <Post state={state} dispatch={dispatch} sendImage={sendImage} />
+        <Post state={state} dispatch={dispatch} />
         <SectionHeader>
           <Title>區域選擇</Title>
           <PostViewBtn onClick={() => handlePostClick()}>
@@ -508,9 +391,9 @@ function View() {
             <PostVieBtnText>發佈視角</PostVieBtnText>
           </PostViewBtn>
         </SectionHeader>
-        <Sections handlerSection={handlerSection} state={state} />
+        <Sections state={state} dispatch={dispatch} sectionRef={sectionRef} />
         <Rows state={state} dispatch={dispatch} sectionRef={sectionRef} />
-        <Seat state={state} handlerComment={handlerComment} dispatch={dispatch} />
+        <Seat state={state} dispatch={dispatch} />
       </Main>
     </Container>
   );

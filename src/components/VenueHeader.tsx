@@ -1,6 +1,6 @@
-import styled from "styled-components";
-import { Link } from "react-router-dom";
 import { useEffect } from "react";
+import { NavLink } from "react-router-dom";
+import styled from "styled-components";
 
 const Container = styled.div`
   width: 100%;
@@ -66,7 +66,7 @@ const Nav = styled.ul`
   }
 `;
 
-const StyleLink = styled(Link)`
+const StyleLink = styled(NavLink)`
   display: inline-block;
   font-weight: 600;
   font-size: 1.5rem;
@@ -81,6 +81,9 @@ const StyleLink = styled(Link)`
   transition: all 0.8s ease-in-out;
   &:hover {
     background-position: 0%;
+  }
+  &.active {
+    background-image: linear-gradient(239deg, #ffe53b 0%, #ff5001 74%);
   }
   @media (max-width: 992px) {
     padding: 8px 50px;
@@ -149,13 +152,19 @@ function VenueHeader() {
       </Banner>
       <Nav>
         <NavItem>
-          <StyleLink to="/view">視角分享</StyleLink>
+          <StyleLink to="/view" className={({ isActive }) => (isActive ? "active" : "")}>
+            視角分享
+          </StyleLink>
         </NavItem>
         <NavItem>
-          <StyleLink to="/transportation-public">大眾運輸</StyleLink>
+          <StyleLink to="/transportation-public" className={({ isActive }) => (isActive ? "active" : "")}>
+            大眾運輸
+          </StyleLink>
         </NavItem>
         <NavItem>
-          <StyleLink to="/transportation-driving">自行開車</StyleLink>
+          <StyleLink to="/transportation-driving" className={({ isActive }) => (isActive ? "active" : "")}>
+            自行開車
+          </StyleLink>
         </NavItem>
       </Nav>
     </Container>

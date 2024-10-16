@@ -229,7 +229,6 @@ const Error = styled.span`
 interface Props {
   state: State;
   dispatch: React.Dispatch<Action>;
-  sendImage: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 interface FormInputs {
@@ -242,7 +241,7 @@ interface FormInputs {
   image: object;
 }
 
-function Post({ state, dispatch, sendImage }: Props) {
+function Post({ state, dispatch }: Props) {
   const authContext = useContext(AuthContext);
   const { labels, handleAnalyzeImage } = useGoogleVisionAPI();
   const {
@@ -253,7 +252,16 @@ function Post({ state, dispatch, sendImage }: Props) {
     getValues,
     setError,
     formState: { errors },
-  } = useForm<FormInputs>();
+  } = useForm<FormInputs>({
+    defaultValues: {
+      section: "2A",
+      row: "6",
+      seat: "6",
+      concert: "IVE THE FIRST FAN CONCERT 《The Prom Queens》 in Taipei",
+      note: "算是很靠邊的位置",
+      content: "很近!，整場看下來的感受很好",
+    },
+  });
   const sectionValue = watch("section");
   const rowValue = parseInt(watch("row"));
 
@@ -277,7 +285,6 @@ function Post({ state, dispatch, sendImage }: Props) {
 
   const onSubmit: SubmitHandler<FormInputs> = async () => {
     let url;
-    console.log(state.isLoading);
     dispatch({ type: "setLoading", payload: { isLoading: true } });
 
     if (state.postEdit?.image) {
@@ -314,11 +321,9 @@ function Post({ state, dispatch, sendImage }: Props) {
 
       document.body.style.overflow = "auto";
     } else if (state.selectPhoto) {
-      console.log(state.selectPhoto);
       url = await api.uploadImage(state.selectPhoto);
       await handleAnalyzeImage(url);
       dispatch({ type: "setUploadPhotoUrl", payload: { uploadPhotoUrl: url } });
-      console.log(labels);
     }
   };
 
@@ -339,8 +344,6 @@ function Post({ state, dispatch, sendImage }: Props) {
         return;
       } else {
         if (formValues) {
-          console.log(formValues);
-
           if (state.postEdit?.id) {
             await api.updateViewPost(state.postEdit.id, formValues, state.uploadPhotoUrl);
 
@@ -367,7 +370,6 @@ function Post({ state, dispatch, sendImage }: Props) {
 
         const rows = await api.getRows(formValues.section);
         const sectionAry: number[] = Array.isArray(rows) ? rows : [];
-        console.log(sectionAry, formValues.section);
 
         dispatch({
           type: "resetPost",
@@ -430,6 +432,13 @@ function Post({ state, dispatch, sendImage }: Props) {
       const update = JSON.parse(JSON.stringify(state.postEdit));
       update.image = "";
       dispatch({ type: "updatePostMode", payload: { postEdit: update } });
+    }
+  };
+  const sendImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const target = event.target as HTMLInputElement;
+
+    if (target.files && target.files.length > 0) {
+      dispatch({ type: "setSelectPhoto", payload: { selectPhoto: target.files[0], localPhotoUrl: URL.createObjectURL(target.files[0]) } });
     }
   };
   return (

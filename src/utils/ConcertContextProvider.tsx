@@ -17,8 +17,6 @@ export function ConcertContextProvider({ children }: { children: React.ReactNode
   const [concertId, setConcertId] = useState<string>("");
   const navigate = useNavigate();
   useEffect(() => {
-    console.log(concertId);
-
     const getConcert = async (concertId: string) => {
       const concert = await api.getConcert(concertId);
       if (!concert.date) {
@@ -28,8 +26,6 @@ export function ConcertContextProvider({ children }: { children: React.ReactNode
     };
 
     getConcert(concertId);
-
-    console.log(concertData.concertName);
   }, [concertId]);
 
   return <ConcertContext.Provider value={{ concertData, setConcertData, concertId, setConcertId }}>{children}</ConcertContext.Provider>;

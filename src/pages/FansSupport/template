@@ -1,0 +1,15 @@
+
+interface Props {
+  
+}
+
+function PostContent({ }: Props) {
+
+  return (
+    <Container>
+     
+    </Container>
+  );
+}
+
+export default PostContent;

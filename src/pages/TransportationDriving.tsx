@@ -150,14 +150,12 @@ function TransportationDriving() {
   const onLoad = async () => {
     try {
       const res = await api.getParkInfo(tw97Max, tw97Min);
-      console.log(res);
       const result = res.map((element: PlaceInfo) => {
         const wgs = proj4(tw97, wgs84, [parseFloat(element.lng as string), parseFloat(element.lat as string)]);
         return { ...element, lng: wgs[0], lat: wgs[1] };
       });
 
       const resAvailable = await api.getParkAvailable(result);
-      console.log(resAvailable);
       const all = result.map((item: PlaceInfo) => {
         const matchedRes = resAvailable.find((res: PlaceAvailable) => item.placeId === res.id);
         return {
@@ -166,9 +164,6 @@ function TransportationDriving() {
           availablemotor: matchedRes?.availablemotor,
         };
       });
-      console.log(all);
-
-      console.log(result);
 
       setPlaces(all);
     } catch (error) {
@@ -178,7 +173,6 @@ function TransportationDriving() {
 
   const handleMarkerClick = (place: PlaceInfo) => {
     setSelectedMarker(place);
-    console.log(place);
   };
   if (!isLoaded) return <Loading />;
 

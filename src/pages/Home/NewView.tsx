@@ -15,13 +15,13 @@ const Container = styled.div`
     padding: 0;
   }
 `;
-const NewViewHeader = styled.div`
+const Header = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 5%;
   justify-content: space-between;
 `;
-const SectionTitle = styled.h3`
+const Title = styled.h3`
   font-size: 5rem;
   font-family: lihsianti;
   text-align: left;
@@ -29,7 +29,7 @@ const SectionTitle = styled.h3`
     font-size: 3rem;
   }
 `;
-const SectionTitleCh = styled.span`
+const TitleCh = styled.span`
   font-size: 3rem;
   margin-left: 30px;
   @media (max-width: 768px) {
@@ -56,7 +56,7 @@ const ViewBtn = styled(Link)`
     align-self: flex-end;
   }
 `;
-const NewViewList = styled.ul`
+const List = styled.ul`
   display: flex;
   overflow-x: scroll;
   column-gap: 20px;
@@ -78,7 +78,7 @@ const NewViewList = styled.ul`
     height: 240px;
   }
 `;
-const NewViewItem = styled.li`
+const ListItem = styled.li`
   background: #fff;
   width: 360px;
   flex-shrink: 0;
@@ -86,6 +86,7 @@ const NewViewItem = styled.li`
   margin-bottom: 10px;
   align-self: flex-start;
   padding: 5px;
+  border-radius: 8px;
   cursor: pointer;
   &:nth-child(even) {
     align-self: flex-end;
@@ -94,17 +95,18 @@ const NewViewItem = styled.li`
     width: 240px;
   }
 `;
-const NewViewImgBox = styled.div`
+const ImgBox = styled.div`
   height: 250px;
   @media (max-width: 768px) {
     height: 160px;
   }
 `;
-const NewViewImg = styled.img`
+const Img = styled.img`
   object-fit: cover;
   width: 100%;
+  border-radius: 8px;
 `;
-const NewViewTitle = styled.h4`
+const ViewTitle = styled.h4`
   color: #fff;
   font-size: 1.2rem;
   font-weight: 700;
@@ -147,22 +149,22 @@ function NewView({ scrollContainerRef }: Props) {
   };
   return (
     <Container>
-      <NewViewHeader>
-        <SectionTitle>
-          New View<SectionTitleCh>最新視角</SectionTitleCh>
-        </SectionTitle>
-      </NewViewHeader>
-      <NewViewList ref={scrollContainerRef}>
+      <Header>
+        <Title>
+          New View<TitleCh>最新視角</TitleCh>
+        </Title>
+      </Header>
+      <List ref={scrollContainerRef}>
         {NewestView.map((item) => (
-          <NewViewItem key={item.id} onClick={() => handleViewPostClick(item.section as string, item.row as number, item.seat as number)}>
-            <NewViewImgBox>
-              <NewViewImg src={item.image} />
-            </NewViewImgBox>
-            <NewViewTitle>{`${item.section}區 ${item.row}排 ${item.seat}號`}</NewViewTitle>
-          </NewViewItem>
+          <ListItem key={item.id} onClick={() => handleViewPostClick(item.section as string, item.row as number, item.seat as number)}>
+            <ImgBox>
+              <Img src={item.image} />
+            </ImgBox>
+            <ViewTitle>{`${item.section}區 ${item.row}排 ${item.seat}號`}</ViewTitle>
+          </ListItem>
         ))}
-      </NewViewList>
-      <ViewBtn to="/view">更多視角...</ViewBtn>
+      </List>
+      <ViewBtn to="/view">更多視角</ViewBtn>
     </Container>
   );
 }

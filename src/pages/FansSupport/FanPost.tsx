@@ -196,10 +196,15 @@ function FanPost({ concert, state, dispatch }: Props) {
   const { register, handleSubmit, control, reset } = useForm<FormInputs>({
     defaultValues: {
       time: dayjs(),
+      item: "SKZOO糰子壓克力鑰匙圈+小零食",
+      day: dayjs("13:30", "HH:mm").format("HH:mm"),
+      status: "0",
+      place: "世運捷運站",
+      qualify: "四期會員/任一成員泡泡滿100天（以上）",
+      more: "大家好！這裡是咪咪貓貓和黑糖饅頭演唱會倒數不到一個月ㄌ好期待好期待😣\n我們兩個這次一起準備了一些應援來和stay們分享～～～\n· 應援物內容：SKZOO糰子壓克力鑰匙圈+小零食幸運餅乾雙面壓克力吊飾圈（兩面的圖案是不一樣的✨）\n· 數量：約15-20份左右（如果有想要交換的朋友可以來私訊我！我們會幫你預留♥♡♥）\n-為了配合ATE的概念（？這次做了食物類的吊飾往後滑有實體照！threads的流量好像會比較好 嗎\n總之來借助串的力量了再請大家分享給你身邊的stay們啦～到時候見！🤤",
     },
   });
-  console.log((state.selectPhotos?.length !== 0 || state.isEditMode.image?.length !== 0) && state.selectPhotos);
-  console.log(state.selectPhotos, state.selectPhotos?.length, state.isEditMode.image?.length);
+
   useEffect(() => {
     if (state.isEditMode.passDay) {
       const values = {
@@ -210,10 +215,8 @@ function FanPost({ concert, state, dispatch }: Props) {
         place: state.isEditMode.passPlace,
         qualify: state.isEditMode.qualify,
         more: state.isEditMode.content,
-        // image: state.isEditMode.image,
       };
       reset(values);
-      console.log(values);
     }
   }, [state.isEditMode]);
 
@@ -225,7 +228,6 @@ function FanPost({ concert, state, dispatch }: Props) {
   });
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
-    console.log(data);
     let urls: string[] = [];
     try {
       if (state.selectPhotos) {
@@ -235,7 +237,6 @@ function FanPost({ concert, state, dispatch }: Props) {
             return url;
           })
         );
-        console.log(urls);
       } else {
         urls = [];
       }
@@ -248,12 +249,9 @@ function FanPost({ concert, state, dispatch }: Props) {
     const hours = time.hour();
     const minutes = String(time.minute()).padStart(2, "0");
     const total = hours.toString() + ":" + minutes;
-    console.log(total);
     const response = (await api.getLoginState()) as string;
-    console.log(state.isEditMode.userUID);
 
     const UID = state.isEditMode.userUID === undefined || state.isEditMode.userUID === "" ? response : state.isEditMode.userUID;
-    console.log(UID);
 
     const allData = {
       concertId: concert.id,
@@ -278,15 +276,11 @@ function FanPost({ concert, state, dispatch }: Props) {
       }
       await api.updateMerchPost(state.isEditMode.id, allData);
     } else {
-      console.log(concert.id);
-
       await api.setMerchPost(allData);
     }
     dispatch({ type: "toggleIsEditMode", payload: { isEditMode: {} as MerchPost, isPostClick: false } });
     reset({ day: "", status: "", concert: "", place: "", qualify: "", more: "", item: "" });
     dispatch({ type: "setLocalPhotoUrl", payload: { localPhotoUrl: [], selectPhotos: [] } });
-
-    // dispatch({ type: "toggleIsPostClick", payload: { isPostClick: false } });
   };
   const handlerCancel = () => {
     dispatch({ type: "toggleIsPostClick", payload: { isPostClick: false } });

@@ -204,14 +204,24 @@ body {
       -90vw 20vh 0 20vw #ff5213,
       -10vw -10vh 0 25vw #ff3714,20vw 80vh 0 100vw #000000;
       filter: blur(8rem);
-
-    @media (max-width: 575px) {
+      @media (max-width: 992px) {
       box-shadow:
       -50vw 20vh 0 0 #1b1a1a,
       90vw 0vh 0 55vw #ffe600,
-      -55vw -20vh 0 25vw #181818,
+      -55vw 0vh 0 25vw #181818,
       -90vw 20vh 0 5vw #ff5213,
-      -10vw -10vh 0 15vw #ff3714,20vw 80vh 0 100vw #000000; filter: blur(6rem);
+      -90vw -60vh 0 15vw #ff3714,
+      20vw 80vh 0 100vw #000000; 
+      filter: blur(8rem);
+  }
+    @media (max-width: 575px) {
+      box-shadow:
+      -50vw 20vh 0 0 #1b1a1a,
+      60vw 0vh 0 55vw #ffe600,
+      -55vw 0vh 0 25vw #181818,
+      -90vw 20vh 0 5vw #ff5213,
+      -10vw -10vh 0 15vw #ff3714,20vw 80vh 0 100vw #000000; 
+      filter: blur(6rem);
   }
   }
 }

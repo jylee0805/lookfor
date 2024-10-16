@@ -96,7 +96,7 @@ function SignUp({ isLogin }: Props) {
       return;
     }
     const response = await api.userSignUp(data.email, data.password);
-    console.log(response);
+
     if (response === "Firebase: Error (auth/email-already-in-use).") {
       setError("email", {
         type: "manual",
@@ -120,8 +120,6 @@ function SignUp({ isLogin }: Props) {
 
   const handlerKeyDown = (e: React.KeyboardEvent, nextFieldName: keyof FormInputs | null) => {
     const currentValue = getValues();
-
-    console.log(nextFieldName);
 
     if (e.keyCode === 13) {
       switch (nextFieldName) {

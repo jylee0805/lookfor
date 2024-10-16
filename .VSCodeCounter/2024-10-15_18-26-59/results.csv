@@ -1,0 +1,87 @@
+"filename", "language", "JSON with Comments", "JSON", "TypeScript", "TypeScript JSX", "Markdown", "JavaScript", "XML", "HTML", "comment", "blank", "total"
+"d:\WEB\lookfor\README.md", "Markdown", 0, 0, 0, 0, 40, 0, 0, 0, 0, 11, 51
+"d:\WEB\lookfor\eslint.config.js", "JavaScript", 0, 0, 0, 0, 0, 27, 0, 0, 0, 2, 29
+"d:\WEB\lookfor\firebase.json", "JSON", 0, 12, 0, 0, 0, 0, 0, 0, 0, 1, 13
+"d:\WEB\lookfor\index.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 27, 0, 5, 32
+"d:\WEB\lookfor\package-lock.json", "JSON", 0, 5569, 0, 0, 0, 0, 0, 0, 0, 1, 5570
+"d:\WEB\lookfor\package.json", "JSON", 0, 54, 0, 0, 0, 0, 0, 0, 0, 1, 55
+"d:\WEB\lookfor\src\App.tsx", "TypeScript JSX", 0, 0, 0, 36, 0, 0, 0, 0, 0, 5, 41
+"d:\WEB\lookfor\src\GlobalStyle.ts", "TypeScript", 0, 0, 223, 0, 0, 0, 0, 0, 1, 11, 235
+"d:\WEB\lookfor\src\components\CustomLabel.tsx", "TypeScript JSX", 0, 0, 0, 36, 0, 0, 0, 0, 0, 4, 40
+"d:\WEB\lookfor\src\components\Dialog.tsx", "TypeScript JSX", 0, 0, 0, 77, 0, 0, 0, 0, 0, 5, 82
+"d:\WEB\lookfor\src\components\Header.tsx", "TypeScript JSX", 0, 0, 0, 454, 0, 0, 0, 0, 0, 23, 477
+"d:\WEB\lookfor\src\components\Loading.tsx", "TypeScript JSX", 0, 0, 0, 90, 0, 0, 0, 0, 0, 4, 94
+"d:\WEB\lookfor\src\components\Section.tsx", "TypeScript JSX", 0, 0, 0, 75, 0, 0, 0, 0, 0, 7, 82
+"d:\WEB\lookfor\src\components\VenueHeader.tsx", "TypeScript JSX", 0, 0, 0, 159, 0, 0, 0, 0, 0, 7, 166
+"d:\WEB\lookfor\src\images\Vector 7-1.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 7-2.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 7.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 8.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-1.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-10.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-11.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-12.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-13.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-2.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-3.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-4.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-5.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-6.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-7.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-8.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9-9.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\images\Vector 9.svg", "XML", 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 4
+"d:\WEB\lookfor\src\main.tsx", "TypeScript JSX", 0, 0, 0, 35, 0, 0, 0, 0, 0, 2, 37
+"d:\WEB\lookfor\src\pages\Background.tsx", "TypeScript JSX", 0, 0, 0, 60, 0, 0, 0, 0, 0, 5, 65
+"d:\WEB\lookfor\src\pages\ConcertList\Filter.tsx", "TypeScript JSX", 0, 0, 0, 62, 0, 0, 0, 0, 0, 8, 70
+"d:\WEB\lookfor\src\pages\ConcertList\ListItem.tsx", "TypeScript JSX", 0, 0, 0, 85, 0, 0, 0, 0, 0, 7, 92
+"d:\WEB\lookfor\src\pages\ConcertList\Search.tsx", "TypeScript JSX", 0, 0, 0, 70, 0, 0, 0, 0, 0, 6, 76
+"d:\WEB\lookfor\src\pages\ConcertList\index.tsx", "TypeScript JSX", 0, 0, 0, 166, 0, 0, 0, 0, 0, 12, 178
+"d:\WEB\lookfor\src\pages\Concert\index.tsx", "TypeScript JSX", 0, 0, 0, 196, 0, 0, 0, 0, 0, 9, 205
+"d:\WEB\lookfor\src\pages\FansSupport\FanPost.tsx", "TypeScript JSX", 0, 0, 0, 341, 0, 0, 0, 0, 2, 22, 365
+"d:\WEB\lookfor\src\pages\FansSupport\KeepFeature.tsx", "TypeScript JSX", 0, 0, 0, 76, 0, 0, 0, 0, 0, 7, 83
+"d:\WEB\lookfor\src\pages\FansSupport\MoreFeature.tsx", "TypeScript JSX", 0, 0, 0, 97, 0, 0, 0, 0, 0, 7, 104
+"d:\WEB\lookfor\src\pages\FansSupport\PostContent.tsx", "TypeScript JSX", 0, 0, 0, 114, 0, 0, 0, 0, 0, 9, 123
+"d:\WEB\lookfor\src\pages\FansSupport\PostFeature.tsx", "TypeScript JSX", 0, 0, 0, 101, 0, 0, 0, 0, 0, 11, 112
+"d:\WEB\lookfor\src\pages\FansSupport\PostList.tsx", "TypeScript JSX", 0, 0, 0, 68, 0, 0, 0, 0, 0, 6, 74
+"d:\WEB\lookfor\src\pages\FansSupport\index.tsx", "TypeScript JSX", 0, 0, 0, 199, 0, 0, 0, 0, 1, 18, 218
+"d:\WEB\lookfor\src\pages\Home\NewView.tsx", "TypeScript JSX", 0, 0, 0, 166, 0, 0, 0, 0, 0, 7, 173
+"d:\WEB\lookfor\src\pages\Home\index.tsx", "TypeScript JSX", 0, 0, 0, 180, 0, 0, 0, 0, 0, 16, 196
+"d:\WEB\lookfor\src\pages\Keep.tsx", "TypeScript JSX", 0, 0, 0, 186, 0, 0, 0, 0, 0, 12, 198
+"d:\WEB\lookfor\src\pages\Login\Login.tsx", "TypeScript JSX", 0, 0, 0, 149, 0, 0, 0, 0, 0, 13, 162
+"d:\WEB\lookfor\src\pages\Login\SignUp.tsx", "TypeScript JSX", 0, 0, 0, 239, 0, 0, 0, 0, 0, 13, 252
+"d:\WEB\lookfor\src\pages\Login\index.tsx", "TypeScript JSX", 0, 0, 0, 70, 0, 0, 0, 0, 0, 6, 76
+"d:\WEB\lookfor\src\pages\Profile\MySupportPost.tsx", "TypeScript JSX", 0, 0, 0, 127, 0, 0, 0, 0, 0, 7, 134
+"d:\WEB\lookfor\src\pages\Profile\MyViewPost.tsx", "TypeScript JSX", 0, 0, 0, 111, 0, 0, 0, 0, 0, 8, 119
+"d:\WEB\lookfor\src\pages\Profile\ProfileInfo.tsx", "TypeScript JSX", 0, 0, 0, 94, 0, 0, 0, 0, 0, 7, 101
+"d:\WEB\lookfor\src\pages\Profile\index.tsx", "TypeScript JSX", 0, 0, 0, 115, 0, 0, 0, 0, 0, 11, 126
+"d:\WEB\lookfor\src\pages\TransportationDriving.tsx", "TypeScript JSX", 0, 0, 0, 235, 0, 0, 0, 0, 0, 14, 249
+"d:\WEB\lookfor\src\pages\TransportationPublic.tsx", "TypeScript JSX", 0, 0, 0, 111, 0, 0, 0, 0, 0, 5, 116
+"d:\WEB\lookfor\src\pages\View\Post.tsx", "TypeScript JSX", 0, 0, 0, 503, 0, 0, 0, 0, 0, 33, 536
+"d:\WEB\lookfor\src\pages\View\RowButtons.tsx", "TypeScript JSX", 0, 0, 0, 76, 0, 0, 0, 0, 0, 5, 81
+"d:\WEB\lookfor\src\pages\View\Rows.tsx", "TypeScript JSX", 0, 0, 0, 74, 0, 0, 0, 0, 0, 9, 83
+"d:\WEB\lookfor\src\pages\View\Seat.tsx", "TypeScript JSX", 0, 0, 0, 209, 0, 0, 0, 0, 0, 22, 231
+"d:\WEB\lookfor\src\pages\View\SeatButtons.tsx", "TypeScript JSX", 0, 0, 0, 122, 0, 0, 0, 0, 0, 7, 129
+"d:\WEB\lookfor\src\pages\View\SectionSecond.tsx", "TypeScript JSX", 0, 0, 0, 143, 0, 0, 0, 0, 0, 6, 149
+"d:\WEB\lookfor\src\pages\View\SectionThird.tsx", "TypeScript JSX", 0, 0, 0, 135, 0, 0, 0, 0, 0, 5, 140
+"d:\WEB\lookfor\src\pages\View\SectionVIP.tsx", "TypeScript JSX", 0, 0, 0, 63, 0, 0, 0, 0, 0, 6, 69
+"d:\WEB\lookfor\src\pages\View\Sections.tsx", "TypeScript JSX", 0, 0, 0, 66, 0, 0, 0, 0, 0, 7, 73
+"d:\WEB\lookfor\src\pages\View\ViewPostCard.tsx", "TypeScript JSX", 0, 0, 0, 371, 0, 0, 0, 0, 0, 18, 389
+"d:\WEB\lookfor\src\pages\View\index.tsx", "TypeScript JSX", 0, 0, 0, 383, 0, 0, 0, 0, 0, 20, 403
+"d:\WEB\lookfor\src\types\index.tsx", "TypeScript JSX", 0, 0, 0, 110, 0, 0, 0, 0, 0, 11, 121
+"d:\WEB\lookfor\src\utils\AuthContextProvider.tsx", "TypeScript JSX", 0, 0, 0, 33, 0, 0, 0, 0, 0, 9, 42
+"d:\WEB\lookfor\src\utils\ComponentContextProvider.tsx", "TypeScript JSX", 0, 0, 0, 13, 0, 0, 0, 0, 0, 3, 16
+"d:\WEB\lookfor\src\utils\ConcertContextProvider.tsx", "TypeScript JSX", 0, 0, 0, 29, 0, 0, 0, 0, 0, 8, 37
+"d:\WEB\lookfor\src\utils\api.ts", "TypeScript", 0, 0, 475, 0, 0, 0, 0, 0, 0, 60, 535
+"d:\WEB\lookfor\src\utils\firebase.ts", "TypeScript", 0, 0, 74, 0, 0, 0, 0, 0, 0, 4, 78
+"d:\WEB\lookfor\src\utils\useDialog.tsx", "TypeScript JSX", 0, 0, 0, 16, 0, 0, 0, 0, 0, 5, 21
+"d:\WEB\lookfor\src\utils\useGoogleVisionAPI.tsx", "TypeScript JSX", 0, 0, 0, 53, 0, 0, 0, 0, 0, 7, 60
+"d:\WEB\lookfor\src\utils\useSection.tsx", "TypeScript JSX", 0, 0, 0, 20, 0, 0, 0, 0, 0, 7, 27
+"d:\WEB\lookfor\src\vite-env.d.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2
+"d:\WEB\lookfor\tsconfig.app.json", "JSON", 0, 20, 0, 0, 0, 0, 0, 0, 2, 3, 25
+"d:\WEB\lookfor\tsconfig.app.tsbuildinfo", "JSON", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"d:\WEB\lookfor\tsconfig.json", "JSON with Comments", 9, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10
+"d:\WEB\lookfor\tsconfig.node.json", "JSON", 0, 18, 0, 0, 0, 0, 0, 0, 2, 3, 23
+"d:\WEB\lookfor\tsconfig.node.tsbuildinfo", "JSON", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"d:\WEB\lookfor\vite.config.ts", "TypeScript", 0, 0, 9, 0, 0, 0, 0, 0, 1, 1, 11
+"Total", "-", 9, 5675, 781, 6799, 40, 27, 54, 27, 10, 614, 14036

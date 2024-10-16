@@ -48,7 +48,7 @@ const Container = styled.div`
 `;
 const Title = styled.p`
   color: #373535;
-  font-size: 5.5rem;
+  font-size: 6rem;
   height: 72px;
   font-family: "Kalam", cursive;
   font-weight: 700;
@@ -62,6 +62,9 @@ const Title = styled.p`
   }
   @media (max-width: 575px) {
     font-size: 4rem;
+  }
+  @media (max-width: 420px) {
+    font-size: 3.2rem;
   }
   &::after {
     content: "Look For";
