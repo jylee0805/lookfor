@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import "react-loading-skeleton/dist/skeleton.css";
+import styled from "styled-components";
 import { Action, State } from ".";
 
 const Container = styled.div`

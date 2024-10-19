@@ -1,13 +1,13 @@
-import styled from "styled-components";
-import { useForm, SubmitHandler } from "react-hook-form";
-import api from "../../utils/api";
-import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import api from "../../utils/api";
 import { AuthContext } from "../../utils/AuthContextProvider";
 
-const LoginBox = styled.div<{ isLogin: boolean }>`
+const LoginBox = styled.div<{ $isLogin: boolean }>`
   width: 100%;
-  display: ${(props) => (props.isLogin ? "flex" : "none")};
+  display: ${(props) => (props.$isLogin ? "flex" : "none")};
   flex-direction: column;
   row-gap: 25px;
   margin-top: 50px;
@@ -128,7 +128,7 @@ function LogIn({ isLogin }: Props) {
     }
   };
   return (
-    <LoginBox isLogin={isLogin}>
+    <LoginBox $isLogin={isLogin}>
       <Input
         type="email"
         placeholder="請輸入電子信箱"

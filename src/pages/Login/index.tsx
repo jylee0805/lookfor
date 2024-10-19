@@ -1,9 +1,9 @@
-import styled from "styled-components";
-import SignUp from "./SignUp";
-import { useState, useContext } from "react";
-import LogIn from "./Login";
-import { AuthContext } from "../../utils/AuthContextProvider";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { AuthContext } from "../../utils/AuthContextProvider";
+import LogIn from "./Login";
+import SignUp from "./SignUp";
 
 const Container = styled.div`
   color: #fff;
@@ -33,11 +33,11 @@ const ButtonGroup = styled.div`
   width: 100%;
   display: flex;
 `;
-const SelectBtn = styled.button<{ isSelect: boolean }>`
+const SelectBtn = styled.button<{ $isSelect: boolean }>`
   display: block;
   flex-grow: 1;
-  background: ${(props) => (props.isSelect ? "#dc724f" : "#e8e8e8")};
-  color: ${(props) => (props.isSelect ? "#fff" : "#000")};
+  background: ${(props) => (props.$isSelect ? "#dc724f" : "#e8e8e8")};
+  color: ${(props) => (props.$isSelect ? "#fff" : "#000")};
   border-radius: 10px 0 0 10px;
   font-weight: 600;
   border: none;
@@ -59,10 +59,10 @@ function Login() {
     <Container>
       <Card>
         <ButtonGroup>
-          <SelectBtn onClick={() => setIsLogin(true)} isSelect={isLogin === true}>
+          <SelectBtn onClick={() => setIsLogin(true)} $isSelect={isLogin === true}>
             Log In
           </SelectBtn>
-          <SignUpBtn onClick={() => setIsLogin(false)} isSelect={isLogin === false}>
+          <SignUpBtn onClick={() => setIsLogin(false)} $isSelect={isLogin === false}>
             Sign Up
           </SignUpBtn>
         </ButtonGroup>

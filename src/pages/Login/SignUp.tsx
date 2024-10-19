@@ -1,15 +1,15 @@
+import { useContext, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
-import { useForm, SubmitHandler } from "react-hook-form";
 import api from "../../utils/api";
-import { useState, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContextProvider";
 
-const SignUpBox = styled.div<{ isLogin: boolean }>`
+const SignUpBox = styled.div<{ $isLogin: boolean }>`
   width: 100%;
   flex-direction: column;
   row-gap: 15px;
   display: flex;
-  display: ${(props) => (props.isLogin ? "none" : "flex")};
+  display: ${(props) => (props.$isLogin ? "none" : "flex")};
   margin-top: 15px;
 `;
 const Label = styled.label`
@@ -184,7 +184,7 @@ function SignUp({ isLogin }: Props) {
     }
   };
   return (
-    <SignUpBox isLogin={isLogin}>
+    <SignUpBox $isLogin={isLogin}>
       {success && <SuccessHint>註冊成功</SuccessHint>}
       <Label>
         電子信箱<Require>*</Require>

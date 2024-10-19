@@ -1,38 +1,36 @@
+import { Comment, Concerts, Detail, MerchPost, Notify, OriginView, Personal, PlaceAvailable, PlaceInfo } from "../types";
 import {
+  addDoc,
+  arrayUnion,
   auth,
+  collection,
   createUserWithEmailAndPassword,
   db,
-  addDoc,
-  collection,
-  signInWithEmailAndPassword,
-  query,
-  where,
-  getDocs,
-  onAuthStateChanged,
-  signOut,
-  serverTimestamp,
-  onSnapshot,
-  orderBy,
-  storage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  signInWithPopup,
-  provider,
-  GoogleAuthProvider,
-  FirebaseError,
   deleteDoc,
   doc,
-  updateDoc,
-  getDoc,
-  arrayUnion,
   documentId,
-  limit,
-  startAfter,
-  Timestamp,
   DocumentSnapshot,
+  getDoc,
+  getDocs,
+  getDownloadURL,
+  limit,
+  onAuthStateChanged,
+  onSnapshot,
+  orderBy,
+  provider,
+  query,
+  ref,
+  serverTimestamp,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  startAfter,
+  storage,
+  Timestamp,
+  updateDoc,
+  uploadBytes,
+  where,
 } from "../utils/firebase";
-import { Notify, OriginView, Comment, MerchPost, Personal, Concerts, Detail, PlaceInfo, PlaceAvailable } from "../types";
 
 interface Data {
   content: string;
@@ -83,36 +81,17 @@ const api = {
   },
 
   async userLogInGoogle() {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const data = await this.findUserUid(user.uid);
-      if (data.length === 0) {
-        this.setUser(user.displayName as string, user.uid, user.photoURL as string);
-      }
-      return user.uid;
-    } catch (error) {
-      if (error instanceof FirebaseError) {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        console.log(errorCode);
-        console.log(errorMessage);
-        console.log(credential);
-      } else {
-        console.error("Unexpected error:", error);
-      }
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    const data = await this.findUserUid(user.uid);
+    if (data.length === 0) {
+      this.setUser(user.displayName as string, user.uid, user.photoURL as string);
     }
+    return user.uid;
   },
 
   async userLogOut() {
-    try {
-      await signOut(auth);
-      return auth.currentUser;
-    } catch (error) {
-      console.error("登出失败", error);
-      return error;
-    }
+    await signOut(auth);
   },
 
   async getLoginState() {
@@ -160,13 +139,8 @@ const api = {
   },
 
   async updateUser(id: string, update: object) {
-    try {
-      const postDoc = doc(db, "users", id);
-      await updateDoc(postDoc, update);
-      console.log("Document updated with ID: ", id);
-    } catch (e) {
-      console.error("Error updating document: ", e);
-    }
+    const postDoc = doc(db, "users", id);
+    await updateDoc(postDoc, update);
   },
 
   async getSections() {
@@ -189,8 +163,8 @@ const api = {
     return row;
   },
 
-  async uploadImage(photo: File) {
-    const storageRef = ref(storage, `images/${photo.name}`);
+  async uploadImage(folder: string, photo: File) {
+    const storageRef = ref(storage, `${folder}/${photo.name}`);
     const uploadTask = await uploadBytes(storageRef, photo);
     const downloadURL = await getDownloadURL(uploadTask.ref);
     return downloadURL;
@@ -252,43 +226,28 @@ const api = {
   },
 
   async deleteViewPost(id: string) {
-    try {
-      const postDoc = doc(db, "viewPosts", id);
-      await deleteDoc(postDoc);
-      console.log("Document deleted with ID: ", id);
-    } catch (e) {
-      console.error("Error deleting document: ", e);
-    }
+    const postDoc = doc(db, "viewPosts", id);
+    await deleteDoc(postDoc);
   },
 
   async updateViewPost(id: string, data: Data, image: string) {
-    try {
-      const postDoc = doc(db, "viewPosts", id);
-      await updateDoc(postDoc, {
-        content: data.content || "",
-        concert: data.concert,
-        image: image,
-        note: data.note || "",
-        row: parseInt(data.row),
-        seat: parseInt(data.seat),
-        section: data.section,
-      });
-      console.log("Document updated with ID: ", id);
-    } catch (e) {
-      console.error("Error updating document: ", e);
-    }
+    const postDoc = doc(db, "viewPosts", id);
+    await updateDoc(postDoc, {
+      content: data.content || "",
+      concert: data.concert,
+      image: image,
+      note: data.note || "",
+      row: parseInt(data.row),
+      seat: parseInt(data.seat),
+      section: data.section,
+    });
   },
 
   async updateComment(post: string, id: string, content: string) {
-    try {
-      const commentDoc = doc(db, `viewPosts/${post}/comments`, id);
-      await updateDoc(commentDoc, {
-        content: content,
-      });
-      console.log("Document updated with ID: ", id);
-    } catch (e) {
-      console.error("Error updating document: ", e);
-    }
+    const commentDoc = doc(db, `viewPosts/${post}/comments`, id);
+    await updateDoc(commentDoc, {
+      content: content,
+    });
   },
   async setComment(id: string, content: string, uid: string, userName: string) {
     await addDoc(collection(db, `viewPosts/${id}/comments`), {
@@ -315,13 +274,8 @@ const api = {
   },
 
   async deleteComment(post: string, id: string) {
-    try {
-      const CommentDoc = doc(db, `viewPosts/${post}/comments`, id);
-      await deleteDoc(CommentDoc);
-      console.log("Document deleted with ID: ", id);
-    } catch (e) {
-      console.error("Error deleting document: ", e);
-    }
+    const CommentDoc = doc(db, `viewPosts/${post}/comments`, id);
+    await deleteDoc(CommentDoc);
   },
 
   async getNextConcerts(lastDoc: DocumentSnapshot | null) {
@@ -399,25 +353,14 @@ const api = {
   },
 
   async setKeepPost(uid: string, keepId: string) {
-    console.log(uid);
-    try {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("UID", "==", uid));
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach(async (docSnapshot) => {
-        await updateDoc(docSnapshot.ref, {
-          keepIds: arrayUnion(keepId),
-        });
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("UID", "==", uid));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (docSnapshot) => {
+      await updateDoc(docSnapshot.ref, {
+        keepIds: arrayUnion(keepId),
       });
-
-      if (querySnapshot.empty) {
-        console.log("No matching documents.");
-      } else {
-        console.log("KeepId added to user's keepIds array");
-      }
-    } catch (e) {
-      console.error("Error updating document: ", e);
-    }
+    });
   },
 
   async getKeepMerchPost(idArray: string[]) {
@@ -434,22 +377,12 @@ const api = {
     return list;
   },
   async updateMerchPost(id: string, merch: object) {
-    try {
-      const postDoc = doc(db, "merchPost", id);
-      await updateDoc(postDoc, merch);
-      console.log("Document updated with ID: ", id);
-    } catch (e) {
-      console.error("Error updating document: ", e);
-    }
+    const postDoc = doc(db, "merchPost", id);
+    await updateDoc(postDoc, merch);
   },
   async deleteMerchPost(id: string) {
-    try {
-      const MerchPostDoc = doc(db, "merchPost", id);
-      await deleteDoc(MerchPostDoc);
-      console.log("Document deleted with ID: ", id);
-    } catch (e) {
-      console.error("Error deleting document: ", e);
-    }
+    const MerchPostDoc = doc(db, "merchPost", id);
+    await deleteDoc(MerchPostDoc);
   },
 
   async setNotify(postId: string, concertId: string, state: string, item: string) {
@@ -483,50 +416,37 @@ const api = {
   },
 
   async deleteNotify(id: string, notifyId: string) {
-    try {
-      const notifyDoc = doc(db, "users", id, "notify", notifyId);
-      await deleteDoc(notifyDoc);
-      console.log("Document deleted with ID: ", id);
-    } catch (e) {
-      console.error("Error deleting document: ", e);
-    }
+    const notifyDoc = doc(db, "users", id, "notify", notifyId);
+    await deleteDoc(notifyDoc);
   },
 
   async getParkInfo(max: number[], min: number[]) {
-    try {
-      const parkInfo = await fetch("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json");
+    const parkInfo = await fetch("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_alldesc.json");
 
-      if (parkInfo.ok) {
-        const data = await parkInfo.json();
-        const need = data.data.park.filter((item: ParkData) => {
-          if (parseFloat(item.tw97x) > min[0] && parseFloat(item.tw97x) < max[0] && parseFloat(item.tw97y) > min[1] && parseFloat(item.tw97y) < max[1]) {
-            return item;
-          }
-        });
-        const result = need.map((item: ParkData) => {
-          return { lng: item.tw97x, lat: item.tw97y, name: item.name, parkNum: item.summary, fee: item.payex, openTime: item.serviceTime, address: item.address, placeId: item.id };
-        });
+    if (parkInfo.ok) {
+      const data = await parkInfo.json();
+      const need = data.data.park.filter((item: ParkData) => {
+        if (parseFloat(item.tw97x) > min[0] && parseFloat(item.tw97x) < max[0] && parseFloat(item.tw97y) > min[1] && parseFloat(item.tw97y) < max[1]) {
+          return item;
+        }
+      });
+      const result = need.map((item: ParkData) => {
+        return { lng: item.tw97x, lat: item.tw97y, name: item.name, parkNum: item.summary, fee: item.payex, openTime: item.serviceTime, address: item.address, placeId: item.id };
+      });
 
-        return result;
-      }
-    } catch (e) {
-      console.error("Error deleting document: ", e);
+      return result;
     }
   },
 
   async getParkAvailable(places: PlaceInfo[]) {
-    try {
-      const park = await fetch("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json");
+    const park = await fetch("https://tcgbusfs.blob.core.windows.net/blobtcmsv/TCMSV_allavailable.json");
 
-      if (park.ok) {
-        const data = await park.json();
-        const need = data.data.park.filter((item: PlaceAvailable) => {
-          return places.some((place) => place.placeId === item.id);
-        });
-        return need;
-      }
-    } catch (e) {
-      console.error("Error deleting document: ", e);
+    if (park.ok) {
+      const data = await park.json();
+      const need = data.data.park.filter((item: PlaceAvailable) => {
+        return places.some((place) => place.placeId === item.id);
+      });
+      return need;
     }
   },
 };

@@ -2,7 +2,6 @@ import { useContext, useState } from "react";
 import { IoSend } from "react-icons/io5";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import styled from "styled-components";
-import { Action, State } from "..";
 import { ViewPost } from "../../../types";
 import api from "../../../utils/api";
 import { AuthContext } from "../../../utils/AuthContextProvider";
@@ -105,13 +104,11 @@ const Type = styled.input`
   }
 `;
 interface Props {
-  state: State;
-  dispatch: React.Dispatch<Action>;
   index: number;
   post: ViewPost;
 }
 
-function ViewPostCard({ state, dispatch, index, post }: Props) {
+function ViewPostCard({ index, post }: Props) {
   const authContext = useContext(AuthContext);
   const [commentText, setCommentText] = useState({ id: "", comment: "" });
 
@@ -133,9 +130,9 @@ function ViewPostCard({ state, dispatch, index, post }: Props) {
       </PhotoProvider>
       <ContentBox>
         <ContentContainer>
-          <PostContent state={state} dispatch={dispatch} post={post} />
+          <PostContent post={post} />
           <Line />
-          <CommentsSection state={state} dispatch={dispatch} post={post} />
+          <CommentsSection post={post} />
         </ContentContainer>
         {authContext?.loginState !== undefined ? (
           <TypeIn>

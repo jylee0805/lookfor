@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { MdOutlineClose } from "react-icons/md";
 import styled from "styled-components";
-import { Action, State } from "..";
 import { Comment, ViewPost } from "../../../types";
 import api from "../../../utils/api";
+import { ViewContext } from "../../../utils/ViewContextProvider";
 import SeatButtons from "./SeatButtons";
 import ViewPostCard from "./ViewPostCard";
 
@@ -12,7 +12,7 @@ const StyleClose = styled(MdOutlineClose)`
   margin-right: 4px;
 `;
 
-const SeatSection = styled.div<{ rowSelect: boolean }>`
+const SeatSection = styled.div<{ $rowSelect: boolean }>`
   grid-column: span 2;
   margin-top: 80px;
   padding: 0 60px;
@@ -23,7 +23,7 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
   position: fixed;
   background: #000;
   top: -80px;
-  left: ${(props) => (props.rowSelect ? "0" : "-100%")};
+  left: ${(props) => (props.$rowSelect ? "0" : "-100%")};
   height: 100vh;
   z-index: 10;
   width: 60vw;
@@ -38,7 +38,7 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
     position: fixed;
     margin-bottom: 0;
     top: auto;
-    bottom: ${(props) => (props.rowSelect ? "0" : "-100%")};
+    bottom: ${(props) => (props.$rowSelect ? "0" : "-100%")};
     left: 0;
     height: 90vh;
     z-index: 10;
@@ -68,7 +68,7 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
     display: block;
     position: fixed;
     top: 0;
-    left: ${(props) => (props.rowSelect ? "0" : "-100%")};
+    left: ${(props) => (props.$rowSelect ? "0" : "-100%")};
     aspect-ratio: 1 / 1;
     border-radius: 50%;
     width: 20%;
@@ -83,8 +83,8 @@ const SeatSection = styled.div<{ rowSelect: boolean }>`
     transition:
       left ease 1s,
       opacity ease 0.5s;
-    opacity: ${(props) => (props.rowSelect ? 1 : 0)};
-    transition-delay: ${(props) => (props.rowSelect ? "0.2s" : "0s")};
+    opacity: ${(props) => (props.$rowSelect ? 1 : 0)};
+    transition-delay: ${(props) => (props.$rowSelect ? "0.2s" : "0s")};
 
     @media (max-width: 992px) {
       top: 20%;
@@ -129,12 +129,8 @@ const NoView = styled.p`
   margin: 40px 0;
 `;
 
-interface Props {
-  state: State;
-  dispatch: React.Dispatch<Action>;
-}
-
-function Seat({ state, dispatch }: Props) {
+function Seat() {
+  const { state, dispatch } = useContext(ViewContext);
   useEffect(() => {
     const loadViewPosts = async () => {
       const unsubscribes: (() => void)[] = [];
@@ -210,20 +206,16 @@ function Seat({ state, dispatch }: Props) {
   }, [state.selectedSection, state.selectedRow, state.selectedSeat]);
 
   return (
-    <SeatSection rowSelect={state.isSelectRow}>
+    <SeatSection $rowSelect={state.isSelectRow}>
       <Header>
         <CloseBtn onClick={() => dispatch({ type: "isSelectRow" })}>
           <StyleClose />
         </CloseBtn>
-        <SeatButtons state={state} dispatch={dispatch} />
+        <SeatButtons />
       </Header>
       <Title> 視角分享</Title>
 
-      {state.viewPosts && state.viewPosts.length !== 0 ? (
-        state.viewPosts.map((post: ViewPost, index) => <ViewPostCard post={post} index={index} state={state} dispatch={dispatch} />)
-      ) : (
-        <NoView>暫時沒有視角</NoView>
-      )}
+      {state.viewPosts && state.viewPosts.length !== 0 ? state.viewPosts.map((post: ViewPost, index) => <ViewPostCard post={post} index={index} />) : <NoView>暫時沒有視角</NoView>}
     </SeatSection>
   );
 }

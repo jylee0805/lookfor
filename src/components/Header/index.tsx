@@ -49,10 +49,10 @@ const NavBox = styled.div`
     align-items: center;
   }
 `;
-const NotifyBox = styled.div<{ show: boolean }>`
+const NotifyBox = styled.div<{ $show: boolean }>`
   display: none;
   @media (max-width: 575px) {
-    display: ${(props) => (props.show ? "none" : "flex")};
+    display: ${(props) => (props.$show ? "none" : "flex")};
     align-items: center;
     position: relative;
   }
@@ -117,7 +117,6 @@ function Header() {
       if (document.readyState === "complete") {
         if (window._jf && typeof window._jf.flush === "function") {
           window._jf.flush();
-          console.log("字型已刷新");
         }
       }
     };
@@ -136,7 +135,6 @@ function Header() {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsLogin(true);
-        console.log(user);
       } else {
         setIsLogin(false);
       }
@@ -147,7 +145,7 @@ function Header() {
     <Container>
       <LogoBox to="/">LookFor</LogoBox>
       <NavBox>
-        <NotifyBox show={authContext?.loginState === undefined}>
+        <NotifyBox $show={authContext?.loginState === undefined}>
           <NotifyButton state={state} dispatch={dispatch} />
         </NotifyBox>
 

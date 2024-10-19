@@ -156,10 +156,10 @@ function ConcertList() {
       {state.searchHint && <Hint>查無該關鍵字活動</Hint>}
       <AllList>
         {state.searchData.length !== 0
-          ? state.searchData.map((concert, index) => <ListItem concert={concert} index={index} state={state} />)
+          ? state.searchData.map((concert, index) => <ListItem key={`search-${concert.id}`} concert={concert} index={index} state={state} />)
           : state.weekData.length !== 0
-            ? state.weekData.map((concert, index) => <ListItem concert={concert} index={index} state={state} />)
-            : state.concertData && state.concertData.map((concert, index) => <ListItem concert={concert} index={index} state={state} />)}
+            ? state.weekData.map((concert, index) => <ListItem key={`eek-${concert.id}`} concert={concert} index={index} state={state} />)
+            : state.concertData && state.concertData.map((concert, index) => <ListItem key={concert.id} concert={concert} index={index} state={state} />)}
       </AllList>
     </Container>
   );

@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import styled from "styled-components";
-import { Action, State } from "..";
 import Dialog from "../../../components/Dialog";
 import MoreFeatures from "../../../components/MoreFeatures";
 import { useDialog } from "../../../hooks/useDialog";
 import { ViewPost } from "../../../types";
 import api from "../../../utils/api";
+import { ViewContext } from "../../../utils/ViewContextProvider";
 
 const PostContainer = styled.div`
   display: flex;
@@ -28,18 +28,17 @@ const Note = styled.p``;
 const Content = styled.p``;
 
 interface Props {
-  state: State;
-  dispatch: React.Dispatch<Action>;
   post: ViewPost;
 }
 
-function PostContent({ state, dispatch, post }: Props) {
+function PostContent({ post }: Props) {
   const [deleteViewId, setDeleteViewId] = useState<string>("");
   const { isOpen, setIsOpen, closeDialog } = useDialog();
   const handlerEditPost = (post: ViewPost) => {
     dispatch({ type: "setPostMode", payload: { postEdit: post, isPostClick: true, isShowMask: true } });
     document.body.style.overflow = "hidden";
   };
+  const { state, dispatch } = useContext(ViewContext);
 
   const handlerClickDelete = (id: string) => {
     setDeleteViewId(id);
@@ -59,7 +58,7 @@ function PostContent({ state, dispatch, post }: Props) {
   return (
     <PostContainer>
       {deleteViewId && (
-        <Dialog isOpen={isOpen} title="刪除視角貼文" onConfirm={deletePost} onCancel={handleCancel} confirmText="刪除1">
+        <Dialog isOpen={isOpen} title="刪除視角貼文" onConfirm={deletePost} onCancel={handleCancel} confirmText="刪除">
           確定刪除該篇視角貼文?
         </Dialog>
       )}

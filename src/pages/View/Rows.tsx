@@ -1,11 +1,11 @@
+import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-import { Action, State } from ".";
 import { OriginView } from "../../types";
-import { useEffect, useState } from "react";
+import { ViewContext } from "../../utils/ViewContextProvider";
 import RowButtons from "./RowButtons";
 
-const RowSection = styled.div<{ isSelectSection: boolean }>`
-  display: ${(props) => (props.isSelectSection ? "block" : "none")};
+const RowSection = styled.div<{ $isSelectSection: boolean }>`
+  display: ${(props) => (props.$isSelectSection ? "block" : "none")};
   width: 30%;
 
   @media (max-width: 992px) {
@@ -41,15 +41,9 @@ const ReviewImg = styled.img`
   border-radius: 5px;
 `;
 
-interface Props {
-  state: State;
-  dispatch: React.Dispatch<Action>;
-  sectionRef: React.RefObject<HTMLDivElement>;
-}
-
-function Rows({ state, dispatch, sectionRef }: Props) {
+function Rows() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
+  const { state, dispatch, sectionRef } = useContext(ViewContext);
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -67,14 +61,14 @@ function Rows({ state, dispatch, sectionRef }: Props) {
 
   return (
     state.selectedSection !== "" && (
-      <RowSection ref={sectionRef} isSelectSection={state.isSelectSection}>
+      <RowSection ref={sectionRef} $isSelectSection={state.isSelectSection}>
         <Title>{state.selectedSection}區</Title>
         {windowWidth <= 992 && state.allPost?.find((view) => view.section === state.selectedSection) && (
           <ReviewContainer>
             <ReviewImg src={state.allPost?.find((view) => view.section === state.selectedSection)?.image || ""} />
           </ReviewContainer>
         )}
-        <RowButtons state={state} dispatch={dispatch} />
+        <RowButtons />
       </RowSection>
     )
   );

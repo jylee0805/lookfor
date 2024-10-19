@@ -2,19 +2,19 @@ import { useContext, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { MdOutlineClose } from "react-icons/md";
 import styled from "styled-components";
-import { Action, State } from ".";
 import imageLoading from "../../assets/imageLoading.gif";
 import loading from "../../assets/loading.gif";
 import { ViewPost } from "../../types";
 import api from "../../utils/api";
 import { AuthContext } from "../../utils/AuthContextProvider";
 import handleAnalyzeImage from "../../utils/handleAnalyzeImage";
+import { ViewContext } from "../../utils/ViewContextProvider";
 
 const StyleClose = styled(MdOutlineClose)`
   font-size: 24px;
   margin-right: 4px;
 `;
-const PostContainer = styled.div<{ show: boolean; loading: boolean }>`
+const PostContainer = styled.div<{ $show: boolean }>`
   position: fixed;
   width: 60%;
   max-height: 80vh;
@@ -22,7 +22,7 @@ const PostContainer = styled.div<{ show: boolean; loading: boolean }>`
   color: #000;
   z-index: 20;
   padding: 20px 5px 20px 30px;
-  display: ${(props) => (props.show ? "block" : "none")};
+  display: ${(props) => (props.$show ? "block" : "none")};
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -158,8 +158,8 @@ const Content = styled.textarea`
     margin-left: 5px;
   }
 `;
-const ImagePreviewBox = styled.div<{ show: boolean }>`
-  display: ${(props) => (props.show ? "block" : "none")};
+const ImagePreviewBox = styled.div<{ $show: boolean }>`
+  display: ${(props) => (props.$show ? "block" : "none")};
   width: fit-content;
   height: 180px;
   position: relative;
@@ -204,8 +204,8 @@ const FileBtn = styled.input`
   visibility: hidden;
   width: 0;
 `;
-const Submit = styled.button<{ load: boolean }>`
-  padding: ${(props) => (props.load ? "0 15px" : "5px 15px")};
+const Submit = styled.button<{ $load: boolean }>`
+  padding: ${(props) => (props.$load ? "0 15px" : "5px 15px")};
   margin-left: 5px;
   display: flex;
   align-items: center;
@@ -226,8 +226,8 @@ const Error = styled.span`
   margin-left: 15px;
 `;
 
-const Mask = styled.div<{ postClick: boolean }>`
-  display: ${(props) => (props.postClick ? "block" : "none")};
+const Mask = styled.div<{ $postClick: boolean }>`
+  display: ${(props) => (props.$postClick ? "block" : "none")};
   background: #3e3e3e99;
   width: 100%;
   height: auto;
@@ -240,10 +240,6 @@ const Mask = styled.div<{ postClick: boolean }>`
   backdrop-filter: blur(10px);
 `;
 
-interface Props {
-  state: State;
-  dispatch: React.Dispatch<Action>;
-}
 interface Seats {
   sectionName: string;
   row: number[];
@@ -269,8 +265,11 @@ const resetValue = {
   content: "",
   image: undefined,
 };
-function Post({ state, dispatch }: Props) {
+
+function Form() {
   const authContext = useContext(AuthContext);
+  const { state, dispatch } = useContext(ViewContext);
+
   const [allSeats, setAllSeats] = useState<Seats[]>([]);
   const {
     register,
@@ -280,16 +279,7 @@ function Post({ state, dispatch }: Props) {
     getValues,
     setError,
     formState: { errors },
-  } = useForm<FormInputs>({
-    defaultValues: {
-      section: "2A",
-      row: "6",
-      seat: "6",
-      concert: "IVE THE FIRST FAN CONCERT 《The Prom Queens》 in Taipei",
-      note: "算是很靠邊的位置",
-      content: "很近!，整場看下來的感受很好",
-    },
-  });
+  } = useForm<FormInputs>();
   const sectionValue = watch("section");
   const rowValue = parseInt(watch("row"));
 
@@ -309,12 +299,8 @@ function Post({ state, dispatch }: Props) {
 
   useEffect(() => {
     const getAllSeats = async () => {
-      try {
-        const allSection = (await api.getSections()) as Seats[];
-        setAllSeats(allSection);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      }
+      const allSection = (await api.getSections()) as Seats[];
+      setAllSeats(allSection);
     };
     getAllSeats();
   }, [state.viewPosts]);
@@ -346,7 +332,7 @@ function Post({ state, dispatch }: Props) {
       });
       dispatch({ type: "setViewPosts", payload: { viewPosts: update as ViewPost[] } });
     } else if (state.selectPhoto) {
-      url = await api.uploadImage(state.selectPhoto);
+      url = await api.uploadImage("viewPost", state.selectPhoto);
       const result = await handleAnalyzeImage(url);
       if (result) {
         if (formValues) {
@@ -434,9 +420,9 @@ function Post({ state, dispatch }: Props) {
   };
   return (
     <>
-      <Mask postClick={state.isShowMask} />
+      <Mask $postClick={state.isShowMask} />
 
-      <PostContainer show={state.isPostClick} loading={state.isLoading}>
+      <PostContainer $show={state.isPostClick}>
         {state.isLoading && (
           <LoadingContainer>
             <ImageLoading src={imageLoading} alt="" />
@@ -493,7 +479,7 @@ function Post({ state, dispatch }: Props) {
 
             <Content defaultValue="" {...register("content")} placeholder="演唱會心得或是視角感受分享..."></Content>
           </FormContainer>
-          <ImagePreviewBox show={!!state.selectPhoto || !!state.postEdit?.image}>
+          <ImagePreviewBox $show={!!state.selectPhoto || !!state.postEdit?.image}>
             <ImagePreviewDelete onClick={() => handleDeletePreview()}>
               <StyleClose />
             </ImagePreviewDelete>
@@ -510,7 +496,7 @@ function Post({ state, dispatch }: Props) {
             </SelectPhotoBtn>
             {errors.image && <Error>{errors.image.message}</Error>}
 
-            <Submit onClick={handleSubmit(onSubmit)} load={state.isLoading}>
+            <Submit onClick={handleSubmit(onSubmit)} $load={state.isLoading}>
               送出
               {state.isLoading && <Loading src={loading} />}
             </Submit>
@@ -521,4 +507,4 @@ function Post({ state, dispatch }: Props) {
   );
 }
 
-export default Post;
+export default Form;

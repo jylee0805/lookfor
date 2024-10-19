@@ -8,6 +8,7 @@ import Loading from "./components/Loading";
 import { AuthContextProvider } from "./utils/AuthContextProvider";
 import { ComponentContextProvider } from "./utils/ComponentContextProvider";
 import { ConcertContextProvider } from "./utils/ConcertContextProvider";
+import { ViewContextProvider } from "./utils/ViewContextProvider";
 
 function App() {
   const [loaded, setLoaded] = useState(false);
@@ -25,12 +26,14 @@ function App() {
     <AuthContextProvider>
       <ConcertContextProvider>
         <ComponentContextProvider>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <GlobalStyle />
-            {!loaded && <Loading />}
-            <Header />
-            <Outlet />
-          </LocalizationProvider>
+          <ViewContextProvider>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <GlobalStyle />
+              {!loaded && <Loading />}
+              <Header />
+              <Outlet />
+            </LocalizationProvider>
+          </ViewContextProvider>
         </ComponentContextProvider>
       </ConcertContextProvider>
     </AuthContextProvider>

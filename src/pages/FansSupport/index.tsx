@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { Concerts, MerchPost, Personal } from "../../types";
 import api from "../../utils/api";
 import { ConcertContext } from "../../utils/ConcertContextProvider";
+import { SupportFormContextProvider } from "../../utils/SupportFormContextProvider";
 import FanPost from "./FanPost";
 import PostFeature from "./PostFeature";
 import PostList from "./PostList";
@@ -51,8 +52,8 @@ const PageBtn = styled(Link)`
     color: rgb(255, 98, 19);
   }
 `;
-const Mask = styled.div<{ postClick: boolean }>`
-  display: ${(props) => (props.postClick ? "block" : "none")};
+const Mask = styled.div<{ $postClick: boolean }>`
+  display: ${(props) => (props.$postClick ? "block" : "none")};
   background: #3e3e3e99;
   width: 100%;
   height: auto;
@@ -61,7 +62,7 @@ const Mask = styled.div<{ postClick: boolean }>`
   bottom: 0;
   right: 0;
   left: 0;
-  z-index: 1;
+  z-index: 10;
   backdrop-filter: blur(10px);
 `;
 
@@ -164,7 +165,6 @@ function FansSupport() {
         targetRef.current[targetIndex]?.scrollIntoView({ behavior: "smooth" });
       }
     };
-    // if (location.hash) handleScroll();
     const timeoutId = setTimeout(() => {
       if (location.hash) handleScroll();
     }, 1000);
@@ -179,10 +179,12 @@ function FansSupport() {
         <PageBtn to={`/concert?concert=${concertId}`}>演唱會資訊</PageBtn>
         <PageBtn to={`/fanssupport?concert=${concertId}`}>應援物發放資訊</PageBtn>
       </BtnBox>
-      <Mask postClick={state.isPostClick} />
+      <Mask $postClick={state.isPostClick} />
       <Content>
         <PostFeature dispatch={dispatch} state={state} />
-        <FanPost concert={concertContext?.concertData as Concerts} dispatch={dispatch} state={state} />
+        <SupportFormContextProvider>
+          <FanPost concert={concertContext?.concertData as Concerts} dispatch={dispatch} state={state} />
+        </SupportFormContextProvider>
         <PostList state={state} dispatch={dispatch} targetRef={targetRef} />
       </Content>
     </Container>

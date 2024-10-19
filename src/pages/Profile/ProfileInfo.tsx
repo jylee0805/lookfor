@@ -1,6 +1,6 @@
+import { useContext } from "react";
 import styled from "styled-components";
 import { ProfileAction, ProfileState } from ".";
-import { useContext } from "react";
 import { AuthContext } from "../../utils/AuthContextProvider";
 import api from "../../utils/api";
 
@@ -35,8 +35,8 @@ const UserName = styled.p`
   line-height: 1.5;
   font-weight: 700;
 `;
-const Label = styled.label<{ isEdit: boolean }>`
-  display: ${(props) => (props.isEdit ? "block" : "none")};
+const Label = styled.label<{ $isEdit: boolean }>`
+  display: ${(props) => (props.$isEdit ? "block" : "none")};
 `;
 const Input = styled.input`
   display: none;
@@ -58,7 +58,7 @@ function ProfileInfo({ state, dispatch }: Props) {
       const profile = state.profile;
       profile.userName = state.editUserName;
       if (state.selectPhoto) {
-        url = await api.uploadImage(state.selectPhoto);
+        url = await api.uploadImage("avatar", state.selectPhoto);
         profile.avatar = url;
       }
       const update = {
@@ -88,7 +88,7 @@ function ProfileInfo({ state, dispatch }: Props) {
       ) : (
         <UserName>{state.profile.userName}</UserName>
       )}
-      <Label isEdit={state.isEditProfile}>
+      <Label $isEdit={state.isEditProfile}>
         選擇照片
         <Input type="file" accept="image/jpg,image/jpeg,image/png,image/gif" onChange={handleImage} />
       </Label>

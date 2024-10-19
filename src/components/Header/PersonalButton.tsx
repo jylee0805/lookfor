@@ -6,19 +6,19 @@ import { Personal } from "../../types";
 import api from "../../utils/api";
 import { AuthContext } from "../../utils/AuthContextProvider";
 
-const PersonalBtn = styled.button<{ avatar: string }>`
+const PersonalBtn = styled.button<{ $avatar: string }>`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-image: url(${(props) => props.avatar});
+  background-image: url(${(props) => props.$avatar});
   background-size: cover;
   background-repeat: no-repeat;
   @media (max-width: 575px) {
     display: none;
   }
 `;
-const PersonalList = styled.ul<{ isPersonalClick: boolean }>`
-  display: ${(props) => (props.isPersonalClick ? "block" : "none")};
+const PersonalList = styled.ul<{ $isPersonalClick: boolean }>`
+  display: ${(props) => (props.$isPersonalClick ? "block" : "none")};
   position: absolute;
   width: 120px;
   right: 0;
@@ -68,15 +68,16 @@ interface Props {
 function PersonalButton({ state, dispatch }: Props) {
   const authContext = useContext(AuthContext);
   const handlerLogout = async () => {
-    const loginState = await api.userLogOut();
-    authContext?.setLoginState(loginState as string);
+    await api.userLogOut();
+
+    authContext?.setLoginState("");
     authContext?.setUser({} as Personal);
     dispatch({ type: "toggleIsPersonalClick" });
   };
   return (
     <>
-      <PersonalBtn avatar={authContext?.user.avatar ? authContext?.user.avatar : ""} onClick={() => dispatch({ type: "toggleIsPersonalClick" })}></PersonalBtn>
-      <PersonalList isPersonalClick={state.isPersonalClick}>
+      <PersonalBtn $avatar={authContext?.user.avatar ? authContext?.user.avatar : ""} onClick={() => dispatch({ type: "toggleIsPersonalClick" })}></PersonalBtn>
+      <PersonalList $isPersonalClick={state.isPersonalClick}>
         <PersonalItem>
           <ProfileLink to="/profile" onClick={() => dispatch({ type: "toggleIsPersonalClick" })}>
             個人頁面

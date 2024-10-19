@@ -1,5 +1,6 @@
+import { useContext } from "react";
 import styled from "styled-components";
-import { Action, State } from ".";
+import { ViewContext } from "../../utils/ViewContextProvider";
 
 const Container = styled.div`
   display: grid;
@@ -25,7 +26,7 @@ const Container = styled.div`
     width: 100%;
   }
 `;
-const Button = styled.button<{ col: boolean; haveData: boolean; isSelect: boolean }>`
+const Button = styled.button<{ $col: boolean; $haveData: boolean; $isSelect: boolean }>`
   display: block;
   width: 100%;
   margin-bottom: 10px;
@@ -34,14 +35,14 @@ const Button = styled.button<{ col: boolean; haveData: boolean; isSelect: boolea
   font-size: 1.1rem;
   font-weight: 600;
   border-radius: 5px;
-  background: ${(props) => (props.isSelect ? "#ffc788" : "fff")};
-  grid-column: ${(props) => (props.col ? "span 2" : "span 3")};
+  background: ${(props) => (props.$isSelect ? "#ffc788" : "fff")};
+  grid-column: ${(props) => (props.$col ? "span 2" : "span 3")};
   &:hover {
     background: #ffc788;
   }
   &::after {
     content: "";
-    display: ${(props) => (props.haveData ? "block" : "none")};
+    display: ${(props) => (props.$haveData ? "block" : "none")};
     position: absolute;
     top: -5%;
     right: -5%;
@@ -52,20 +53,16 @@ const Button = styled.button<{ col: boolean; haveData: boolean; isSelect: boolea
   }
 `;
 
-interface Props {
-  state: State;
-  dispatch: React.Dispatch<Action>;
-}
-
-function RowButtons({ state, dispatch }: Props) {
+function RowButtons() {
+  const { state, dispatch } = useContext(ViewContext);
   return (
     <Container>
       {Array.from({ length: state.rowSeats.length }).map((_, index) => (
         <Button
           key={index}
-          col={state.rowSeats.length > 10}
-          haveData={state.allRowPost?.some((item) => item.row === index + 1) ?? false}
-          isSelect={state.selectedRow === index && state.isSelectRow === true}
+          $col={state.rowSeats.length > 10}
+          $haveData={state.allRowPost?.some((item) => item.row === index + 1) ?? false}
+          $isSelect={state.selectedRow === index && state.isSelectRow === true}
           onClick={() => {
             dispatch({ type: "selectRow", payload: { selectedRow: index, isSelectRow: true, selectedSeat: 0 } });
           }}

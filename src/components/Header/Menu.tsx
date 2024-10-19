@@ -12,7 +12,7 @@ const StyleClose = styled(MdOutlineClose)`
   margin-right: 4px;
 `;
 
-const Nav = styled.ul<{ isMenuOpen: boolean }>`
+const Nav = styled.ul<{ $isMenuOpen: boolean }>`
   display: flex;
   align-items: center;
   z-index: 5;
@@ -25,7 +25,7 @@ const Nav = styled.ul<{ isMenuOpen: boolean }>`
     background: #1e1e1e;
     top: 0;
     width: 50%;
-    right: ${(props) => (props.isMenuOpen ? "0" : " -100%")};
+    right: ${(props) => (props.$isMenuOpen ? "0" : " -100%")};
     transition: right 500ms ease-out;
   }
 `;
@@ -97,7 +97,7 @@ interface Props {
 function Menu({ state, dispatch, isLogin }: Props) {
   const authContext = useContext(AuthContext);
   return (
-    <Nav isMenuOpen={state.isMenuOpen}>
+    <Nav $isMenuOpen={state.isMenuOpen}>
       <NavCloseItem>
         <NavCloseBtn onClick={() => dispatch({ type: "toggleIsMenuOpen", payload: { isMenuOpen: false } })}>
           <StyleClose />

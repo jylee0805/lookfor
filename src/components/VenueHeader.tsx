@@ -129,7 +129,6 @@ function VenueHeader() {
       if (document.readyState === "complete") {
         if (window._jf && typeof window._jf.flush === "function") {
           window._jf.flush();
-          console.log("字型已刷新");
         }
       }
     };

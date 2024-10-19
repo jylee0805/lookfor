@@ -1,6 +1,7 @@
+import { useContext } from "react";
 import styled from "styled-components";
-import { Action, State } from "..";
 import api from "../../../utils/api";
+import { ViewContext } from "../../../utils/ViewContextProvider";
 import SectionSecond from "./SectionSecond";
 import SectionThird from "./SectionThird";
 import SectionVIP from "./SectionVIP";
@@ -26,12 +27,8 @@ const SelectSection = styled.div`
   }
 `;
 
-interface Props {
-  state: State;
-  dispatch: React.Dispatch<Action>;
-  sectionRef: React.RefObject<HTMLDivElement>;
-}
-function Sections({ state, dispatch, sectionRef }: Props) {
+function Sections() {
+  const { state, dispatch, sectionRef } = useContext(ViewContext);
   const handlerSection = async (section: string) => {
     const rows = await api.getRows(section);
     const sectionAry: number[] = Array.isArray(rows) ? rows : [];
@@ -61,9 +58,9 @@ function Sections({ state, dispatch, sectionRef }: Props) {
         }
       }}
     >
-      <SectionVIP state={state} />
-      <SectionSecond state={state} />
-      <SectionThird state={state} />
+      <SectionVIP />
+      <SectionSecond />
+      <SectionThird />
     </SelectSection>
   );
 }

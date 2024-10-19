@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import { Action, State } from "..";
 import dataSeat from "../../../assets/dataSeat.png";
 import defaultSeat from "../../../assets/defaultSeat.png";
 
 import { motion } from "framer-motion";
+import { useContext } from "react";
+import { ViewContext } from "../../../utils/ViewContextProvider";
 
 const Container = styled.div`
   width: 100%;
@@ -29,13 +30,13 @@ const Container = styled.div`
     }
   }
 `;
-const SeatBtn = styled.button<{ haveData: boolean }>`
+const SeatBtn = styled.button<{ $haveData: boolean }>`
   padding: 0;
   width: 55px;
   height: 55px;
   margin-bottom: 5px;
   margin-top: 10px;
-  background-image: ${(props) => (props.haveData ? `url(${dataSeat})` : `url(${defaultSeat})`)};
+  background-image: ${(props) => (props.$haveData ? `url(${dataSeat})` : `url(${defaultSeat})`)};
   background-repeat: no-repeat;
   background-color: transparent;
   background-position: center;
@@ -84,21 +85,18 @@ const SeatPoint = styled(motion.div)`
   }
 `;
 
-interface Props {
-  state: State;
-  dispatch: React.Dispatch<Action>;
-}
-
-function SeatButtons({ state, dispatch }: Props) {
+function SeatButtons() {
+  const { state, dispatch } = useContext(ViewContext);
   const handlerSeat = (value: number) => {
     dispatch({ type: "selectSeat", payload: { selectedSeat: value } });
   };
+
   return (
     <Container>
       {Array.from({ length: state.rowSeats[state.selectedRow] }).map((_, index) => (
         <SeatBtn
           key={index}
-          haveData={state.allRowPost?.some((item) => item.row === state.selectedRow + 1 && item.seat === index + 1) ?? false}
+          $haveData={state.allRowPost?.some((item) => item.row === state.selectedRow + 1 && item.seat === index + 1) ?? false}
           onClick={() => {
             handlerSeat(index);
           }}

@@ -12,7 +12,7 @@ const StyleNotify = styled(IoMdNotifications)`
   margin-right: 4px;
 `;
 
-const NotifyBtn = styled.button<{ num: boolean }>`
+const NotifyBtn = styled.button<{ $num: boolean }>`
   background: none;
   border: none;
   color: #fff;
@@ -29,7 +29,7 @@ const NotifyBtn = styled.button<{ num: boolean }>`
     right: 15px;
     width: 10px;
     height: 10px;
-    background: ${(props) => (props.num ? "#f85a5a" : "transparent")};
+    background: ${(props) => (props.$num ? "#f85a5a" : "transparent")};
     border-radius: 50%;
   }
 
@@ -37,8 +37,8 @@ const NotifyBtn = styled.button<{ num: boolean }>`
     margin: 0 10px 0 0;
   }
 `;
-const NotifyList = styled.ul<{ isNotifyOpen: boolean }>`
-  display: ${(props) => (props.isNotifyOpen ? "block" : "none")};
+const NotifyList = styled.ul<{ $isNotifyOpen: boolean }>`
+  display: ${(props) => (props.$isNotifyOpen ? "block" : "none")};
   width: 300px;
   padding: 0;
   background: #fff;
@@ -117,10 +117,10 @@ function NotifyButton({ state, dispatch }: Props) {
   }, [authContext?.loginState]);
   return (
     <>
-      <NotifyBtn onClick={() => dispatch({ type: "toggleIsNotifyOpen" })} num={notifyData.length > 0}>
+      <NotifyBtn onClick={() => dispatch({ type: "toggleIsNotifyOpen" })} $num={notifyData.length > 0}>
         <StyleNotify />
       </NotifyBtn>
-      <NotifyList isNotifyOpen={state.isNotifyOpen}>
+      <NotifyList $isNotifyOpen={state.isNotifyOpen}>
         {notifyData.length > 0 ? (
           notifyData.map((item) => (
             <Link to={`/fanssupport?concert=${item.concertId}#${item.postId}`} onClick={() => handleNotify(item.id as string)}>

@@ -15,8 +15,8 @@ const FeatureBtn = styled.button`
   border: none;
 `;
 
-const FeatureList = styled.ul<{ open: boolean }>`
-  display: ${(props) => (props.open ? "block" : "none")};
+const FeatureList = styled.ul<{ $open: boolean }>`
+  display: ${(props) => (props.$open ? "block" : "none")};
   position: absolute;
   background: #fff;
   width: 70px;
@@ -62,7 +62,7 @@ const MoreFeatures = ({ itemID, onEdit, onDelete, itemUID }: MoreFeatures) => {
       <MoreBtn onClick={() => toggleMoreClick(itemID)}>
         <StyleMore />
       </MoreBtn>
-      <FeatureList open={isMoreClick === itemID}>
+      <FeatureList $open={isMoreClick === itemID}>
         <FeatureItem>
           <FeatureInnerBtn onClick={handleEdit}>編輯</FeatureInnerBtn>
         </FeatureItem>

@@ -148,27 +148,23 @@ function TransportationDriving() {
     document.body.style.overflowY = "auto";
   }, []);
   const onLoad = async () => {
-    try {
-      const res = await api.getParkInfo(tw97Max, tw97Min);
-      const result = res.map((element: PlaceInfo) => {
-        const wgs = proj4(tw97, wgs84, [parseFloat(element.lng as string), parseFloat(element.lat as string)]);
-        return { ...element, lng: wgs[0], lat: wgs[1] };
-      });
+    const res = await api.getParkInfo(tw97Max, tw97Min);
+    const result = res.map((element: PlaceInfo) => {
+      const wgs = proj4(tw97, wgs84, [parseFloat(element.lng as string), parseFloat(element.lat as string)]);
+      return { ...element, lng: wgs[0], lat: wgs[1] };
+    });
 
-      const resAvailable = await api.getParkAvailable(result);
-      const all = result.map((item: PlaceInfo) => {
-        const matchedRes = resAvailable.find((res: PlaceAvailable) => item.placeId === res.id);
-        return {
-          ...item,
-          availablecar: matchedRes?.availablecar,
-          availablemotor: matchedRes?.availablemotor,
-        };
-      });
+    const resAvailable = await api.getParkAvailable(result);
+    const all = result.map((item: PlaceInfo) => {
+      const matchedRes = resAvailable.find((res: PlaceAvailable) => item.placeId === res.id);
+      return {
+        ...item,
+        availablecar: matchedRes?.availablecar,
+        availablemotor: matchedRes?.availablemotor,
+      };
+    });
 
-      setPlaces(all);
-    } catch (error) {
-      console.error("Error loading park info:", error);
-    }
+    setPlaces(all);
   };
 
   const handleMarkerClick = (place: PlaceInfo) => {

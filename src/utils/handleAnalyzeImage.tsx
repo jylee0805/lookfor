@@ -23,34 +23,30 @@ const handleAnalyzeImage = async (imageUrl: string) => {
     ],
   };
 
-  try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    });
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(requestBody),
+  });
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+
+  const data = await response.json();
+
+  const labelsRes = data.responses[0].localizedObjectAnnotations;
+
+  if (labelsRes) {
+    const labels = labelsRes.map((label: Label) => label.name).toString();
+    if (labels.includes("Person") && labels.includes("Clothing") && labels.includes("Pants")) {
+      return false;
     }
-
-    const data = await response.json();
-
-    const labelsRes = data.responses[0].localizedObjectAnnotations;
-
-    if (labelsRes) {
-      const labels = labelsRes.map((label: Label) => label.name).toString();
-      if (labels.includes("Person") && labels.includes("Clothing") && labels.includes("Pants")) {
-        return false;
-      }
-      return true;
-    } else {
-      return true;
-    }
-  } catch (err) {
-    console.error(err);
+    return true;
+  } else {
+    return true;
   }
 };
 

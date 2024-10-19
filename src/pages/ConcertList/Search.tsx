@@ -53,7 +53,7 @@ function Search({ state, dispatch }: Props) {
   const handleSearch = () => {
     const fuse = new Fuse(state.concertData, options);
     const result = fuse.search(searchValue);
-    console.log(result);
+
     const search = result.map((item) => {
       return item.item;
     });

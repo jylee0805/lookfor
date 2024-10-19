@@ -1,11 +1,12 @@
-import { TimePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
-import { useEffect, useState } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useContext, useEffect, useState } from "react";
+import { SubmitHandler } from "react-hook-form";
 import { MdOutlineClose } from "react-icons/md";
 import styled from "styled-components";
 import { Concerts, MerchPost } from "../../types";
 import api from "../../utils/api";
+import { SupportFormContext } from "../../utils/SupportFormContextProvider";
+import FanPostForm from "./FanPostForm";
 import { Action, State } from "./index";
 
 const StyleClose = styled(MdOutlineClose)`
@@ -62,56 +63,7 @@ const Title = styled.h3`
   transform: translateX(-50%);
   background: #fff;
 `;
-const Label = styled.p`
-  color: #000;
-`;
 
-const InputContainer = styled.div`
-  display: grid;
-  grid-template-columns: auto 1fr auto 1fr;
-
-  column-gap: 20px;
-  row-gap: 15px;
-  @media (max-width: 768px) {
-    grid-template-columns: auto 1fr;
-  }
-`;
-const Input = styled.input`
-  border: 1px solid #d2d2d2;
-  border-radius: 5px;
-  padding: 5px;
-`;
-const QualifyInput = styled(Input)`
-  grid-column: span 3;
-  @media (max-width: 768px) {
-    grid-column: span 1;
-  }
-`;
-const CustomTimePicker = styled(TimePicker)({
-  "& .MuiInputBase-root": {
-    backgroundColor: "#ffffff",
-    borderRadius: "5px",
-    padding: "0px",
-    fontSize: "14px",
-    height: "30px",
-  },
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderColor: "#d2d2d2",
-  },
-
-  "& .MuiIconButton-root": {
-    marginRight: "3px",
-  },
-  "& .css-lc42l8-MuiInputBase-input-MuiOutlinedInput-input": {
-    padding: "0px 8px",
-  },
-});
-
-const Select = styled.select`
-  border: 1px solid #d2d2d2;
-  border-radius: 5px;
-  padding: 5px;
-`;
 const BtnBox = styled.div`
   display: flex;
   align-items: center;
@@ -130,18 +82,22 @@ const Btn = styled.button`
 const SubmitBtn = styled(Btn)`
   margin-left: 5px;
 `;
-const MoreContent = styled.textarea`
-  border: 1px solid #d2d2d2;
-  height: 120px;
-  resize: none;
-  border-radius: 5px;
-  padding: 5px;
-  flex-grow: 1;
-  grid-column: span 4;
-  @media (max-width: 768px) {
-    grid-column: span 2;
-    height: 80px;
-  }
+const ImageContainer = styled.div<{ $show: boolean }>`
+  display: ${(props) => (props.$show ? "block" : "none")};
+  overflow-x: auto;
+  overflow-y: hidden;
+`;
+const ImagePreviewBox = styled.div`
+  position: relative;
+  margin-top: 15px;
+  display: flex;
+  width: fit-content;
+  column-gap: 10px;
+`;
+
+const ImageBox = styled.div`
+  position: relative;
+  width: 200px;
 `;
 const Image = styled.img`
   object-fit: cover;
@@ -153,7 +109,7 @@ const ImagePreviewDelete = styled.button`
   padding: 0;
   right: 5px;
   top: 5px;
-  color: #fff;
+  color: #808080;
 `;
 const SelectPhotoBtn = styled.label`
   text-align: center;
@@ -165,13 +121,6 @@ const SelectPhotoBtn = styled.label`
 const FileBtn = styled.input`
   visibility: hidden;
   width: 0;
-`;
-const ImagePreviewBox = styled.div<{ show: boolean }>`
-  display: ${(props) => (props.show ? "block" : "none")};
-  width: fit-content;
-  height: 180px;
-  position: relative;
-  margin-top: 15px;
 `;
 
 export interface FormInputs {
@@ -192,20 +141,10 @@ interface Props {
 }
 
 function FanPost({ concert, state, dispatch }: Props) {
-  const { register, handleSubmit, control, reset } = useForm<FormInputs>({
-    defaultValues: {
-      time: dayjs(),
-      item: "SKZOO糰子壓克力鑰匙圈+小零食",
-      day: dayjs("13:30", "HH:mm").format("HH:mm"),
-      status: "0",
-      place: "世運捷運站",
-      qualify: "四期會員/任一成員泡泡滿100天（以上）",
-      more: "大家好！這裡是咪咪貓貓和黑糖饅頭演唱會倒數不到一個月ㄌ好期待好期待😣\n我們兩個這次一起準備了一些應援來和stay們分享～～～\n· 應援物內容：SKZOO糰子壓克力鑰匙圈+小零食幸運餅乾雙面壓克力吊飾圈（兩面的圖案是不一樣的✨）\n· 數量：約15-20份左右（如果有想要交換的朋友可以來私訊我！我們會幫你預留♥♡♥）\n-為了配合ATE的概念（？這次做了食物類的吊飾往後滑有實體照！threads的流量好像會比較好 嗎\n總之來借助串的力量了再請大家分享給你身邊的stay們啦～到時候見！🤤",
-    },
-  });
+  //const { register, handleSubmit, control, reset } = useForm<FormInputs>();
   const [localPhotoUrl, setLocalPhotoUrl] = useState<string[]>([]);
-  const [selectPhotos, setSelectPhotos] = useState<File[] | null>([]);
-
+  const [selectPhotos, setSelectPhotos] = useState<File[]>([]);
+  const { register, handleSubmit, reset } = useContext(SupportFormContext);
   useEffect(() => {
     if (state.isEditMode.passDay) {
       const values = {
@@ -222,28 +161,17 @@ function FanPost({ concert, state, dispatch }: Props) {
     }
   }, [state.isEditMode]);
 
-  const day = concert?.date?.map((item) => {
-    if (item) {
-      const dayOnly = item.split(" ")[0] + " " + item.split(" ")[1];
-      return dayOnly;
-    }
-  });
-
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     let urls: string[] = [];
-    try {
-      if (selectPhotos) {
-        urls = await Promise.all(
-          selectPhotos.map(async (item: File) => {
-            const url = await api.uploadImage(item);
-            return url;
-          })
-        );
-      } else {
-        urls = [];
-      }
-    } catch (error) {
-      console.error("上傳圖片時出錯:", error);
+    if (selectPhotos) {
+      urls = await Promise.all(
+        selectPhotos.map(async (item: File) => {
+          const url = await api.uploadImage("fansSupport", item);
+          return url;
+        })
+      );
+    } else {
+      urls = [];
     }
 
     const time = data.time;
@@ -286,7 +214,6 @@ function FanPost({ concert, state, dispatch }: Props) {
     setLocalPhotoUrl([]);
   };
   const handlerCancel = () => {
-    dispatch({ type: "toggleIsPostClick", payload: { isPostClick: false } });
     dispatch({ type: "toggleIsEditMode", payload: { isEditMode: {} as MerchPost, isPostClick: false } });
     setLocalPhotoUrl([]);
     setSelectPhotos([]);
@@ -304,14 +231,15 @@ function FanPost({ concert, state, dispatch }: Props) {
     }
   };
 
-  const handleDeletePreview = () => {
-    if (selectPhotos) {
-      setLocalPhotoUrl([]);
-      setSelectPhotos([]);
+  const handleDeletePreview = (id: number) => {
+    if (selectPhotos.length > 0) {
+      setLocalPhotoUrl((prev) => prev.filter((_, index) => index !== id));
+      setSelectPhotos((prev) => prev.filter((_, index) => index !== id));
     } else if (state.isEditMode.image) {
       const update = JSON.parse(JSON.stringify(state.isEditMode));
-      update.image = "";
-      dispatch({ type: "toggleIsEditMode", payload: { isEditMode: update, isPostClick: true } });
+      const result = update.image.filter((_: void, index: number) => index !== id);
+
+      dispatch({ type: "toggleIsEditMode", payload: { isEditMode: result, isPostClick: true } });
     }
   };
 
@@ -319,35 +247,29 @@ function FanPost({ concert, state, dispatch }: Props) {
     <Container isPostClick={state.isPostClick}>
       <Title>建立資訊</Title>
       <ContentContainer>
-        <InputContainer>
-          <Label>應援物品</Label>
-          <QualifyInput type="text" {...register("item", { required: true })} />
-          <Label>日期</Label>
-          <Select {...register("day", { required: true })}>
-            <option value="">請選擇日期</option>
-            {concert?.date && day.map((item) => <option value={item}>{item}</option>)}
-          </Select>
-          <Label>時間</Label>
-          <Controller name="time" control={control} render={({ field }) => <CustomTimePicker value={field.value} onChange={(newValue) => field.onChange(newValue)} />} />
-          <Label>狀態</Label>
-          <Select {...register("status", { required: true })}>
-            <option value="0">未發放</option>
-            <option value="1">發放中</option>
-            <option value="2">發放完畢</option>
-          </Select>
-          <Label>地點</Label>
-          <Input type="text" {...register("place", { required: true })} />
-          <Label>領取資格</Label>
-          <QualifyInput type="text" {...register("qualify", { required: true })} />
-          <MoreContent {...register("more", { required: true })}></MoreContent>
-        </InputContainer>
-        <ImagePreviewBox show={selectPhotos !== null && (selectPhotos?.length > 0 || state.isEditMode?.image?.length > 0)}>
-          <ImagePreviewDelete onClick={() => handleDeletePreview()}>
-            <StyleClose />
-          </ImagePreviewDelete>
-          {localPhotoUrl && localPhotoUrl.map((item: string) => <Image src={item} />)}
-          {state.isEditMode.image && state.isEditMode.image.map((item: string) => <Image src={item} />)}
-        </ImagePreviewBox>
+        <FanPostForm concert={concert} />
+        <ImageContainer $show={selectPhotos !== null && (selectPhotos?.length > 0 || state.isEditMode?.image?.length > 0)}>
+          <ImagePreviewBox>
+            {localPhotoUrl &&
+              localPhotoUrl.map((item: string, index) => (
+                <ImageBox>
+                  <ImagePreviewDelete onClick={() => handleDeletePreview(index)}>
+                    <StyleClose />
+                  </ImagePreviewDelete>
+                  <Image src={item} />
+                </ImageBox>
+              ))}
+            {state.isEditMode.image &&
+              state.isEditMode.image.map((item: string, index) => (
+                <ImageBox>
+                  <ImagePreviewDelete onClick={() => handleDeletePreview(index)}>
+                    <StyleClose />
+                  </ImagePreviewDelete>
+                  <Image src={item} />
+                </ImageBox>
+              ))}
+          </ImagePreviewBox>
+        </ImageContainer>
       </ContentContainer>
 
       <BtnBox>

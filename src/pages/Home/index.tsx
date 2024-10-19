@@ -1,9 +1,9 @@
-import styled, { keyframes } from "styled-components";
-import { useEffect, useContext, useState, useRef } from "react";
-import { ComponentContext } from "../../utils/ComponentContextProvider";
-import Loading from "../../components/Loading";
-import Background from "../Background";
+import { useContext, useEffect, useRef } from "react";
 import { MdDoubleArrow } from "react-icons/md";
+import styled, { keyframes } from "styled-components";
+import Loading from "../../components/Loading";
+import { ComponentContext } from "../../utils/ComponentContextProvider";
+import Background from "../Background";
 import NewView from "./NewView";
 
 const moveArrow = keyframes`
@@ -74,7 +74,7 @@ const Title = styled.h2`
     width: 100%;
   }
 `;
-const SecondTitle = styled.span<{ windowWidth: number }>`
+const SecondTitle = styled.span`
   font-size: 4.5rem;
   color: #f5f5f5;
   margin-bottom: 30px;
@@ -122,19 +122,7 @@ declare global {
 function Home() {
   const componentContext = useContext(ComponentContext);
   const scrollContainerRef = useRef<HTMLUListElement>(null);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
 
@@ -152,7 +140,6 @@ function Home() {
     const checkIfPageIsLoaded = () => {
       if (window._jf && typeof window._jf.flush === "function") {
         window._jf.flush();
-        console.log("字型已刷新");
       }
     };
 
@@ -182,7 +169,7 @@ function Home() {
 
       <FirstPage>
         <Title>
-          尋找理想座位，<SecondTitle windowWidth={windowWidth}>擁有最佳體驗。</SecondTitle>
+          尋找理想座位，<SecondTitle>擁有最佳體驗。</SecondTitle>
         </Title>
         <SubTitle>One Show,Countless Views, Infinite Memories.</SubTitle>
         <StyleArrow />
