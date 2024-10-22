@@ -6,8 +6,8 @@ import { Concerts, MerchPost, Personal } from "../../types";
 import api from "../../utils/api";
 import { ConcertContext } from "../../utils/ConcertContextProvider";
 import { SupportFormContextProvider } from "../../utils/SupportFormContextProvider";
-import FanPost from "./FanPost";
-import PostFeature from "./PostFeature";
+import AddPost from "./AddPost";
+import Form from "./Form";
 import PostList from "./PostList";
 
 const Container = styled.div`
@@ -181,9 +181,9 @@ function FansSupport() {
       </BtnBox>
       <Mask $postClick={state.isPostClick} />
       <Content>
-        <PostFeature dispatch={dispatch} state={state} />
+        <AddPost dispatch={dispatch} state={state} />
         <SupportFormContextProvider>
-          <FanPost concert={concertContext?.concertData as Concerts} dispatch={dispatch} state={state} />
+          <Form concert={concertContext?.concertData as Concerts} dispatch={dispatch} state={state} />
         </SupportFormContextProvider>
         <PostList state={state} dispatch={dispatch} targetRef={targetRef} />
       </Content>

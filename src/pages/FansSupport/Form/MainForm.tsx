@@ -2,8 +2,8 @@ import { TimePicker } from "@mui/x-date-pickers";
 import { useContext } from "react";
 import { Controller } from "react-hook-form";
 import styled from "styled-components";
-import { Concerts } from "../../types";
-import { SupportFormContext } from "../../utils/SupportFormContextProvider";
+import { Concerts } from "../../../types";
+import { SupportFormContext } from "../../../utils/SupportFormContextProvider";
 
 const Label = styled.p`
   color: #000;
@@ -68,7 +68,7 @@ const Select = styled.select`
 interface Props {
   concert: Concerts;
 }
-function FanPostForm({ concert }: Props) {
+function MainForm({ concert }: Props) {
   const { register, control } = useContext(SupportFormContext);
   const day = concert?.date?.map((item) => {
     if (item) {
@@ -102,4 +102,4 @@ function FanPostForm({ concert }: Props) {
   );
 }
 
-export default FanPostForm;
+export default MainForm;

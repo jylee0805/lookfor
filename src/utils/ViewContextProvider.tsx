@@ -1,4 +1,5 @@
 import { createContext, useReducer, useRef } from "react";
+import { FieldErrors, useForm, UseFormGetValues, UseFormHandleSubmit, UseFormRegister, UseFormReset, UseFormSetError, UseFormWatch } from "react-hook-form";
 import { OriginView, ViewPost } from "../types";
 
 export interface State {
@@ -127,11 +128,29 @@ const reducer = (state: State, action: Action): State => {
       return state;
   }
 };
-
+export interface FormInputs {
+  section: string;
+  row: string;
+  seat: string;
+  concert: string;
+  note: string;
+  content: string;
+  image: object;
+}
 export interface ViewContextType {
   state: State;
   dispatch: React.Dispatch<Action>;
   sectionRef: React.RefObject<HTMLDivElement>;
+
+  register: UseFormRegister<FormInputs>;
+  handleSubmit: UseFormHandleSubmit<FormInputs>;
+  reset: UseFormReset<FormInputs>;
+  watch: UseFormWatch<FormInputs>;
+  getValues: UseFormGetValues<FormInputs>;
+  setError: UseFormSetError<FormInputs>;
+  formState: {
+    errors: FieldErrors<FormInputs>;
+  };
 }
 
 export const ViewContext = createContext<ViewContextType>({} as ViewContextType);
@@ -139,5 +158,14 @@ export const ViewContext = createContext<ViewContextType>({} as ViewContextType)
 export function ViewContextProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initial);
   const sectionRef = useRef<HTMLDivElement>(null);
-  return <ViewContext.Provider value={{ state, dispatch, sectionRef }}>{children}</ViewContext.Provider>;
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    getValues,
+    setError,
+    formState: { errors },
+  } = useForm<FormInputs>();
+  return <ViewContext.Provider value={{ register, handleSubmit, reset, watch, getValues, formState: { errors }, setError, state, dispatch, sectionRef }}>{children}</ViewContext.Provider>;
 }

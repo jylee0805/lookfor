@@ -1,12 +1,12 @@
 import { useContext, useEffect, useReducer, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import Loading from "../../components/Loading";
+import { MerchPost, OriginView, Personal } from "../../types";
 import api from "../../utils/api";
 import { AuthContext } from "../../utils/AuthContextProvider";
-import { OriginView, MerchPost, Personal } from "../../types";
-import { useNavigate } from "react-router-dom";
-import Loading from "../../components/Loading";
-import MyViewPost from "./MyViewPost";
-import MySupportPost from "./MySupportPost";
+import MySupport from "./MySupport";
+import MyViewPost from "./MyView";
 import ProfileInfo from "./ProfileInfo";
 
 const Container = styled.div`
@@ -115,7 +115,7 @@ function Profile() {
       {!loaded && <Loading />}
       <ProfileInfo state={state} dispatch={dispatch} />
       <MyViewPost state={state} />
-      <MySupportPost state={state} />
+      <MySupport state={state} />
     </Container>
   );
 }

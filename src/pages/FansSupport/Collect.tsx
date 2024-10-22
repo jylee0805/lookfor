@@ -1,11 +1,11 @@
-import styled from "styled-components";
-import api from "../../utils/api";
 import { useContext } from "react";
-import { AuthContext } from "../../utils/AuthContextProvider";
-import { MdOutlineBookmarkBorder, MdOutlineBookmark } from "react-icons/md";
+import { MdOutlineBookmark, MdOutlineBookmarkBorder } from "react-icons/md";
 import "react-photo-view/dist/react-photo-view.css";
-import { MerchPost, Personal } from "../../types";
+import styled from "styled-components";
 import { Action, State } from ".";
+import { MerchPost, Personal } from "../../types";
+import api from "../../utils/api";
+import { AuthContext } from "../../utils/AuthContextProvider";
 
 const StyleKeep = styled(MdOutlineBookmarkBorder)`
   font-size: 1.5em;
@@ -37,7 +37,7 @@ interface Props {
   item: MerchPost;
 }
 
-function KeepFeature({ state, dispatch, item }: Props) {
+function Collect({ state, dispatch, item }: Props) {
   const authContext = useContext(AuthContext);
   const handleKeep = async (id: string) => {
     if (authContext?.user.keepIds?.includes(id)) {
@@ -79,4 +79,4 @@ function KeepFeature({ state, dispatch, item }: Props) {
   );
 }
 
-export default KeepFeature;
+export default Collect;

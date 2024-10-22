@@ -1,5 +1,5 @@
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
 import { ProfileState } from ".";
 
 const Title = styled.h3`
@@ -8,6 +8,7 @@ const Title = styled.h3`
   grid-column: span 2;
   margin-top: 50px;
 `;
+
 const PostContainer = styled.ul`
   display: flex;
   overflow-x: auto;
@@ -39,13 +40,6 @@ const PostTextContainer = styled.div`
   flex-grow: 1;
   min-height: 120px;
 `;
-const SupportPostTextContainer = styled(PostTextContainer)`
-  width: 250px;
-  min-height: 120px;
-  @media (max-width: 575px) {
-    width: 180px;
-  }
-`;
 
 const PostTitle = styled.p`
   font-weight: 700;
@@ -72,13 +66,7 @@ const PostImgBox = styled.div`
     height: 120px;
   }
 `;
-const SupportPostImgBox = styled(PostImgBox)`
-  @media (max-width: 992px) {
-    width: 180px;
-    height: 150px;
-    margin: 15px auto 0;
-  }
-`;
+
 const PostImg = styled.img`
   object-fit: cover;
   border-radius: 8px;
@@ -91,43 +79,40 @@ const Hint = styled.p`
   line-height: 2;
 `;
 
-const StyleLink = styled(Link)`
-  color: #000;
-  display: block;
-  min-width: 240px;
-`;
-
 interface Props {
   state: ProfileState;
 }
 
-function MySupportPost({ state }: Props) {
+function MyView({ state }: Props) {
+  const navigate = useNavigate();
+  const handleViewPostClick = (section: string, row: number, seat: number) => {
+    navigate("/view", {
+      state: { section, row, seat },
+    });
+  };
   return (
     <>
-      <Title>我的應援發放公告</Title>
-      {state.merchPosts.length !== 0 ? (
+      <Title>我的視角文章</Title>
+      {state.viewPosts.length !== 0 ? (
         <PostContainer>
-          {state.merchPosts.map((item, index) => (
-            <PostItem key={item.id}>
-              <StyleLink to={`/fanssupport?concert=${item.concertId}#${item.id}`}>
-                <SupportPostTextContainer>
-                  <PostTitle>{state.concertNames[index]}</PostTitle>
-                  <PostText>{item.passDay}</PostText>
-                  <PostText>{item.passTime}</PostText>
-                  <PostText>{item.passState === "0" ? "尚未發放" : item.passState === "1 " ? "發放中" : "發放完畢"}</PostText>
-                </SupportPostTextContainer>
-                <SupportPostImgBox>
-                  <PostImg src={item.image[0]} />
-                </SupportPostImgBox>
-              </StyleLink>
+          {state.viewPosts.map((item) => (
+            <PostItem key={item.id} onClick={() => handleViewPostClick(item.section as string, item.row as number, item.seat as number)}>
+              <PostTextContainer>
+                <PostTitle>{`${item.section}區${item.row}排${item.seat}號`}</PostTitle>
+                <PostText>{item.note}</PostText>
+                <PostText>{item.content}</PostText>
+              </PostTextContainer>
+              <PostImgBox>
+                <PostImg src={item.image} />
+              </PostImgBox>
             </PostItem>
           ))}
         </PostContainer>
       ) : (
-        <Hint>尚未發布應援物資訊</Hint>
+        <Hint>尚未發佈視角文章</Hint>
       )}
     </>
   );
 }
 
-export default MySupportPost;
+export default MyView;

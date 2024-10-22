@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { Detail } from "../../types";
-import api from "../../utils/api";
-import { ConcertContext } from "../../utils/ConcertContextProvider";
+import { Detail } from "../types";
+import api from "../utils/api";
+import { ConcertContext } from "../utils/ConcertContextProvider";
 
 const Container = styled.div`
   width: 80%;

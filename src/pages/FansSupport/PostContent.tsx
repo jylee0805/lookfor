@@ -1,11 +1,11 @@
-import styled from "styled-components";
 import { useContext } from "react";
-import { AuthContext } from "../../utils/AuthContextProvider";
-import "react-photo-view/dist/react-photo-view.css";
 import { PhotoProvider, PhotoView } from "react-photo-view";
-import { MerchPost } from "../../types";
+import "react-photo-view/dist/react-photo-view.css";
+import styled from "styled-components";
 import { Action, State } from ".";
-import KeepFeature from "./KeepFeature";
+import { MerchPost } from "../../types";
+import { AuthContext } from "../../utils/AuthContextProvider";
+import Collect from "./Collect";
 
 const UserName = styled.p`
   font-size: 1.2rem;
@@ -114,7 +114,7 @@ function PostContent({ state, dispatch, item }: Props) {
           ))}
         </ImageContainer>
       </PhotoProvider>
-      {authContext?.loginState && <KeepFeature state={state} dispatch={dispatch} item={item} />}
+      {authContext?.loginState && <Collect state={state} dispatch={dispatch} item={item} />}
     </Container>
   );
 }

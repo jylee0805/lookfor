@@ -47,7 +47,7 @@ interface Props {
   dispatch: React.Dispatch<Action>;
 }
 
-function PostFeature({ state, dispatch }: Props) {
+function AddPost({ state, dispatch }: Props) {
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
   const { isOpen, setIsOpen, closeDialog } = useDialog();
@@ -104,4 +104,4 @@ function PostFeature({ state, dispatch }: Props) {
   );
 }
 
-export default PostFeature;
+export default AddPost;

@@ -158,7 +158,6 @@ function View() {
       </Dialog>
       {!componentContext?.isViewLoad && <Loading />}
       <VenueHeader />
-
       <Main>
         <Post />
         <SectionHeader>
