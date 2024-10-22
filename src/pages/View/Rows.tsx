@@ -1,22 +1,16 @@
+import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-import { Action, AllPost } from ".";
-import { useEffect, useState } from "react";
-import { darken } from "polished";
-import { State } from "./index";
+import { OriginView } from "../../types";
+import { ViewContext } from "../../utils/ViewContextProvider";
+import RowButtons from "./RowButtons";
 
-const RowSection = styled.div<{ isSelectSection: boolean; col: boolean }>`
-  display: ${(props) => (props.isSelectSection ? "grid" : "none")};
-  grid-template-rows: repeat(8, 1fr);
-  grid-template-columns: repeat(3, 1fr);
-
-  grid-auto-flow: column;
-  padding: 0px 30px 60px 30px;
-  color: white;
-  gap: 10px;
+const RowSection = styled.div<{ $isSelectSection: boolean }>`
+  display: ${(props) => (props.$isSelectSection ? "block" : "none")};
+  width: 30%;
 
   @media (max-width: 992px) {
     padding: 0px 60px;
-    margin: 100px auto;
+    margin: 60px auto;
     width: 80%;
   }
   @media (max-width: 768px) {
@@ -26,7 +20,7 @@ const RowSection = styled.div<{ isSelectSection: boolean; col: boolean }>`
   }
   @media (max-width: 575px) {
     padding: 0px 30px;
-    margin: 100px auto 0px;
+    margin: 60px auto 0px;
     width: 100%;
   }
 `;
@@ -35,81 +29,46 @@ const Title = styled.h4`
   margin-bottom: 25px;
   grid-column: span 3;
 `;
-const RowBtn = styled.button<{ col: boolean; haveData: boolean; isSelect: boolean; color: string }>`
-  display: block;
-  width: 100%;
-  /* width: ${(props) => (props.col ? "100%" : "50%")}; */
-  margin-bottom: 10px;
-  border: none;
-  position: relative;
-  font-size: 1.1rem;
-  font-weight: 600;
-
+const ReviewContainer = styled.div`
+  grid-column: span 3;
+  text-align: center;
   border-radius: 5px;
-  background: ${(props) => (props.isSelect ? props.color : "fff")};
-  grid-column: ${(props) => (props.col ? "span 1" : "span 1")};
-  &:hover {
-    background: ${(props) => props.color};
-  }
-  &::after {
-    content: "";
-    display: ${(props) => (props.haveData ? "block" : "none")};
-    position: absolute;
-    top: -5%;
-    right: -5%;
-
-    background: ${(props) => darken(0.3, props.color || "#000000")};
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-  }
+  margin-bottom: 20px;
+  height: 240px;
 `;
-interface Props {
-  state: State;
-  dispatch: React.Dispatch<Action>;
-}
+const ReviewImg = styled.img`
+  border: 5px solid #fff;
+  border-radius: 5px;
+`;
 
-function Rows({ state, dispatch }: Props) {
-  const [color, setColor] = useState("");
-  console.log(state.allSectionPost?.filter((item) => item.section === state.section));
-
+function Rows() {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const { state, dispatch, sectionRef } = useContext(ViewContext);
   useEffect(() => {
-    // const getAllView = async () => {
-    //   const allView = await api.getAllViewPost(state.section);
-    //   console.log(allView);
-    //   dispatch({ type: "setAllSectionPost", payload: { allSectionPost: allView as AllPost[] } });
-    // };
-    // getAllView();
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
 
-    dispatch({ type: "setAllRowPost", payload: { allRowPost: state.allSectionPost?.filter((item) => item.section === state.section) as AllPost[] } });
-    if (state.section.includes("VIP")) {
-      setColor("#f1b3ff");
-    } else if (state.section.includes("2")) {
-      setColor("#ffb3b3");
-    } else if (state.section.includes("3")) {
-      setColor("#fff1b3");
-    }
-  }, [state.section]);
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+  useEffect(() => {
+    dispatch({ type: "setAllRowPost", payload: { allRowPost: state.allPost?.filter((item) => item.section === state.selectedSection) as OriginView[] } });
+  }, [state.viewPosts, state.selectedSection, state.selectedRow, state.selectedSeat]);
 
   return (
-    state.section !== "" && (
-      <RowSection isSelectSection={state.isSelectSection} col={state.rowSeats.length > 10}>
-        <Title>{state.section}區</Title>
-        {Array.from({ length: state.rowSeats.length }).map((_, index) => (
-          <RowBtn
-            key={index}
-            col={state.rowSeats.length > 10}
-            color={color}
-            haveData={state.allRowPost?.some((item) => item.row === index + 1) ?? false}
-            isSelect={state.row === index && state.isSelectRow === true}
-            onClick={() => {
-              dispatch({ type: "selectRow", payload: { row: index, isSelectRow: true } });
-              dispatch({ type: "selectSeat", payload: { seat: 0 } });
-            }}
-          >
-            {index + 1}排
-          </RowBtn>
-        ))}
+    state.selectedSection !== "" && (
+      <RowSection ref={sectionRef} $isSelectSection={state.isSelectSection}>
+        <Title>{state.selectedSection}區</Title>
+        {windowWidth <= 992 && state.allPost?.find((view) => view.section === state.selectedSection) && (
+          <ReviewContainer>
+            <ReviewImg src={state.allPost?.find((view) => view.section === state.selectedSection)?.image || ""} />
+          </ReviewContainer>
+        )}
+        <RowButtons />
       </RowSection>
     )
   );

@@ -1,18 +1,17 @@
-import styled from "styled-components";
-import { useForm, SubmitHandler } from "react-hook-form";
-import api from "../../utils/api";
-import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import api from "../../utils/api";
 import { AuthContext } from "../../utils/AuthContextProvider";
 
-const LoginBox = styled.div<{ isLogin: boolean }>`
+const LoginBox = styled.div<{ $isLogin: boolean }>`
   width: 100%;
-  display: ${(props) => (props.isLogin ? "flex" : "none")};
+  display: ${(props) => (props.$isLogin ? "flex" : "none")};
   flex-direction: column;
   row-gap: 25px;
   margin-top: 50px;
 `;
-
 const Input = styled.input`
   border-radius: 30px;
   background: #ededed;
@@ -22,18 +21,10 @@ const Input = styled.input`
   width: 100%;
   font-size: 1rem;
   line-height: 1.5;
-  @media (max-width: 575px) {
-  }
 `;
-
 const LoginBtn = styled(Input)`
   margin-top: 20px;
 `;
-const Error = styled.span`
-  margin-top: -20px;
-  color: #ff6262;
-`;
-
 const OrBox = styled.div`
   display: flex;
   align-items: center;
@@ -43,8 +34,6 @@ const Or = styled.p`
   line-height: 1.5;
   color: #ffffff;
   margin: 0 8px;
-  @media (max-width: 575px) {
-  }
 `;
 const Line = styled.div`
   height: 1px;
@@ -58,6 +47,10 @@ const GoogleBtn = styled.button`
   background: #ffffff;
   @media (max-width: 575px) {
   }
+`;
+const Error = styled.span`
+  margin-top: -20px;
+  color: #ff6262;
 `;
 
 interface Props {
@@ -85,7 +78,7 @@ function LogIn({ isLogin }: Props) {
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     const response = await api.userLogIn(data.email, data.password);
-    console.log(response);
+
     if (response === "Firebase: Error (auth/invalid-credential).") {
       setError("password", {
         type: "manual",
@@ -108,7 +101,6 @@ function LogIn({ isLogin }: Props) {
 
   const handlerKeyDown = (e: React.KeyboardEvent, nextFieldName: keyof FormInputs | null) => {
     const currentValue = getValues();
-    console.log(e.currentTarget);
 
     if (e.keyCode === 13) {
       if (nextFieldName) {
@@ -118,7 +110,7 @@ function LogIn({ isLogin }: Props) {
             type: "manual",
             message: "請輸入正確的電子郵件",
           });
-          return; // Exit if validation fails
+          return;
         }
         clearErrors();
         setFocus(nextFieldName);
@@ -136,7 +128,7 @@ function LogIn({ isLogin }: Props) {
     }
   };
   return (
-    <LoginBox isLogin={isLogin}>
+    <LoginBox $isLogin={isLogin}>
       <Input
         type="email"
         placeholder="請輸入電子信箱"

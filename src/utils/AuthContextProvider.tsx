@@ -1,44 +1,31 @@
 import { createContext, useEffect, useState } from "react";
+import { Personal } from "../types";
+
 import api from "./api";
 
 export interface AuthContextType {
   loginState: string;
   setLoginState: React.Dispatch<React.SetStateAction<string>>;
-  user: Profile;
-  setUser: React.Dispatch<React.SetStateAction<Profile>>;
-}
-
-export interface Profile {
-  avatar: string;
-  userName: string;
-  UID: string;
-  id: string;
-  keepIds?: string[];
+  user: Personal;
+  setUser: React.Dispatch<React.SetStateAction<Personal>>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthContextProvider({ children }: { children: React.ReactNode }) {
   const [loginState, setLoginState] = useState<string>("");
-  const [user, setUser] = useState<Profile>({} as Profile);
+  const [user, setUser] = useState<Personal>({} as Personal);
 
   useEffect(() => {
     const getAuth = async () => {
-      try {
-        const response = (await api.getLoginState()) as string;
-        console.log(response);
-        if (response !== undefined) {
-          const currentUser = await api.getUser(response);
-          console.log(currentUser);
+      const response = (await api.getLoginState()) as string;
+      if (response !== undefined) {
+        const currentUser = await api.getUser(response);
 
-          setUser(currentUser);
-        }
-
-        setLoginState(response);
-        console.log("Login state:", response);
-      } catch (error) {
-        console.error("Failed to fetch login state:", error);
+        setUser(currentUser);
       }
+
+      setLoginState(response);
     };
     getAuth();
   }, [loginState]);

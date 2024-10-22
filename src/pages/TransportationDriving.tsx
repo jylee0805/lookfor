@@ -1,13 +1,14 @@
-import styled from "styled-components";
-import { useLoadScript, GoogleMap, MarkerF } from "@react-google-maps/api";
-import { useEffect, useState } from "react";
-import pin from "../images/pin.png";
-import selectPin from "../images/selectPin.png";
-import api from "../utils/api";
+import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
 import proj4 from "proj4";
-import VenueHeader from "../components/VenueHeader";
+import { useEffect, useState } from "react";
+import styled from "styled-components";
+import pin from "../assets/pin.png";
+import selectPin from "../assets/selectPin.png";
 import CustomMarkerLabel from "../components/CustomLabel";
 import Loading from "../components/Loading";
+import VenueHeader from "../components/VenueHeader";
+import { PlaceAvailable, PlaceInfo } from "../types";
+import api from "../utils/api";
 
 const Container = styled.div`
   padding: 0 30px;
@@ -41,15 +42,12 @@ const SubTitle = styled.h4`
   @media (max-width: 992px) {
     padding: 0;
   }
-  @media (max-width: 575px) {
-  }
 `;
-const ParkSubTitle = styled(SubTitle)`
-  grid-column: span 2;
-  margin: 0;
-  justify-content: flex-start;
+const Detail = styled.div`
+  padding: 0px 0 20px;
   @media (max-width: 992px) {
-    grid-column: span 1;
+    grid-template-columns: auto;
+    padding: 0;
   }
 `;
 const Station = styled.p`
@@ -58,16 +56,6 @@ const Station = styled.p`
 `;
 const Away = styled.p`
   margin-bottom: 25px;
-
-  @media (max-width: 992px) {
-  }
-`;
-const Detail = styled.div`
-  padding: 0px 0 20px;
-  @media (max-width: 992px) {
-    grid-template-columns: auto;
-    padding: 0;
-  }
 `;
 const Line = styled.div`
   grid-column: span 2;
@@ -78,7 +66,14 @@ const Line = styled.div`
     grid-column: span 1;
   }
 `;
-
+const ParkSubTitle = styled(SubTitle)`
+  grid-column: span 2;
+  margin: 0;
+  justify-content: flex-start;
+  @media (max-width: 992px) {
+    grid-column: span 1;
+  }
+`;
 const containerStyle = {
   width: "100%",
   height: "600px",
@@ -103,8 +98,8 @@ const Map = styled.div`
   position: relative;
   border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加陰影 */
-  overflow: hidden; /* 防止地圖超出容器 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 `;
 const Place = styled.div`
   width: 30%;
@@ -133,37 +128,16 @@ const GoogleLink = styled.a`
   text-decoration: underline;
 `;
 
-export interface Place {
-  lat: number | string;
-  lng: number | string;
-  name: string;
-  parkNum: string;
-  fee: string;
-  openTime: string;
-  address?: string;
-  placeId?: string;
-  availablecar?: number;
-  availablemotor?: number;
-}
-
-export interface PlaceAvailable {
-  availablebus: number;
-  availablecar: number;
-  availablehandicap: number;
-  availableheavymotor: number;
-  availablemotor: number;
-  id: string;
-}
 function TransportationDriving() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_KEY,
     libraries: ["places"],
   });
-  const [places, setPlaces] = useState<Place[]>([]);
-  const [selectedMarker, setSelectedMarker] = useState<Place | null>(null);
+  const [places, setPlaces] = useState<PlaceInfo[]>([]);
+  const [selectedMarker, setSelectedMarker] = useState<PlaceInfo | null>(null);
 
   const tw97 = "+proj=tmerc +lat_0=0 +lon_0=121 +k=1 +x_0=250000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
-  const wgs84 = "EPSG:4326"; // WGS84 坐标系
+  const wgs84 = "EPSG:4326";
 
   const center = { lat: 25.052391331855265, lng: 121.59855174326229 };
   const wgs84Min = [121.59412155976037, 25.048075142191188];
@@ -174,44 +148,33 @@ function TransportationDriving() {
     document.body.style.overflowY = "auto";
   }, []);
   const onLoad = async () => {
-    try {
-      const res = await api.getParkInfo(tw97Max, tw97Min); // 直接在 onLoad 中呼叫 getParkInfo
-      console.log(res); // 使用回傳的資料
-      const result = res.map((element: Place) => {
-        const wgs = proj4(tw97, wgs84, [parseFloat(element.lng as string), parseFloat(element.lat as string)]);
-        return { ...element, lng: wgs[0], lat: wgs[1] };
-      });
+    const res = await api.getParkInfo(tw97Max, tw97Min);
+    const result = res.map((element: PlaceInfo) => {
+      const wgs = proj4(tw97, wgs84, [parseFloat(element.lng as string), parseFloat(element.lat as string)]);
+      return { ...element, lng: wgs[0], lat: wgs[1] };
+    });
 
-      const resAvailable = await api.getParkAvailable(result);
-      console.log(resAvailable);
-      const all = result.map((item: Place) => {
-        const matchedRes = resAvailable.find((res: PlaceAvailable) => item.placeId === res.id);
-        return {
-          ...item,
-          availablecar: matchedRes?.availablecar,
-          availablemotor: matchedRes?.availablemotor,
-        };
-      });
-      console.log(all);
+    const resAvailable = await api.getParkAvailable(result);
+    const all = result.map((item: PlaceInfo) => {
+      const matchedRes = resAvailable.find((res: PlaceAvailable) => item.placeId === res.id);
+      return {
+        ...item,
+        availablecar: matchedRes?.availablecar,
+        availablemotor: matchedRes?.availablemotor,
+      };
+    });
 
-      console.log(result);
-
-      setPlaces(all); // 更新 places 狀態
-    } catch (error) {
-      console.error("Error loading park info:", error);
-    }
+    setPlaces(all);
   };
 
-  const handleMarkerClick = (place: Place) => {
+  const handleMarkerClick = (place: PlaceInfo) => {
     setSelectedMarker(place);
-    console.log(place);
   };
   if (!isLoaded) return <Loading />;
 
   return (
     <Container>
       <VenueHeader />
-      {/* {!loaded && <Loading />} */}
       <Main>
         <Content>
           <SubTitle>自行開車</SubTitle>
@@ -240,12 +203,6 @@ function TransportationDriving() {
                         url: place.name === selectedMarker?.name ? selectPin : pin,
                         scaledSize: new window.google.maps.Size(65, 65),
                       }}
-                      // label={{
-                      //   text: place.availablecar === undefined ? " " : place.availablecar === -9 ? "0" : place.availablecar.toString(),
-                      //   color: "#000000",
-                      //   fontWeight: "700",
-                      //   fontSize: "18px",
-                      // }}
                     >
                       <CustomMarkerLabel
                         position={{ lat: place.lat as number, lng: place.lng as number }}

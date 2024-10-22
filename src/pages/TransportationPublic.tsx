@@ -33,21 +33,18 @@ const SubTitle = styled.h4`
   @media (max-width: 575px) {
   }
 `;
+const Detail = styled.div`
+  @media (max-width: 992px) {
+    grid-template-columns: auto;
+    padding: 0;
+  }
+`;
 const Station = styled.p`
   font-size: 1.2rem;
   font-weight: 700;
 `;
 const Away = styled.p`
   margin-bottom: 25px;
-
-  @media (max-width: 992px) {
-  }
-`;
-const Detail = styled.div`
-  @media (max-width: 992px) {
-    grid-template-columns: auto;
-    padding: 0;
-  }
 `;
 const Line = styled.div`
   grid-column: span 2;

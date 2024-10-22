@@ -15,7 +15,7 @@ const spotlight = keyframes`
   }
 `;
 const Container = styled.div`
-  position: absolute;
+  position: fixed;
   width: 100vw;
   height: 100vh;
   top: 0%;
@@ -44,25 +44,6 @@ const Container = styled.div`
       -10vw -10vh 0 25vw #ff3714,
       20vw 80vh 0 100vw #000000;
     filter: blur(12rem);
-    /* z-index: -1;
-
-    content: "";
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    aspect-ratio: 1 / 1;
-    border-radius: 50%;
-    width: 20%;
-    background: #535252;
-    overflow: hidden;
-    box-shadow:
-      5vw 60vh 0 10vw #504f4f,
-      30vw 20vh 0 10vw #171414,
-      35vw 50vh 0 2vw #2b2b2a,
-      60vw -10vh 0 3vw #737272,
-      80vw 80vh 0 20vw #4a4a4a;
-    filter: blur(12rem); */
   }
 `;
 const Title = styled.p`
@@ -82,13 +63,15 @@ const Title = styled.p`
   @media (max-width: 575px) {
     font-size: 4rem;
   }
+  @media (max-width: 420px) {
+    font-size: 3.2rem;
+  }
   &::after {
     content: "Look For";
     font-family: "Kalam", cursive;
     font-weight: 700;
     color: transparent;
     position: absolute;
-
     left: 50%;
     top: 0%;
     transform: translate(-50%, -50%);

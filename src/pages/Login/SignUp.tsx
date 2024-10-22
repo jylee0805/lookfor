@@ -1,14 +1,26 @@
+import { useContext, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
-import { useForm, SubmitHandler } from "react-hook-form";
 import api from "../../utils/api";
+import { AuthContext } from "../../utils/AuthContextProvider";
 
-const SignUpBox = styled.div<{ isLogin: boolean }>`
+const SignUpBox = styled.div<{ $isLogin: boolean }>`
   width: 100%;
   flex-direction: column;
   row-gap: 15px;
   display: flex;
-  display: ${(props) => (props.isLogin ? "none" : "flex")};
+  display: ${(props) => (props.$isLogin ? "none" : "flex")};
   margin-top: 15px;
+`;
+const Label = styled.label`
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #fff;
+`;
+const Require = styled.span`
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #dc3131;
 `;
 const Input = styled.input`
   border-radius: 30px;
@@ -19,20 +31,6 @@ const Input = styled.input`
   width: 100%;
   font-size: 1rem;
   line-height: 1.5;
-  @media (max-width: 575px) {
-  }
-`;
-const Label = styled.label`
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #fff;
-  @media (max-width: 575px) {
-  }
-`;
-const Require = styled.span`
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #dc3131;
 `;
 const SignUpBtn = styled(Input)`
   margin-top: 30px;
@@ -43,10 +41,22 @@ const Error = styled.span`
   margin-top: 5px;
   font-weight: 600;
 `;
+const SuccessHint = styled.p`
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  line-height: 2;
+  transform: translateX(-50%);
+  background: #fff;
+  color: #000;
+  font-weight: 700;
+  width: 100px;
+  border-radius: 50px;
+  text-align: center;
+`;
 
 interface Props {
   isLogin: boolean;
-  setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface FormInputs {
@@ -56,7 +66,9 @@ interface FormInputs {
   checkPassword: string;
 }
 
-function SignUp({ isLogin, setIsLogin }: Props) {
+function SignUp({ isLogin }: Props) {
+  const authContext = useContext(AuthContext);
+  const [success, setSuccess] = useState(false);
   const {
     register,
     handleSubmit,
@@ -84,7 +96,7 @@ function SignUp({ isLogin, setIsLogin }: Props) {
       return;
     }
     const response = await api.userSignUp(data.email, data.password);
-    console.log(response);
+
     if (response === "Firebase: Error (auth/email-already-in-use).") {
       setError("email", {
         type: "manual",
@@ -98,15 +110,16 @@ function SignUp({ isLogin, setIsLogin }: Props) {
         response.user.uid,
         "https://firebasestorage.googleapis.com/v0/b/look-for-18287.appspot.com/o/images%2Fprofile.png?alt=media&token=e5653560-c959-4f42-a741-a30794521275"
       );
-      setIsLogin(true);
-      alert("註冊成功");
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+        authContext?.setLoginState(response.user.uid);
+      }, 2000);
     }
   };
 
   const handlerKeyDown = (e: React.KeyboardEvent, nextFieldName: keyof FormInputs | null) => {
     const currentValue = getValues();
-
-    console.log(nextFieldName);
 
     if (e.keyCode === 13) {
       switch (nextFieldName) {
@@ -117,7 +130,7 @@ function SignUp({ isLogin, setIsLogin }: Props) {
               type: "manual",
               message: "請輸入有效的電子郵件",
             });
-            return; // Exit if validation fails
+            return;
           }
           clearErrors("email");
           setFocus(nextFieldName);
@@ -167,11 +180,12 @@ function SignUp({ isLogin, setIsLogin }: Props) {
         type: "manual",
         message: "請輸入有效的電子郵件",
       });
-      return; // Exit if validation fails
+      return;
     }
   };
   return (
-    <SignUpBox isLogin={isLogin}>
+    <SignUpBox $isLogin={isLogin}>
+      {success && <SuccessHint>註冊成功</SuccessHint>}
       <Label>
         電子信箱<Require>*</Require>
         <Input

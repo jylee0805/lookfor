@@ -1,11 +1,9 @@
 import { createGlobalStyle } from "styled-components";
-
-import swei600 from "./utils/SweiGothicCJKtc-Medium.ttf";
-
-import swei700 from "./utils/SweiGothicCJKtc-Bold.ttf";
+import swei700 from "./assets/SweiGothicCJKtc-Bold.ttf";
+import swei600 from "./assets/SweiGothicCJKtc-Medium.ttf";
+import swei500 from "./assets/SweiGothicCJKtc-Regular.ttf";
 
 const GlobalStyle = createGlobalStyle`
-
 
 @font-face {
   font-family: "swei";
@@ -14,12 +12,13 @@ const GlobalStyle = createGlobalStyle`
 }
 @font-face {
   font-family: "swei";
-  src: url("${swei600}") format("TrueType");
- 
+  src: url("${swei500}") format("TrueType");
 }
-
-
-
+@font-face {
+  font-family: "swei";
+  src: url("${swei600}") format("TrueType");
+  font-weight: 600;
+}
 html,
 body,
 div,
@@ -108,7 +107,7 @@ video {
   font: inherit;
   vertical-align: baseline;
 }
-/* HTML5 display-role reset for older browsers */
+
 article,
 aside,
 details,
@@ -166,10 +165,7 @@ html{
   @media (max-width: 768px) {
     font-size: 14px;
   }
-  @media (max-width: 575px) {
-    font-size: 12px;
-
-  }
+ 
 }
 body {
  
@@ -207,7 +203,26 @@ body {
       -45vw -30vh 0 25vw #181818,
       -90vw 20vh 0 20vw #ff5213,
       -10vw -10vh 0 25vw #ff3714,20vw 80vh 0 100vw #000000;
-    filter: blur(12rem);
+      filter: blur(8rem);
+      @media (max-width: 992px) {
+      box-shadow:
+      -50vw 20vh 0 0 #1b1a1a,
+      90vw 0vh 0 55vw #ffe600,
+      -55vw 0vh 0 25vw #181818,
+      -90vw 20vh 0 5vw #ff5213,
+      -90vw -60vh 0 15vw #ff3714,
+      20vw 80vh 0 100vw #000000; 
+      filter: blur(8rem);
+  }
+    @media (max-width: 575px) {
+      box-shadow:
+      -50vw 20vh 0 0 #1b1a1a,
+      60vw 0vh 0 55vw #ffe600,
+      -55vw 0vh 0 25vw #181818,
+      -90vw 20vh 0 5vw #ff5213,
+      -10vw -10vh 0 15vw #ff3714,20vw 80vh 0 100vw #000000; 
+      filter: blur(6rem);
+  }
   }
 }
 a {

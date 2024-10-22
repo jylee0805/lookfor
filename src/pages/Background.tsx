@@ -1,6 +1,6 @@
 import styled, { keyframes } from "styled-components";
-const path1 = "M 50,400 C 150,250, 150,560, 300,400 C 450,250, 450,550, 550,400"; // 第一条路径向下移动
-const path2 = "M 550,300 C 500,200, 400,450, 300,350 C 200,200, 150,450, 50,300"; // 第二条路径向下移动
+const pathOrange = "M 50,400 C 150,250, 150,560, 300,400 C 450,250, 450,550, 550,400";
+const pathYellow = "M 550,300 C 500,200, 400,450, 300,350 C 200,200, 150,450, 50,300";
 
 const moveAlongPath = keyframes`
   0% {
@@ -13,6 +13,7 @@ const moveAlongPath = keyframes`
     offset-distance: 0%;
   }
 `;
+
 const Container = styled.div`
   &::before {
     content: "";
@@ -27,14 +28,13 @@ const Container = styled.div`
 `;
 const BackgroundItem = styled.div`
   position: fixed;
-  //opacity: 0.5;
   z-index: 1;
 `;
 
 const BackgroundItem4 = styled(BackgroundItem)`
-  offset-path: path("${path1}");
+  offset-path: path("${pathOrange}");
   animation: ${moveAlongPath} 15s linear infinite;
-  offset-distance: 0%; // 初始位置
+  offset-distance: 0%;
   width: 40%;
   height: 60vh;
   top: 60px;
@@ -42,7 +42,7 @@ const BackgroundItem4 = styled(BackgroundItem)`
   clip-path: polygon(0 10%, 30% 0, 60% 40%, 50% 50%, 20% 100%);
 `;
 const BackgroundItem5 = styled(BackgroundItem)`
-  offset-path: path("${path2}");
+  offset-path: path("${pathYellow}");
   animation: ${moveAlongPath} 15s linear infinite;
   offset-distance: 0%;
   width: 30%;

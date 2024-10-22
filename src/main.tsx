@@ -1,18 +1,17 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-
 import App from "./App.tsx";
-import Home from "./pages/Home.tsx";
-import Concert from "./pages/Concert";
+import Concert from "./pages/Concert.tsx";
 import ConcertList from "./pages/ConcertList";
+import FansSupport from "./pages/FansSupport/index.tsx";
+import Home from "./pages/Home";
+import Keep from "./pages/Keep.tsx";
 import Login from "./pages/Login";
-import View from "./pages/View";
+import Profile from "./pages/Profile";
 import TransportationDriving from "./pages/TransportationDriving.tsx";
 import TransportationPublic from "./pages/TransportationPublic.tsx";
-import FansSupport from "./pages/FansSupport/index.tsx";
-import Profile from "./pages/Profile.tsx";
-import Keep from "./pages/Keep.tsx";
+import View from "./pages/View";
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>

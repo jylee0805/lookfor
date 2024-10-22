@@ -1,6 +1,27 @@
 import { initializeApp, FirebaseError } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore, addDoc, collection, query, where, getDocs, doc, serverTimestamp, onSnapshot, orderBy, deleteDoc, updateDoc, limit, getDoc, arrayUnion, documentId } from "firebase/firestore";
+import {
+  getFirestore,
+  addDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  serverTimestamp,
+  onSnapshot,
+  orderBy,
+  deleteDoc,
+  updateDoc,
+  limit,
+  getDoc,
+  arrayUnion,
+  documentId,
+  startAfter,
+  Timestamp,
+  DocumentSnapshot,
+  QueryDocumentSnapshot,
+} from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
@@ -49,4 +70,8 @@ export {
   getDoc,
   arrayUnion,
   documentId,
+  startAfter,
+  Timestamp,
+  DocumentSnapshot,
+  QueryDocumentSnapshot,
 };
