@@ -15,7 +15,9 @@ const UserName = styled.p`
     font-size: 1rem;
   }
 `;
-const Container = styled.div``;
+const Container = styled.div`
+  width: 90%;
+`;
 const ImportInfo = styled.div`
   display: grid;
   grid-template-columns: 100px auto;

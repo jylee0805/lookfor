@@ -67,7 +67,7 @@ const Mask = styled.div<{ $postClick: boolean }>`
 `;
 
 const Content = styled.div`
-  width: 75%;
+  width: 80%;
   margin: 0 auto;
   @media (max-width: 768px) {
     width: 95%;

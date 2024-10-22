@@ -8,11 +8,14 @@ import { useDialog } from "../../hooks/useDialog";
 import api from "../../utils/api";
 import PostContent from "./PostContent";
 
-const List = styled.ul``;
+const List = styled.ul`
+  width: 100%;
+`;
 const PostItem = styled.li`
   position: relative;
   display: flex;
   padding: 30px 0;
+
   & + &::before {
     content: "";
     height: 1px;
