@@ -97,9 +97,9 @@ const StyleLink = styled(Link)`
   min-width: 240px;
 `;
 
-interface Props {
+type Props = {
   state: ProfileState;
-}
+};
 
 function MySupport({ state }: Props) {
   return (

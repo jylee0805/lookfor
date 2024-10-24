@@ -79,9 +79,9 @@ const Hint = styled.p`
   line-height: 2;
 `;
 
-interface Props {
+type Props = {
   state: ProfileState;
-}
+};
 
 function MyView({ state }: Props) {
   const navigate = useNavigate();

@@ -1,10 +1,10 @@
 import { OverlayView } from "@react-google-maps/api";
 import { useState } from "react";
 
-interface Props {
+type Props = {
   position: google.maps.LatLngLiteral;
   text: string;
-}
+};
 const CustomMarkerLabel = ({ position, text }: Props) => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 

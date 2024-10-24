@@ -11,12 +11,12 @@ const Label = styled.p`
   margin: 0 15px 0 5px;
 `;
 
-interface Props {
+type Props = {
   label: string;
   options: string[] | number[];
   name: keyof FormInputs;
   hint: string;
-}
+};
 
 function ViewSelect({ name, label, options, hint }: Props) {
   const { register } = useContext(ViewContext);

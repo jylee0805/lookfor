@@ -32,16 +32,16 @@ import {
   where,
 } from "../utils/firebase";
 
-interface Data {
+type Data = {
   content: string;
   concert: string;
   note: string;
   row: string;
   seat: string;
   section: string;
-}
+};
 
-interface ParkData {
+type ParkData = {
   name: string;
   summary: string;
   tw97x: string;
@@ -50,7 +50,7 @@ interface ParkData {
   serviceTime: string;
   address: string;
   id: string;
-}
+};
 const api = {
   async userSignUp(email: string, password: string) {
     try {

@@ -1,11 +1,11 @@
 import { createContext, useState } from "react";
 
-export interface ComponentContextType {
+export type ComponentContextType = {
   isViewLoad: boolean;
   setIsViewLoad: React.Dispatch<React.SetStateAction<boolean>>;
   isHomeLoad: boolean;
   setIsHomeLoad: React.Dispatch<React.SetStateAction<boolean>>;
-}
+};
 export const ComponentContext = createContext<ComponentContextType | null>(null);
 
 export function ComponentContextProvider({ children }: { children: React.ReactNode }) {

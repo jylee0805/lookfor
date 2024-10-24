@@ -85,10 +85,10 @@ const NotifyTime = styled.p`
   font-size: 0.8rem;
 `;
 
-interface Props {
+type Props = {
   state: State;
   dispatch: React.Dispatch<Action>;
-}
+};
 
 function NotifyButton({ state, dispatch }: Props) {
   const authContext = useContext(AuthContext);

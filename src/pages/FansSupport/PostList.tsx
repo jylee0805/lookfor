@@ -43,11 +43,11 @@ const Hint = styled.p`
   margin-top: 60px;
 `;
 
-interface Props {
+type Props = {
   state: State;
   dispatch: React.Dispatch<Action>;
   targetRef: React.RefObject<(HTMLLIElement | null)[]>;
-}
+};
 
 function PostList({ state, dispatch, targetRef }: Props) {
   const { isOpen, setIsOpen, closeDialog } = useDialog();

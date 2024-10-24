@@ -27,9 +27,9 @@ const UserName = styled.p``;
 const Note = styled.p``;
 const Content = styled.p``;
 
-interface Props {
+type Props = {
   post: ViewPost;
-}
+};
 
 function PostContent({ post }: Props) {
   const [deleteViewId, setDeleteViewId] = useState<string>("");

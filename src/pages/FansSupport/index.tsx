@@ -74,12 +74,12 @@ const Content = styled.div`
   }
 `;
 
-export interface State {
+export type State = {
   postData: MerchPost[];
   isEditMode: MerchPost;
   isPostClick: boolean;
   users: Personal[];
-}
+};
 export type Action =
   | { type: "setPostData"; payload: { postData: MerchPost[] } }
   | { type: "toggleIsPostClick"; payload: { isPostClick: boolean } }

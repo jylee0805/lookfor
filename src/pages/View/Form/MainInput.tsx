@@ -59,10 +59,10 @@ const Content = styled.textarea`
 
 const seatOptions = ["VIPA", "VIPB", "VIPC", "2A", "2B", "2C", "2D", "2E", "2F", "2G", "3A", "3B", "3C", "3D", "3E", "3F", "3G"];
 
-interface Seats {
+type Seats = {
   sectionName: string;
   row: number[];
-}
+};
 
 function MainInput() {
   const { state, register, watch } = useContext(ViewContext);

@@ -1,6 +1,6 @@
-interface Label {
+type Label = {
   name: string;
-}
+};
 const handleAnalyzeImage = async (imageUrl: string) => {
   const apiKey = import.meta.env.VITE_GOOGLE_CLOUD_API_KEY;
   const endpoint = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;

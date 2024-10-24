@@ -37,11 +37,11 @@ const FileBtn = styled.input`
   width: 0;
 `;
 
-interface Props {
+type Props = {
   concert: Concerts;
   state: State;
   dispatch: React.Dispatch<Action>;
-}
+};
 
 function Footer({ concert, state, dispatch }: Props) {
   const { register, handleSubmit, reset, selectPhotos, setLocalPhotoUrl, setSelectPhotos } = useContext(SupportFormContext);

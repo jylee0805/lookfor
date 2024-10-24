@@ -38,12 +38,12 @@ const MoreBtn = styled(FeatureBtn)`
 const StyleMore = styled(MdOutlineMoreVert)`
   font-size: 1.5rem;
 `;
-interface MoreFeatures {
+type MoreFeatures = {
   itemID: string;
   onEdit: () => void;
   onDelete: () => void;
   itemUID: string;
-}
+};
 
 const MoreFeatures = ({ itemID, onEdit, onDelete, itemUID }: MoreFeatures) => {
   const { show, isMoreClick, toggleMoreClick, handleEdit, handleDelete } = useMoreFeatures(

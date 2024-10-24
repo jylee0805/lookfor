@@ -103,10 +103,10 @@ const Type = styled.input`
     padding: 6px 15px;
   }
 `;
-interface Props {
+type Props = {
   index: number;
   post: ViewPost;
-}
+};
 
 function ViewPostCard({ index, post }: Props) {
   const authContext = useContext(AuthContext);

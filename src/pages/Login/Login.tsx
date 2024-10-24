@@ -53,14 +53,14 @@ const Error = styled.span`
   color: #ff6262;
 `;
 
-interface Props {
+type Props = {
   isLogin: boolean;
-}
+};
 
-interface FormInputs {
+type FormInputs = {
   email: string;
   password: string;
-}
+};
 
 function LogIn({ isLogin }: Props) {
   const navigate = useNavigate();
@@ -74,7 +74,12 @@ function LogIn({ isLogin }: Props) {
     setError,
     getValues,
     clearErrors,
-  } = useForm<FormInputs>();
+  } = useForm<FormInputs>({
+    defaultValues: {
+      email: "lookfor@gmail.com",
+      password: "lookfor123456",
+    },
+  });
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     const response = await api.userLogIn(data.email, data.password);

@@ -39,10 +39,10 @@ const ImagePreviewDelete = styled.button`
   color: #808080;
 `;
 
-interface Props {
+type Props = {
   state: State;
   dispatch: React.Dispatch<Action>;
-}
+};
 
 function ImagePreview({ state, dispatch }: Props) {
   const { selectPhotos, localPhotoUrl, setLocalPhotoUrl, setSelectPhotos } = useContext(SupportFormContext);

@@ -81,11 +81,11 @@ const Image = styled.img`
   }
 `;
 
-interface Props {
+type Props = {
   state: State;
   dispatch: React.Dispatch<Action>;
   item: MerchPost;
-}
+};
 
 function PostContent({ state, dispatch, item }: Props) {
   const authContext = useContext(AuthContext);

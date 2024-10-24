@@ -1,14 +1,14 @@
 import { createContext, useEffect, useState } from "react";
-import api from "./api";
-import { Concerts } from "../types";
 import { useNavigate } from "react-router-dom";
+import { Concerts } from "../types";
+import api from "./api";
 
-export interface ConcertContextType {
+export type ConcertContextType = {
   concertData: Concerts;
   setConcertData: React.Dispatch<React.SetStateAction<Concerts>>;
   concertId: string;
   setConcertId: React.Dispatch<React.SetStateAction<string>>;
-}
+};
 
 export const ConcertContext = createContext<ConcertContextType | null>(null);
 

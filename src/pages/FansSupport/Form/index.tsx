@@ -58,7 +58,7 @@ const Title = styled.h3`
   background: #fff;
 `;
 
-export interface FormInputs {
+export type FormInputs = {
   day: string | number;
   time: Dayjs;
   status: string;
@@ -68,12 +68,12 @@ export interface FormInputs {
   more: string;
   image: object;
   item: string;
-}
-interface Props {
+};
+type Props = {
   concert: Concerts;
   state: State;
   dispatch: React.Dispatch<Action>;
-}
+};
 
 function FanPost({ concert, state, dispatch }: Props) {
   const { reset } = useContext(SupportFormContext);

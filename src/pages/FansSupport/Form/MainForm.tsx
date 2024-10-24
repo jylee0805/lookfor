@@ -65,9 +65,9 @@ const Select = styled.select`
   border-radius: 5px;
   padding: 5px;
 `;
-interface Props {
+type Props = {
   concert: Concerts;
-}
+};
 function MainForm({ concert }: Props) {
   const { register, control } = useContext(SupportFormContext);
   const day = concert?.date?.map((item) => {

@@ -60,11 +60,11 @@ const DetailPlace = styled(DetailItem)`
   grid-column: span 2;
 `;
 
-interface Props {
+type Props = {
   concert: Concerts;
   index: number;
   state: State;
-}
+};
 
 function ListItem({ state, concert, index }: Props) {
   return (

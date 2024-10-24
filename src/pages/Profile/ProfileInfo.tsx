@@ -43,10 +43,10 @@ const Input = styled.input`
 `;
 const EditBtn = styled.button``;
 
-interface Props {
+type Props = {
   state: ProfileState;
   dispatch: React.Dispatch<ProfileAction>;
-}
+};
 
 function ProfileInfo({ state, dispatch }: Props) {
   const authContext = useContext(AuthContext);

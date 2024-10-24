@@ -19,7 +19,7 @@ const Container = styled.div`
   }
 `;
 
-export interface ProfileState {
+export type ProfileState = {
   profile: Personal;
   viewPosts: OriginView[];
   merchPosts: MerchPost[];
@@ -28,7 +28,7 @@ export interface ProfileState {
   editUserName: string;
   selectPhoto: File | null;
   localPhotoUrl: string;
-}
+};
 export type ProfileAction =
   | { type: "setData"; payload: { profile: Personal; viewPosts: OriginView[]; supportPosts: MerchPost[]; concertNames: string[]; editUserName: string } }
   | { type: "toggleIsEditProfile" }

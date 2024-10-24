@@ -60,10 +60,10 @@ const LogOutBtn = styled.button`
   }
 `;
 
-interface Props {
+type Props = {
   state: State;
   dispatch: React.Dispatch<Action>;
-}
+};
 
 function PersonalButton({ state, dispatch }: Props) {
   const authContext = useContext(AuthContext);

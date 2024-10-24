@@ -71,11 +71,11 @@ const NavBtn = styled.button`
   }
 `;
 
-export interface State {
+export type State = {
   isPersonalClick: boolean;
   isMenuOpen: boolean;
   isNotifyOpen: boolean;
-}
+};
 
 export type Action = { type: "toggleIsPersonalClick" } | { type: "toggleIsMenuOpen"; payload: { isMenuOpen: boolean } } | { type: "toggleIsNotifyOpen" };
 

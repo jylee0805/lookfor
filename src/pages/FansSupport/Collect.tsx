@@ -31,11 +31,11 @@ const Container = styled.div`
 `;
 const KeepNumber = styled.p``;
 
-interface Props {
+type Props = {
   state: State;
   dispatch: React.Dispatch<Action>;
   item: MerchPost;
-}
+};
 
 function Collect({ state, dispatch, item }: Props) {
   const authContext = useContext(AuthContext);

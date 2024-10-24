@@ -1,8 +1,8 @@
-import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../utils/api";
+import styled from "styled-components";
 import { OriginView } from "../../types";
+import api from "../../utils/api";
 
 const Container = styled.div`
   z-index: 2;
@@ -120,9 +120,9 @@ const ViewTitle = styled.h4`
   text-align: right;
 `;
 
-interface Props {
+type Props = {
   scrollContainerRef: React.RefObject<HTMLUListElement>;
-}
+};
 
 function NewView({ scrollContainerRef }: Props) {
   const navigate = useNavigate();

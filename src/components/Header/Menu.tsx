@@ -88,11 +88,11 @@ const StyleLink = styled(Link)`
     color: transparent;
   }
 `;
-interface Props {
+type Props = {
   state: State;
   dispatch: React.Dispatch<Action>;
   isLogin: boolean;
-}
+};
 
 function Menu({ state, dispatch, isLogin }: Props) {
   const authContext = useContext(AuthContext);

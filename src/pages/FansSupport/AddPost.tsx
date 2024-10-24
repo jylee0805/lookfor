@@ -42,10 +42,10 @@ const ActionBtn = styled.button`
   }
 `;
 
-interface Props {
+type Props = {
   state: State;
   dispatch: React.Dispatch<Action>;
-}
+};
 
 function AddPost({ state, dispatch }: Props) {
   const navigate = useNavigate();

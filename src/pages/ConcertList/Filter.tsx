@@ -42,10 +42,10 @@ const Hint = styled.div<{ $show: boolean }>`
   opacity: ${(props) => (props.$show ? "100" : "0")};
   transition: opacity ease 200ms;
 `;
-interface Props {
+type Props = {
   state: State;
   dispatch: React.Dispatch<Action>;
-}
+};
 
 function Filter({ state, dispatch }: Props) {
   const [show, setShow] = useState(false);

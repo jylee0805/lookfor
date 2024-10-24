@@ -55,16 +55,16 @@ const SuccessHint = styled.p`
   text-align: center;
 `;
 
-interface Props {
+type Props = {
   isLogin: boolean;
-}
+};
 
-interface FormInputs {
+type FormInputs = {
   name: string;
   email: string;
   password: string;
   checkPassword: string;
-}
+};
 
 function SignUp({ isLogin }: Props) {
   const authContext = useContext(AuthContext);

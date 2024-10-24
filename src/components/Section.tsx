@@ -42,12 +42,12 @@ const Text = styled.p<{ $haveData: boolean }>`
   transform: translate(-50%, -50%);
 `;
 
-interface SectionProps {
+type SectionProps = {
   sectionName: string;
   state: State;
   imgUrl: string;
   className?: string;
-}
+};
 
 const Section = ({ sectionName, state, imgUrl, className }: SectionProps) => {
   const { hasData, sectionData, image, mousePosition, handleMouseMove, windowWidth } = useSection(sectionName, state);

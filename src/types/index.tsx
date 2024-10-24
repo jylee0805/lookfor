@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app";
 
-export interface Notify {
+export type Notify = {
   message: string;
   createdTime: { seconds: number };
   isRead: boolean;
@@ -8,9 +8,9 @@ export interface Notify {
   id?: string;
   postId: string;
   concertId: string;
-}
+};
 
-export interface OriginView {
+export type OriginView = {
   image: string;
   note: string;
   content: string;
@@ -21,9 +21,9 @@ export interface OriginView {
   seat: number;
   section: string;
   userUID: string;
-}
+};
 
-export interface ViewPost {
+export type ViewPost = {
   image: string;
   note: string;
   content: string;
@@ -37,18 +37,18 @@ export interface ViewPost {
   userUID: string;
   userName: string | undefined;
   avatar: string | undefined;
-}
+};
 
-export interface Comment {
+export type Comment = {
   content: string;
   userUID: string;
   createdTime: string;
   id: string;
   userName?: string;
   avatar?: string;
-}
+};
 
-export interface PlaceInfo {
+export type PlaceInfo = {
   lat: number | string;
   lng: number | string;
   name: string;
@@ -59,18 +59,18 @@ export interface PlaceInfo {
   placeId?: string;
   availablecar?: number;
   availablemotor?: number;
-}
+};
 
-export interface PlaceAvailable {
+export type PlaceAvailable = {
   availablebus: number;
   availablecar: number;
   availablehandicap: number;
   availableheavymotor: number;
   availablemotor: number;
   id: string;
-}
+};
 
-export interface MerchPost {
+export type MerchPost = {
   concertId: string;
   content: string;
   passDay: string;
@@ -86,17 +86,17 @@ export interface MerchPost {
   id: string;
   avatar?: string;
   item: string;
-}
+};
 
-export interface Personal {
+export type Personal = {
   avatar: string;
   userName: string;
   UID: string;
   id: string;
   keepIds?: string[];
-}
+};
 
-export interface Concerts {
+export type Concerts = {
   concertName: string;
   date: string[];
   images: string;
@@ -106,11 +106,11 @@ export interface Concerts {
   id: string;
   poster?: string;
   endDay: firebase.firestore.Timestamp;
-}
+};
 
-export interface Detail {
+export type Detail = {
   ticketPrice: string;
   ticketSaleTime: string[];
   ticketSaleWebsite: string;
   images: string;
-}
+};

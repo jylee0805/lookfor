@@ -29,7 +29,6 @@ const Container = styled.div`
     padding: 0 10px;
   }
 `;
-
 const Main = styled.main`
   max-width: 75%;
   margin: 0 auto;

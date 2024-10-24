@@ -66,12 +66,12 @@ const Send = styled.button`
   border: none;
 `;
 
-interface CommentEdit {
+type CommentEdit = {
   comment: string;
-}
-interface Props {
+};
+type Props = {
   post: ViewPost;
-}
+};
 
 function CommentsSection({ post }: Props) {
   const { register: registerEditComment, setValue, handleSubmit: handlerEditComment } = useForm<CommentEdit>();

@@ -2,7 +2,7 @@ import { createContext, useReducer, useRef } from "react";
 import { FieldErrors, useForm, UseFormGetValues, UseFormHandleSubmit, UseFormRegister, UseFormReset, UseFormSetError, UseFormWatch } from "react-hook-form";
 import { OriginView, ViewPost } from "../types";
 
-export interface State {
+export type State = {
   rowSeats: number[];
   selectedSection: string;
   selectedRow: number;
@@ -18,7 +18,7 @@ export interface State {
   isSelectSection: boolean;
   isPostClick: boolean;
   isShowMask: boolean;
-}
+};
 export type Action =
   | { type: "selectSection"; payload: { selectedSection: string; rowSeats: number[]; isSelectRow: boolean } }
   | { type: "selectRow"; payload: { selectedRow: number; isSelectRow: boolean; selectedSeat: number } }
@@ -128,7 +128,7 @@ const reducer = (state: State, action: Action): State => {
       return state;
   }
 };
-export interface FormInputs {
+export type FormInputs = {
   section: string;
   row: string;
   seat: string;
@@ -136,8 +136,8 @@ export interface FormInputs {
   note: string;
   content: string;
   image: object;
-}
-export interface ViewContextType {
+};
+export type ViewContextType = {
   state: State;
   dispatch: React.Dispatch<Action>;
   sectionRef: React.RefObject<HTMLDivElement>;
@@ -151,7 +151,7 @@ export interface ViewContextType {
   formState: {
     errors: FieldErrors<FormInputs>;
   };
-}
+};
 
 export const ViewContext = createContext<ViewContextType>({} as ViewContextType);
 

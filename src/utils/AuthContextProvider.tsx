@@ -3,12 +3,12 @@ import { Personal } from "../types";
 
 import api from "./api";
 
-export interface AuthContextType {
+export type AuthContextType = {
   loginState: string;
   setLoginState: React.Dispatch<React.SetStateAction<string>>;
   user: Personal;
   setUser: React.Dispatch<React.SetStateAction<Personal>>;
-}
+};
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 

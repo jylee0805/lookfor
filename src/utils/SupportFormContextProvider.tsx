@@ -2,7 +2,7 @@ import { Dayjs } from "dayjs";
 import { createContext, useState } from "react";
 import { Control, useForm, UseFormHandleSubmit, UseFormRegister, UseFormReset } from "react-hook-form";
 
-export interface SupportFormContextType {
+export type SupportFormContextType = {
   register: UseFormRegister<FormInputs>;
   handleSubmit: UseFormHandleSubmit<FormInputs>;
   control: Control<FormInputs>;
@@ -13,11 +13,11 @@ export interface SupportFormContextType {
 
   selectPhotos: File[];
   setSelectPhotos: React.Dispatch<React.SetStateAction<File[]>>;
-}
+};
 
 export const SupportFormContext = createContext<SupportFormContextType>({} as SupportFormContextType);
 
-export interface FormInputs {
+export type FormInputs = {
   day: string | number;
   time: Dayjs;
   status: string;
@@ -27,7 +27,7 @@ export interface FormInputs {
   more: string;
   image: object;
   item: string;
-}
+};
 export function SupportFormContextProvider({ children }: { children: React.ReactNode }) {
   const { register, handleSubmit, control, reset } = useForm<FormInputs>();
   const [localPhotoUrl, setLocalPhotoUrl] = useState<string[]>([]);

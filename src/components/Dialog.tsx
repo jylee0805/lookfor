@@ -52,14 +52,14 @@ const CancelBtn = styled.button`
   color: #090909;
 `;
 
-interface DialogProps {
+type DialogProps = {
   isOpen: boolean;
   onCancel: () => void;
   onConfirm: () => void;
   title: string;
   confirmText: string;
   children: React.ReactNode;
-}
+};
 
 const Dialog = ({ isOpen, onCancel, onConfirm, title, confirmText, children }: DialogProps) => {
   if (!isOpen) return null;

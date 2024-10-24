@@ -62,7 +62,7 @@ const Hint = styled.p`
   margin: 0 auto 30px;
 `;
 
-export interface State {
+export type State ={
   concertData: Concerts[];
   searchData: Concerts[];
   weekData: Concerts[];

@@ -43,10 +43,10 @@ const options = {
   includeScore: false,
 };
 
-interface Props {
+type Props = {
   state: State;
   dispatch: React.Dispatch<Action>;
-}
+};
 
 function Search({ state, dispatch }: Props) {
   const [searchValue, setSearchValue] = useState<string>("");
