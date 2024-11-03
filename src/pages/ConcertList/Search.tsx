@@ -60,9 +60,15 @@ function Search({ state, dispatch }: Props) {
     dispatch({ type: "toggleSearchHint", payload: { length: search.length } });
     dispatch({ type: "setSearchData", payload: { searchData: search.sort() } });
   };
+
+  const handlerKeyDown = (e: React.KeyboardEvent) => {
+    if (e.keyCode === 13) {
+      handleSearch();
+    }
+  };
   return (
     <Container>
-      <SearchInput type="text" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} placeholder="搜尋演唱會、場地" />
+      <SearchInput type="text" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} placeholder="搜尋演唱會、場地" onKeyDown={(e) => handlerKeyDown(e)} />
       <SearchBtn onClick={() => handleSearch()}>
         <StyleSearch />
       </SearchBtn>
