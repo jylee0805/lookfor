@@ -62,17 +62,17 @@ const Hint = styled.p`
   margin: 0 auto 30px;
 `;
 
-export type State ={
+export type State = {
   concertData: Concerts[];
   searchData: Concerts[];
   weekData: Concerts[];
   searchHint: boolean;
   isLoaded: boolean;
-}
+};
 export type Action =
   | { type: "setConcertData"; payload: { concertData: Concerts[] } }
   | { type: "setSearchData"; payload: { searchData: Concerts[] } }
-  | { type: "toggleSearchHint"; payload: { searchHint: boolean } }
+  | { type: "toggleSearchHint"; payload: { length: number } }
   | { type: "toggleIsLoaded"; payload: { isLoaded: boolean } }
   | { type: "setFilterData"; payload: { searchData: Concerts[]; weekData: Concerts[] } };
 
@@ -89,8 +89,12 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, concertData: action.payload.concertData };
     case "setSearchData":
       return { ...state, searchData: action.payload.searchData };
-    case "toggleSearchHint":
-      return { ...state, searchHint: action.payload.searchHint };
+    case "toggleSearchHint": {
+      if (action.payload.length === 0) {
+        return { ...state, searchHint: true };
+      }
+      return { ...state, searchHint: false };
+    }
     case "toggleIsLoaded":
       return { ...state, isLoaded: action.payload.isLoaded };
     case "setFilterData":
