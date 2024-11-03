@@ -108,7 +108,7 @@ function ConcertList() {
   const [startAt, setStartAt] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [nextLoad, setNextLoad] = useState<boolean>(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
-
+  const dataList = state.searchData.length !== 0 ? state.searchData : state.weekData.length !== 0 ? state.weekData : state.concertData || [];
   useEffect(() => {
     const timer = setTimeout(() => {
       dispatch({ type: "toggleIsLoaded", payload: { isLoaded: true } });
@@ -159,11 +159,9 @@ function ConcertList() {
       </Header>
       {state.searchHint && <Hint>查無該關鍵字活動</Hint>}
       <AllList>
-        {state.searchData.length !== 0
-          ? state.searchData.map((concert, index) => <ListItem key={`search-${concert.id}`} concert={concert} index={index} state={state} />)
-          : state.weekData.length !== 0
-            ? state.weekData.map((concert, index) => <ListItem key={`eek-${concert.id}`} concert={concert} index={index} state={state} />)
-            : state.concertData && state.concertData.map((concert, index) => <ListItem key={concert.id} concert={concert} index={index} state={state} />)}
+        {dataList.map((concert, index) => (
+          <ListItem key={`search-${concert.id}`} concert={concert} index={index} state={state} />
+        ))}
       </AllList>
     </Container>
   );
