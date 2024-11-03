@@ -166,6 +166,15 @@ export function ViewContextProvider({ children }: { children: React.ReactNode })
     getValues,
     setError,
     formState: { errors },
-  } = useForm<FormInputs>();
+  } = useForm<FormInputs>({
+    defaultValues: {
+      section: "3E",
+      row: "1",
+      seat: "5",
+      concert: "[BABYMONSTER PRESENTS : SEE YOU THERE] IN TAIPEI",
+      note: "不用擔心會被欄杆擋到",
+      content: "整場的氛圍很棒~~~",
+    },
+  });
   return <ViewContext.Provider value={{ register, handleSubmit, reset, watch, getValues, formState: { errors }, setError, state, dispatch, sectionRef }}>{children}</ViewContext.Provider>;
 }

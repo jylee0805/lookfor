@@ -62,17 +62,17 @@ const Hint = styled.p`
   margin: 0 auto 30px;
 `;
 
-export type State ={
+export type State = {
   concertData: Concerts[];
   searchData: Concerts[];
   weekData: Concerts[];
   searchHint: boolean;
   isLoaded: boolean;
-}
+};
 export type Action =
   | { type: "setConcertData"; payload: { concertData: Concerts[] } }
   | { type: "setSearchData"; payload: { searchData: Concerts[] } }
-  | { type: "toggleSearchHint"; payload: { searchHint: boolean } }
+  | { type: "toggleSearchHint"; payload: { length: number } }
   | { type: "toggleIsLoaded"; payload: { isLoaded: boolean } }
   | { type: "setFilterData"; payload: { searchData: Concerts[]; weekData: Concerts[] } };
 
@@ -89,8 +89,12 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, concertData: action.payload.concertData };
     case "setSearchData":
       return { ...state, searchData: action.payload.searchData };
-    case "toggleSearchHint":
-      return { ...state, searchHint: action.payload.searchHint };
+    case "toggleSearchHint": {
+      if (action.payload.length === 0) {
+        return { ...state, searchHint: true };
+      }
+      return { ...state, searchHint: false };
+    }
     case "toggleIsLoaded":
       return { ...state, isLoaded: action.payload.isLoaded };
     case "setFilterData":
@@ -104,7 +108,7 @@ function ConcertList() {
   const [startAt, setStartAt] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [nextLoad, setNextLoad] = useState<boolean>(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
-
+  const dataList = state.searchData.length !== 0 ? state.searchData : state.weekData.length !== 0 ? state.weekData : state.concertData || [];
   useEffect(() => {
     const timer = setTimeout(() => {
       dispatch({ type: "toggleIsLoaded", payload: { isLoaded: true } });
@@ -155,11 +159,9 @@ function ConcertList() {
       </Header>
       {state.searchHint && <Hint>查無該關鍵字活動</Hint>}
       <AllList>
-        {state.searchData.length !== 0
-          ? state.searchData.map((concert, index) => <ListItem key={`search-${concert.id}`} concert={concert} index={index} state={state} />)
-          : state.weekData.length !== 0
-            ? state.weekData.map((concert, index) => <ListItem key={`eek-${concert.id}`} concert={concert} index={index} state={state} />)
-            : state.concertData && state.concertData.map((concert, index) => <ListItem key={concert.id} concert={concert} index={index} state={state} />)}
+        {dataList.map((concert, index) => (
+          <ListItem key={`search-${concert.id}`} concert={concert} index={index} state={state} />
+        ))}
       </AllList>
     </Container>
   );

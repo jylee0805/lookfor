@@ -57,16 +57,18 @@ function Search({ state, dispatch }: Props) {
     const search = result.map((item) => {
       return item.item;
     });
-    if (search.length === 0) {
-      dispatch({ type: "toggleSearchHint", payload: { searchHint: true } });
-    } else {
-      dispatch({ type: "toggleSearchHint", payload: { searchHint: false } });
-    }
+    dispatch({ type: "toggleSearchHint", payload: { length: search.length } });
     dispatch({ type: "setSearchData", payload: { searchData: search.sort() } });
+  };
+
+  const handlerKeyDown = (e: React.KeyboardEvent) => {
+    if (e.keyCode === 13) {
+      handleSearch();
+    }
   };
   return (
     <Container>
-      <SearchInput type="text" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} placeholder="搜尋演唱會、場地" />
+      <SearchInput type="text" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} placeholder="搜尋演唱會、場地" onKeyDown={(e) => handlerKeyDown(e)} />
       <SearchBtn onClick={() => handleSearch()}>
         <StyleSearch />
       </SearchBtn>

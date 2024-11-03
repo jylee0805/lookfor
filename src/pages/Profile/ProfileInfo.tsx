@@ -35,13 +35,25 @@ const UserName = styled.p`
   line-height: 1.5;
   font-weight: 700;
 `;
+const BtnContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: 25px;
+`;
 const Label = styled.label<{ $isEdit: boolean }>`
   display: ${(props) => (props.$isEdit ? "block" : "none")};
+  background: #6a6565;
+  display: block;
+  padding: 10px;
+  border-radius: 8px;
 `;
 const Input = styled.input`
   display: none;
 `;
-const EditBtn = styled.button``;
+const EditBtn = styled.button`
+  padding: 10px 20px;
+`;
 
 type Props = {
   state: ProfileState;
@@ -88,11 +100,13 @@ function ProfileInfo({ state, dispatch }: Props) {
       ) : (
         <UserName>{state.profile.userName}</UserName>
       )}
-      <Label $isEdit={state.isEditProfile}>
-        選擇照片
-        <Input type="file" accept="image/jpg,image/jpeg,image/png,image/gif" onChange={handleImage} />
-      </Label>
-      <EditBtn onClick={() => handleProfile()}>{state.isEditProfile ? "儲存" : "編輯"}</EditBtn>
+      <BtnContainer>
+        <Label $isEdit={state.isEditProfile}>
+          選擇照片
+          <Input type="file" accept="image/jpg,image/jpeg,image/png,image/gif" onChange={handleImage} />
+        </Label>
+        <EditBtn onClick={() => handleProfile()}>{state.isEditProfile ? "儲存" : "編輯"}</EditBtn>
+      </BtnContainer>
     </ProfileContainer>
   );
 }
