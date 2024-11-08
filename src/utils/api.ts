@@ -60,7 +60,6 @@ const api = {
       if (error instanceof Error) {
         return error.message;
       } else {
-        console.error("Unexpected error:", error);
         return "An unexpected error occurred.";
       }
     }
@@ -74,7 +73,6 @@ const api = {
       if (error instanceof Error) {
         return error.message;
       } else {
-        console.error("Unexpected error:", error);
         return "An unexpected error occurred.";
       }
     }
@@ -446,6 +444,7 @@ const api = {
       const need = data.data.park.filter((item: PlaceAvailable) => {
         return places.some((place) => place.placeId === item.id);
       });
+
       return need;
     }
   },

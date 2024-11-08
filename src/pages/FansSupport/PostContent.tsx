@@ -106,7 +106,7 @@ function PostContent({ state, dispatch, item }: Props) {
         <ImportInfoContent>{item.qualify}</ImportInfoContent>
       </ImportInfo>
 
-      <InfoContent dangerouslySetInnerHTML={{ __html: item.content.replace(/\n/g, "<br />") }}></InfoContent>
+      <InfoContent dangerouslySetInnerHTML={{ __html: item.content.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br />") }}></InfoContent>
       <PhotoProvider maskOpacity={0.8} bannerVisible={false}>
         <ImageContainer>
           {item.image.map((item) => (
