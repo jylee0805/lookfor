@@ -44,10 +44,8 @@ const handleAnalyzeImage = async (imageUrl: string) => {
     if (labels.includes("Person") && labels.includes("Clothing") && labels.includes("Pants")) {
       return false;
     }
-    return true;
-  } else {
-    return true;
   }
+  return true;
 };
 
 export default handleAnalyzeImage;

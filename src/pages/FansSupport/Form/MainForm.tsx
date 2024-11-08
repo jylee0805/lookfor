@@ -97,7 +97,7 @@ function MainForm({ concert }: Props) {
       <Input type="text" {...register("place", { required: true })} />
       <Label>領取資格</Label>
       <QualifyInput type="text" {...register("qualify", { required: true })} />
-      <MoreContent {...register("more", { required: true })}></MoreContent>
+      <MoreContent {...register("more", { required: true })} placeholder="分享更多應援物資訊..."></MoreContent>
     </InputContainer>
   );
 }
