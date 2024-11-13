@@ -1,9 +1,8 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { MdOutlineClose } from "react-icons/md";
 import styled from "styled-components";
-import { Comment, ViewPost } from "../../../types";
+import { Comment, ViewAction, ViewPost, ViewState } from "../../../types";
 import api from "../../../utils/api";
-import { ViewContext } from "../../../utils/ViewContextProvider";
 import SeatButtons from "./SeatButtons";
 import ViewPostCard from "./ViewPostCard";
 
@@ -128,9 +127,11 @@ const NoView = styled.p`
   text-align: center;
   margin: 40px 0;
 `;
-
-function Seat() {
-  const { state, dispatch } = useContext(ViewContext);
+interface Props {
+  state: ViewState;
+  dispatch: React.Dispatch<ViewAction>;
+}
+function Seat({ state, dispatch }: Props) {
   useEffect(() => {
     const loadViewPosts = async () => {
       const unsubscribes: (() => void)[] = [];
@@ -211,11 +212,15 @@ function Seat() {
         <CloseBtn onClick={() => dispatch({ type: "isSelectRow" })}>
           <StyleClose />
         </CloseBtn>
-        <SeatButtons />
+        <SeatButtons state={state} dispatch={dispatch} />
       </Header>
       <Title> 視角分享</Title>
 
-      {state.viewPosts && state.viewPosts.length !== 0 ? state.viewPosts.map((post: ViewPost, index) => <ViewPostCard post={post} index={index} />) : <NoView>暫時沒有視角</NoView>}
+      {state.viewPosts && state.viewPosts.length !== 0 ? (
+        state.viewPosts.map((post: ViewPost, index: number) => <ViewPostCard post={post} index={index} state={state} dispatch={dispatch} />)
+      ) : (
+        <NoView>暫時沒有視角</NoView>
+      )}
     </SeatSection>
   );
 }

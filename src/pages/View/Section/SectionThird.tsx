@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import styled from "styled-components";
 import ThirdDPhoto from "../../../assets/Vector 9-10.svg";
 import ThirdCPhoto from "../../../assets/Vector 9-11.svg";
@@ -8,7 +7,7 @@ import ThirdGPhoto from "../../../assets/Vector 9-7.svg";
 import ThirdFPhoto from "../../../assets/Vector 9-8.svg";
 import ThirdEPhoto from "../../../assets/Vector 9-9.svg";
 import Section from "../../../components/Section";
-import { ViewContext } from "../../../utils/ViewContextProvider";
+import { ViewState } from "../../../types";
 
 const Third = styled.div`
   height: 300px;
@@ -118,9 +117,10 @@ const ThirdG = styled(ThirdBase)`
     height: 100%;
   }
 `;
-
-function SectionThird() {
-  const { state } = useContext(ViewContext);
+interface Props {
+  state: ViewState;
+}
+function SectionThird({ state }: Props) {
   return (
     <Third>
       <ThirdA sectionName="3A" state={state} imgUrl={ThirdAPhoto} />

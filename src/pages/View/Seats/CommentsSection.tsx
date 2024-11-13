@@ -1,13 +1,12 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IoSend } from "react-icons/io5";
 import styled from "styled-components";
 import Dialog from "../../../components/Dialog";
 import MoreFeatures from "../../../components/MoreFeatures";
 import { useDialog } from "../../../hooks/useDialog";
-import { ViewPost } from "../../../types";
+import { ViewAction, ViewPost, ViewState } from "../../../types";
 import api from "../../../utils/api";
-import { ViewContext } from "../../../utils/ViewContextProvider";
 
 const Avatar = styled.img`
   border-radius: 20px;
@@ -69,16 +68,17 @@ const Send = styled.button`
 type CommentEdit = {
   comment: string;
 };
-type Props = {
+interface Props {
   post: ViewPost;
-};
+  state: ViewState;
+  dispatch: React.Dispatch<ViewAction>;
+}
 
-function CommentsSection({ post }: Props) {
+function CommentsSection({ post, state, dispatch }: Props) {
   const { register: registerEditComment, setValue, handleSubmit: handlerEditComment } = useForm<CommentEdit>();
   const { isOpen, setIsOpen, closeDialog } = useDialog();
   const [commentEdit, setCommentEdit] = useState<string>("");
   const [deleteCommentId, setDeleteComment] = useState({ viewId: "", commentId: "" });
-  const { state, dispatch } = useContext(ViewContext);
 
   const createSubmitHandler = (postId: string, commentId: string): SubmitHandler<CommentEdit> => {
     const onSubmitEditComment: SubmitHandler<CommentEdit> = async (data) => {

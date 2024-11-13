@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import ViewSelect from "../../../components/ViewSelect";
+import { ViewState } from "../../../types";
 import { ViewContext } from "../../../utils/ViewContextProvider";
 import api from "../../../utils/api";
 
@@ -59,13 +60,15 @@ const Content = styled.textarea`
 
 const seatOptions = ["VIPA", "VIPB", "VIPC", "2A", "2B", "2C", "2D", "2E", "2F", "2G", "3A", "3B", "3C", "3D", "3E", "3F", "3G"];
 
-type Seats = {
+interface Seats {
   sectionName: string;
   row: number[];
-};
-
-function MainInput() {
-  const { state, register, watch } = useContext(ViewContext);
+}
+interface Props {
+  state: ViewState;
+}
+function MainInput({ state }: Props) {
+  const { register, watch } = useContext(ViewContext);
 
   const [allSeats, setAllSeats] = useState<Seats[]>([]);
   const sectionValue = watch("section");

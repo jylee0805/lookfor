@@ -1,10 +1,9 @@
-import { useContext } from "react";
 import styled from "styled-components";
 import VIPCPhoto from "../../../assets/Vector 7-2.svg";
 import VIPAPhoto from "../../../assets/Vector 7.svg";
 import VIPBPhoto from "../../../assets/Vector 8.svg";
 import Section from "../../../components/Section";
-import { ViewContext } from "../../../utils/ViewContextProvider";
+import { ViewState } from "../../../types";
 
 const Vip = styled.div`
   position: relative;
@@ -42,9 +41,10 @@ const VipC = styled(VipBase)`
   top: 0;
   left: 62%;
 `;
-
-function SectionVIP() {
-  const { state } = useContext(ViewContext);
+interface Props {
+  state: ViewState;
+}
+function SectionVIP({ state }: Props) {
   return (
     <Vip>
       <VipA sectionName="VIPA" state={state} imgUrl={VIPAPhoto} />

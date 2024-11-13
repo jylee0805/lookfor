@@ -1,11 +1,10 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import Dialog from "../../../components/Dialog";
 import MoreFeatures from "../../../components/MoreFeatures";
 import { useDialog } from "../../../hooks/useDialog";
-import { ViewPost } from "../../../types";
+import { ViewAction, ViewPost, ViewState } from "../../../types";
 import api from "../../../utils/api";
-import { ViewContext } from "../../../utils/ViewContextProvider";
 
 const PostContainer = styled.div`
   display: flex;
@@ -27,18 +26,19 @@ const UserName = styled.p``;
 const Note = styled.p``;
 const Content = styled.p``;
 
-type Props = {
+interface Props {
   post: ViewPost;
-};
+  state: ViewState;
+  dispatch: React.Dispatch<ViewAction>;
+}
 
-function PostContent({ post }: Props) {
+function PostContent({ post, state, dispatch }: Props) {
   const [deleteViewId, setDeleteViewId] = useState<string>("");
   const { isOpen, setIsOpen, closeDialog } = useDialog();
   const handlerEditPost = (post: ViewPost) => {
     dispatch({ type: "setPostMode", payload: { postEdit: post, isPostClick: true, isShowMask: true } });
     document.body.style.overflow = "hidden";
   };
-  const { state, dispatch } = useContext(ViewContext);
 
   const handlerClickDelete = (id: string) => {
     setDeleteViewId(id);

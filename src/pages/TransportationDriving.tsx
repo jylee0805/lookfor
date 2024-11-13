@@ -6,7 +6,6 @@ import pin from "../assets/pin.png";
 import selectPin from "../assets/selectPin.png";
 import CustomMarkerLabel from "../components/CustomLabel";
 import Loading from "../components/Loading";
-import VenueHeader from "../components/VenueHeader";
 import { PlaceAvailable, PlaceInfo } from "../types";
 import api from "../utils/api";
 
@@ -174,7 +173,6 @@ function TransportationDriving() {
 
   return (
     <Container>
-      <VenueHeader />
       <Main>
         <Content>
           <SubTitle>自行開車</SubTitle>

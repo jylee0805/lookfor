@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import styled from "styled-components";
 import SecondFPhoto from "../../../assets/Vector 9-1.svg";
 import SecondEPhoto from "../../../assets/Vector 9-2.svg";
@@ -8,7 +7,7 @@ import SecondBPhoto from "../../../assets/Vector 9-5.svg";
 import SecondAPhoto from "../../../assets/Vector 9-6.svg";
 import SecondGPhoto from "../../../assets/Vector 9.svg";
 import Section from "../../../components/Section";
-import { ViewContext } from "../../../utils/ViewContextProvider";
+import { ViewState } from "../../../types";
 
 const Second = styled.div`
   position: relative;
@@ -127,9 +126,10 @@ const SecondG = styled(SecondBase)`
     top: -20px;
   }
 `;
-
-function SectionSecond() {
-  const { state } = useContext(ViewContext);
+interface Props {
+  state: ViewState;
+}
+function SectionSecond({ state }: Props) {
   return (
     <Second>
       <SecondA sectionName="2A" state={state} imgUrl={SecondAPhoto} />

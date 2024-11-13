@@ -2,7 +2,7 @@ import { useContext, useEffect } from "react";
 import { MdOutlineClose } from "react-icons/md";
 import styled from "styled-components";
 import imageLoading from "../../../assets/imageLoading.gif";
-import { ViewPost } from "../../../types";
+import { ViewAction, ViewPost, ViewState } from "../../../types";
 import { ViewContext } from "../../../utils/ViewContextProvider";
 import Footer from "./Footer";
 import ImagePreView from "./ImagePreView";
@@ -124,9 +124,12 @@ const resetValue = {
   content: "",
   image: undefined,
 };
-
-function Form() {
-  const { state, dispatch, reset } = useContext(ViewContext);
+interface Props {
+  state: ViewState;
+  dispatch: React.Dispatch<ViewAction>;
+}
+function Form({ state, dispatch }: Props) {
+  const { reset } = useContext(ViewContext);
 
   useEffect(() => {
     if (state.postEdit?.section) {
@@ -165,10 +168,10 @@ function Form() {
           <StyleClose />
         </Btn>
         <ContentContainer>
-          <MainInput />
-          <ImagePreView />
+          <MainInput state={state} />
+          <ImagePreView state={state} dispatch={dispatch} />
         </ContentContainer>
-        <Footer />
+        <Footer state={state} dispatch={dispatch} />
       </PostContainer>
     </>
   );

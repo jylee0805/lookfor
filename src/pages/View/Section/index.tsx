@@ -1,7 +1,7 @@
-import { useContext } from "react";
+import { memo } from "react";
 import styled from "styled-components";
+import { ViewAction, ViewState } from "../../../types";
 import api from "../../../utils/api";
-import { ViewContext } from "../../../utils/ViewContextProvider";
 import SectionSecond from "./SectionSecond";
 import SectionThird from "./SectionThird";
 import SectionVIP from "./SectionVIP";
@@ -26,9 +26,12 @@ const SelectSection = styled.div`
     font-size: 0.8rem;
   }
 `;
-
-function Sections() {
-  const { state, dispatch, sectionRef } = useContext(ViewContext);
+interface Props {
+  state: ViewState;
+  dispatch: React.Dispatch<ViewAction>;
+  sectionRef: React.RefObject<HTMLDivElement>;
+}
+function Sections({ state, dispatch, sectionRef }: Props) {
   const handlerSection = async (section: string) => {
     const rows = await api.getRows(section);
     const sectionAry: number[] = Array.isArray(rows) ? rows : [];
@@ -58,11 +61,13 @@ function Sections() {
         }
       }}
     >
-      <SectionVIP />
-      <SectionSecond />
-      <SectionThird />
+      <SectionVIP state={state} />
+      <SectionSecond state={state} />
+      <SectionThird state={state} />
     </SelectSection>
   );
 }
 
-export default Sections;
+export default memo(Sections, (prevProps, nextProps) => {
+  return prevProps.state.selectedSection === nextProps.state.selectedSection;
+});

@@ -1,7 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { OriginView } from "../../types";
-import { ViewContext } from "../../utils/ViewContextProvider";
+import { OriginView, ViewAction, ViewState } from "../../types";
 import RowButtons from "./RowButtons";
 
 const RowSection = styled.div<{ $isSelectSection: boolean }>`
@@ -40,10 +39,15 @@ const ReviewImg = styled.img`
   border: 5px solid #fff;
   border-radius: 5px;
 `;
+interface Props {
+  state: ViewState;
+  dispatch: React.Dispatch<ViewAction>;
+  sectionRef: React.RefObject<HTMLDivElement>;
+}
 
-function Rows() {
+function Rows({ state, dispatch, sectionRef }: Props) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const { state, dispatch, sectionRef } = useContext(ViewContext);
+
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -68,7 +72,7 @@ function Rows() {
             <ReviewImg src={state.allPost?.find((view) => view.section === state.selectedSection)?.image || ""} />
           </ReviewContainer>
         )}
-        <RowButtons />
+        <RowButtons state={state} dispatch={dispatch} />
       </RowSection>
     )
   );

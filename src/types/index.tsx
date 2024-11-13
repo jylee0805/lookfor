@@ -114,3 +114,53 @@ export type Detail = {
   ticketSaleWebsite: string;
   images: string;
 };
+
+export type ViewState = {
+  rowSeats: number[];
+  selectedSection: string;
+  selectedRow: number;
+  selectedSeat: number;
+  viewPosts: ViewPost[];
+  selectPhoto: File | null;
+  localPhotoUrl: string;
+  postEdit: ViewPost;
+  allPost: OriginView[];
+  allRowPost: OriginView[];
+  isLoading: boolean;
+  isSelectRow: boolean;
+  isSelectSection: boolean;
+  isPostClick: boolean;
+  isShowMask: boolean;
+};
+export type ViewAction =
+  | { type: "selectSection"; payload: { selectedSection: string; rowSeats: number[]; isSelectRow: boolean } }
+  | { type: "selectRow"; payload: { selectedRow: number; isSelectRow: boolean; selectedSeat: number } }
+  | { type: "selectSeat"; payload: { selectedSeat: number } }
+  | { type: "setViewPosts"; payload: { viewPosts: ViewPost[] } }
+  | { type: "togglePostClick"; payload: { isPostClick: boolean; isShowMask: boolean } }
+  | { type: "setSelectPhoto"; payload: { selectPhoto: File | null; localPhotoUrl: string } }
+  | { type: "isSelectRow" }
+  | { type: "setLoading"; payload: { isLoading: boolean } }
+  | { type: "setPostMode"; payload: { postEdit: ViewPost; isPostClick: boolean; isShowMask: boolean } }
+  | { type: "updatePostMode"; payload: { postEdit: ViewPost } }
+  | { type: "setAllSectionPost"; payload: { allPost: OriginView[] } }
+  | { type: "setAllRowPost"; payload: { allRowPost: OriginView[] } }
+  | { type: "setDefaultSeat"; payload: { rowSeats: number[]; selectedSection: string; isSelectSection: boolean; isSelectRow: boolean; selectedRow: number; selectedSeat: number } }
+  | { type: "editPost"; payload: { viewPosts: ViewPost[]; isLoading: boolean; isPostClick: boolean; isShowMask: boolean; selectPhoto: File | null; localPhotoUrl: string } }
+  | {
+      type: "resetPost";
+      payload: {
+        selectedSection: string;
+        rowSeats: number[];
+        isSelectRow: boolean;
+        isSelectSection: boolean;
+        selectedRow: number;
+        selectedSeat: number;
+        isLoading: boolean;
+        isPostClick: boolean;
+        isShowMask: boolean;
+        selectPhoto: File | null;
+        localPhotoUrl: string;
+      };
+    }
+  | { type: "cancelPost"; payload: { postEdit: ViewPost; isPostClick: boolean; isShowMask: boolean; selectPhoto: File | null; localPhotoUrl: string } };
