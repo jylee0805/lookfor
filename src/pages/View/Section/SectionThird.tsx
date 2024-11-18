@@ -20,116 +20,53 @@ const Third = styled.div`
     height: 120px;
   }
 `;
-const ThirdBase = styled(Section)`
+const ThirdBase = styled(Section)<{ $width: string; $height: string; $top: string; $left: string; $top768: string; $top575: string; $height575: string }>`
   background-color: #ffac4d;
+  width: ${(props) => props.$width};
+  height: ${(props) => props.$height};
+  top: ${(props) => props.$top};
+  left: ${(props) => props.$left};
   &:hover {
     background-color: #ff8800;
   }
-`;
-const ThirdA = styled(ThirdBase)`
-  width: 14.1%;
-  height: 151px;
-  top: -10px;
-  left: 4.5%;
   @media (max-width: 768px) {
-    top: -35px;
+    top: ${(props) => props.$top768};
   }
   @media (max-width: 575px) {
-    height: 100%;
-    top: -25px;
+    top: ${(props) => props.$top575};
+    height: ${(props) => props.$height575};
   }
 `;
-const ThirdB = styled(ThirdBase)`
-  width: 15%;
-  height: 176px;
-  top: 40px;
-  left: 15%;
-  @media (max-width: 768px) {
-    top: -5px;
-  }
-  @media (max-width: 575px) {
-    height: 100%;
-    top: 5px;
-  }
-`;
-const ThirdC = styled(ThirdBase)`
-  width: 11.4%;
-  height: 185px;
-  top: 70px;
-  left: 28%;
-  @media (max-width: 768px) {
-    top: 15px;
-  }
-  @media (max-width: 575px) {
-    height: 100%;
-    top: 20px;
-  }
-`;
-const ThirdD = styled(ThirdBase)`
-  width: 14.1%;
-  height: 176px;
-  top: 85px;
-  left: 42.5%;
-  @media (max-width: 768px) {
-    top: 30px;
-  }
-  @media (max-width: 575px) {
-    height: 100%;
-    top: 25px;
-  }
-`;
-const ThirdE = styled(ThirdBase)`
-  width: 11.4%;
-  height: 185px;
-  top: 70px;
-  left: 60%;
-  @media (max-width: 768px) {
-    top: 15px;
-  }
-  @media (max-width: 575px) {
-    height: 100%;
-    top: 20px;
-  }
-`;
-const ThirdF = styled(ThirdBase)`
-  width: 15.1%;
-  height: 176px;
-  top: 40px;
-  left: 69%;
-  @media (max-width: 768px) {
-    top: -5px;
-  }
-  @media (max-width: 575px) {
-    height: 100%;
-    top: 5px;
-  }
-`;
-const ThirdG = styled(ThirdBase)`
-  width: 14.1%;
-  height: 150px;
-  top: -10px;
-  left: 80.5%;
-  @media (max-width: 768px) {
-    top: -35px;
-  }
-  @media (max-width: 575px) {
-    top: -25px;
-    height: 100%;
-  }
-`;
+
 interface Props {
   state: ViewState;
 }
+const thirdData = [
+  { sectionName: "3A", imgUrl: ThirdAPhoto, width: "14.1%", height: "151px", top: "-10px", left: " 4.5%", top768: "-35px", top575: "-25px", height575: "100%" },
+  { sectionName: "3B", imgUrl: ThirdBPhoto, width: "15%", height: "176px", top: "40px", left: " 15%", top768: "-5px", top575: "5px", height575: "100%" },
+  { sectionName: "3C", imgUrl: ThirdCPhoto, width: "11.4%", height: "185px", top: "70px", left: " 28%", top768: "15px", top575: "20px", height575: "100%" },
+  { sectionName: "3D", imgUrl: ThirdDPhoto, width: "14.1%", height: "176px", top: "85px", left: " 42.5%", top768: "30px", top575: "25px", height575: "100%" },
+  { sectionName: "3E", imgUrl: ThirdEPhoto, width: "11.4%", height: "185px", top: "70px", left: " 60%", top768: "15px", top575: "20px", height575: "100%" },
+  { sectionName: "3F", imgUrl: ThirdFPhoto, width: "15.1%", height: "176px", top: "40px", left: " 69%", top768: "-5px", top575: "5px", height575: "100%" },
+  { sectionName: "3G", imgUrl: ThirdGPhoto, width: "14.1%", height: "150px", top: "-10px", left: " 80.5%", top768: "-35px", top575: "-25px", height575: "100%" },
+];
 function SectionThird({ state }: Props) {
   return (
     <Third>
-      <ThirdA sectionName="3A" state={state} imgUrl={ThirdAPhoto} />
-      <ThirdB sectionName="3B" state={state} imgUrl={ThirdBPhoto} />
-      <ThirdC sectionName="3C" state={state} imgUrl={ThirdCPhoto} />
-      <ThirdD sectionName="3D" state={state} imgUrl={ThirdDPhoto} />
-      <ThirdE sectionName="3E" state={state} imgUrl={ThirdEPhoto} />
-      <ThirdF sectionName="3F" state={state} imgUrl={ThirdFPhoto} />
-      <ThirdG sectionName="3G" state={state} imgUrl={ThirdGPhoto} />
+      {thirdData.map((item) => (
+        <ThirdBase
+          sectionName={item.sectionName}
+          state={state}
+          imgUrl={item.imgUrl}
+          $width={item.width}
+          $height={item.height}
+          $top={item.top}
+          $left={item.left}
+          $top768={item.top768}
+          $top575={item.top575}
+          $height575={item.height575}
+        />
+      ))}
     </Third>
   );
 }

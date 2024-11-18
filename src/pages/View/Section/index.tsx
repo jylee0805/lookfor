@@ -44,12 +44,7 @@ function Sections({ state, dispatch, sectionRef }: Props) {
         });
       }
     }, 100);
-
-    if (section === state.selectedSection) {
-      dispatch({ type: "selectSection", payload: { rowSeats: [], selectedSection: "", isSelectRow: false } });
-    } else {
-      dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, selectedSection: section, isSelectRow: false } });
-    }
+    dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, selectedSection: section, isSelectRow: false } });
   };
 
   return (

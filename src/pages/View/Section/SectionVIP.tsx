@@ -14,8 +14,12 @@ const Vip = styled.div`
   }
 `;
 
-const VipBase = styled(Section)`
+const VipBase = styled(Section)<{ $width: string; $height: string; $top: string; $left: string }>`
   background-color: #ffe6cf;
+  width: ${(props) => props.$width};
+  height: ${(props) => props.$height};
+  top: ${(props) => props.$top};
+  left: ${(props) => props.$left};
   &:hover {
     background-color: #ff9318;
   }
@@ -23,33 +27,20 @@ const VipBase = styled(Section)`
     height: 100%;
   }
 `;
-const VipA = styled(VipBase)`
-  width: 19.6%;
-  height: 160px;
-  top: 0;
-  left: 16%;
-`;
-const VipB = styled(VipBase)`
-  width: 21%;
-  height: 161px;
-  top: 0;
-  left: 38%;
-`;
-const VipC = styled(VipBase)`
-  width: 19.5%;
-  height: 160px;
-  top: 0;
-  left: 62%;
-`;
 interface Props {
   state: ViewState;
 }
+const vipData = [
+  { sectionName: "VIPA", imgUrl: VIPAPhoto, width: "19.6%", height: "160px", top: "0", left: " 16%" },
+  { sectionName: "VIPB", imgUrl: VIPBPhoto, width: "21%", height: "161px", top: "0", left: " 38%" },
+  { sectionName: "VIPC", imgUrl: VIPCPhoto, width: "19.5%", height: "160px", top: "0", left: " 62%" },
+];
 function SectionVIP({ state }: Props) {
   return (
     <Vip>
-      <VipA sectionName="VIPA" state={state} imgUrl={VIPAPhoto} />
-      <VipB sectionName="VIPB" state={state} imgUrl={VIPBPhoto} />
-      <VipC sectionName="VIPC" state={state} imgUrl={VIPCPhoto} />
+      {vipData.map((item) => (
+        <VipBase sectionName={item.sectionName} state={state} imgUrl={item.imgUrl} $width={item.width} $height={item.height} $top={item.top} $left={item.left} key={item.sectionName} />
+      ))}
     </Vip>
   );
 }
