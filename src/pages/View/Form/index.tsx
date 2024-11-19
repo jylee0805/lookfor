@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react";
 import { MdOutlineClose } from "react-icons/md";
 import styled from "styled-components";
+import { Seats } from "..";
 import imageLoading from "../../../assets/imageLoading.gif";
 import { ViewAction, ViewPost, ViewState } from "../../../types";
 import { ViewContext } from "../../../utils/ViewContextProvider";
@@ -127,8 +128,9 @@ const resetValue = {
 interface Props {
   state: ViewState;
   dispatch: React.Dispatch<ViewAction>;
+  sectionData: Seats[];
 }
-function Form({ state, dispatch }: Props) {
+function Form({ state, dispatch, sectionData }: Props) {
   const { reset } = useContext(ViewContext);
 
   useEffect(() => {
@@ -168,7 +170,7 @@ function Form({ state, dispatch }: Props) {
           <StyleClose />
         </Btn>
         <ContentContainer>
-          <MainInput state={state} />
+          <MainInput sectionData={sectionData} />
           <ImagePreView state={state} dispatch={dispatch} />
         </ContentContainer>
         <Footer state={state} dispatch={dispatch} />

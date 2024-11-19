@@ -162,7 +162,19 @@ const reducer = (state: ViewState, action: ViewAction): ViewState => {
       return state;
   }
 };
-
+export interface Seats {
+  sectionName: string;
+  row: number[];
+  height: string;
+  width: string;
+  top: string;
+  top768: string;
+  top575: string;
+  height575: string;
+  height768?: string;
+  left: string;
+  imgUrl: string;
+}
 function View() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -172,17 +184,24 @@ function View() {
 
   const [state, dispatch] = useReducer(reducer, initial);
   const [isViewLoad, setIsViewLoad] = useState<boolean>(false);
+  const [sectionData, setSectionData] = useState<Seats[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const getSeat = async () => {
       const rows = await api.getRows(section);
+
       const sectionAry: number[] = Array.isArray(rows) ? rows : [];
+
       dispatch({ type: "setDefaultSeat", payload: { rowSeats: sectionAry, selectedSection: section, isSelectSection: true, isSelectRow: true, selectedRow: row - 1, selectedSeat: seat - 1 } });
     };
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       document.body.style.overflowY = "auto";
       setIsViewLoad(true);
+      const allSection = (await api.getSections()) as Seats[];
+      console.log(allSection);
+
+      setSectionData(allSection);
     }, 4000);
     const timerLink = setTimeout(() => {
       if (location.state) {
@@ -236,7 +255,7 @@ function View() {
 
       <Main>
         <ViewContextProvider>
-          <Form state={state} dispatch={dispatch} />
+          <Form state={state} dispatch={dispatch} sectionData={sectionData} />
         </ViewContextProvider>
         <SectionHeader>
           <Title>區域選擇</Title>
@@ -245,7 +264,7 @@ function View() {
             <PostVieBtnText>發佈視角</PostVieBtnText>
           </PostViewBtn>
         </SectionHeader>
-        <Sections state={state} dispatch={dispatch} sectionRef={sectionRef} />
+        <Sections state={state} dispatch={dispatch} sectionRef={sectionRef} sectionData={sectionData} />
         <Rows state={state} dispatch={dispatch} sectionRef={sectionRef} />
         <Seat state={state} dispatch={dispatch} />
       </Main>

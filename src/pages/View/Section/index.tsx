@@ -1,5 +1,5 @@
-import { memo } from "react";
 import styled from "styled-components";
+import { Seats } from "..";
 import { ViewAction, ViewState } from "../../../types";
 import api from "../../../utils/api";
 import SectionSecond from "./SectionSecond";
@@ -30,8 +30,11 @@ interface Props {
   state: ViewState;
   dispatch: React.Dispatch<ViewAction>;
   sectionRef: React.RefObject<HTMLDivElement>;
+  sectionData: Seats[];
 }
-function Sections({ state, dispatch, sectionRef }: Props) {
+function Sections({ state, dispatch, sectionRef, sectionData }: Props) {
+  console.log(sectionData);
+
   const handlerSection = async (section: string) => {
     const rows = await api.getRows(section);
     const sectionAry: number[] = Array.isArray(rows) ? rows : [];
@@ -56,13 +59,11 @@ function Sections({ state, dispatch, sectionRef }: Props) {
         }
       }}
     >
-      <SectionVIP state={state} />
-      <SectionSecond state={state} />
-      <SectionThird state={state} />
+      <SectionVIP state={state} sectionData={sectionData} />
+      <SectionSecond state={state} sectionData={sectionData} />
+      <SectionThird state={state} sectionData={sectionData} />
     </SelectSection>
   );
 }
 
-export default memo(Sections, (prevProps, nextProps) => {
-  return prevProps.state.selectedSection === nextProps.state.selectedSection;
-});
+export default Sections;
