@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { State } from "../pages/View";
+import { useEffect, useState } from "react";
+import { ViewState } from "../types";
 
-const useSectionData = (sectionName: string, state: State) => {
+const useSectionData = (sectionName: string, state: ViewState) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 

@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import VenueHeader from "../components/VenueHeader";
 
 const Container = styled.div``;
 const Main = styled.main`
@@ -60,7 +59,6 @@ const Line = styled.div`
 function TransportationPublic() {
   return (
     <Container>
-      <VenueHeader />
       <Main>
         <Content>
           <SubTitle>捷運</SubTitle>

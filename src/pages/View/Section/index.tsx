@@ -1,7 +1,8 @@
-import { useContext } from "react";
+import { memo } from "react";
 import styled from "styled-components";
+import { Seats } from "..";
+import { ViewAction, ViewState } from "../../../types";
 import api from "../../../utils/api";
-import { ViewContext } from "../../../utils/ViewContextProvider";
 import SectionSecond from "./SectionSecond";
 import SectionThird from "./SectionThird";
 import SectionVIP from "./SectionVIP";
@@ -26,13 +27,18 @@ const SelectSection = styled.div`
     font-size: 0.8rem;
   }
 `;
+interface Props {
+  state: ViewState;
+  dispatch: React.Dispatch<ViewAction>;
+  sectionRef: React.RefObject<HTMLDivElement>;
+  sectionData: Seats[];
+}
+function Sections({ state, dispatch, sectionRef, sectionData }: Props) {
+  console.log(sectionData);
 
-function Sections() {
-  const { state, dispatch, sectionRef } = useContext(ViewContext);
   const handlerSection = async (section: string) => {
     const rows = await api.getRows(section);
     const sectionAry: number[] = Array.isArray(rows) ? rows : [];
-
     setTimeout(() => {
       if (sectionRef.current) {
         sectionRef.current.scrollIntoView({
@@ -41,12 +47,7 @@ function Sections() {
         });
       }
     }, 100);
-
-    if (section === state.selectedSection) {
-      dispatch({ type: "selectSection", payload: { rowSeats: [], selectedSection: "", isSelectRow: false } });
-    } else {
-      dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, selectedSection: section, isSelectRow: false } });
-    }
+    dispatch({ type: "selectSection", payload: { rowSeats: sectionAry, selectedSection: section, isSelectRow: false } });
   };
 
   return (
@@ -58,11 +59,13 @@ function Sections() {
         }
       }}
     >
-      <SectionVIP />
-      <SectionSecond />
-      <SectionThird />
+      <SectionVIP state={state} sectionData={sectionData} />
+      <SectionSecond state={state} sectionData={sectionData} />
+      <SectionThird state={state} sectionData={sectionData} />
     </SelectSection>
   );
 }
 
-export default Sections;
+export default memo(Sections, (prevProps, nextProps) => {
+  return prevProps.state.selectedSection === nextProps.state.selectedSection && prevProps.sectionData === nextProps.sectionData;
+});

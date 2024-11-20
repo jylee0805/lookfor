@@ -1,7 +1,6 @@
-import { useContext } from "react";
 import { MdOutlineClose } from "react-icons/md";
 import styled from "styled-components";
-import { ViewContext } from "../../../utils/ViewContextProvider";
+import { ViewAction, ViewState } from "../../../types";
 
 const StyleClose = styled(MdOutlineClose)`
   font-size: 24px;
@@ -25,9 +24,11 @@ const ImagePreviewDelete = styled.button`
 const ImagePreview = styled.img`
   object-fit: cover;
 `;
-
-function ImagePreView() {
-  const { state, dispatch } = useContext(ViewContext);
+interface Props {
+  state: ViewState;
+  dispatch: React.Dispatch<ViewAction>;
+}
+function ImagePreView({ state, dispatch }: Props) {
   const handleDeletePreview = () => {
     if (state.selectPhoto) {
       dispatch({ type: "setSelectPhoto", payload: { selectPhoto: null, localPhotoUrl: "" } });

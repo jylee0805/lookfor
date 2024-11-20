@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { SubmitHandler } from "react-hook-form";
 import styled from "styled-components";
-import { ViewPost } from "../../../types";
+import { ViewAction, ViewPost, ViewState } from "../../../types";
 import api from "../../../utils/api";
 import { AuthContext } from "../../../utils/AuthContextProvider";
 import handleAnalyzeImage from "../../../utils/handleAnalyzeImage";
@@ -63,12 +63,13 @@ const resetValue = {
   content: "",
   image: undefined,
 };
-
-function Footer() {
+interface Props {
+  state: ViewState;
+  dispatch: React.Dispatch<ViewAction>;
+}
+function Footer({ state, dispatch }: Props) {
   const authContext = useContext(AuthContext);
   const {
-    state,
-    dispatch,
     register,
     reset,
     getValues,

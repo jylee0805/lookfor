@@ -1,17 +1,15 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useReducer, useRef, useState } from "react";
 import { MdOutlineAdd } from "react-icons/md";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Dialog from "../../components/Dialog";
 import Loading from "../../components/Loading";
-import VenueHeader from "../../components/VenueHeader";
 import { useDialog } from "../../hooks/useDialog";
-import { OriginView } from "../../types";
+import { OriginView, ViewAction, ViewPost, ViewState } from "../../types";
 import api from "../../utils/api";
 import { AuthContext } from "../../utils/AuthContextProvider";
-import { ComponentContext } from "../../utils/ComponentContextProvider";
-import { ViewContext } from "../../utils/ViewContextProvider";
-import Post from "./Form";
+import { ViewContextProvider } from "../../utils/ViewContextProvider";
+import Form from "./Form";
 import Rows from "./Rows";
 import Seat from "./Seats";
 import Sections from "./Section";
@@ -88,24 +86,122 @@ const PostViewBtn = styled.button`
 `;
 const PostVieBtnText = styled.span``;
 
+const initial: ViewState = {
+  rowSeats: [],
+  selectedSection: "0",
+  selectedRow: 0,
+  selectedSeat: 0,
+  isSelectRow: false,
+  isSelectSection: false,
+  viewPosts: [],
+  isPostClick: false,
+  isShowMask: false,
+  selectPhoto: null,
+  localPhotoUrl: "",
+  isLoading: false,
+  postEdit: {} as ViewPost,
+  allPost: [],
+  allRowPost: [],
+};
+
+const reducer = (state: ViewState, action: ViewAction): ViewState => {
+  switch (action.type) {
+    case "setDefaultSeat":
+      return {
+        ...state,
+        ...action.payload,
+      };
+    case "selectSection":
+      return { ...state, selectedSection: action.payload.selectedSection, rowSeats: action.payload.rowSeats, isSelectRow: action.payload.isSelectRow, isSelectSection: true };
+    case "selectRow":
+      return { ...state, selectedRow: action.payload.selectedRow, isSelectRow: action.payload.isSelectRow, selectedSeat: action.payload.selectedSeat };
+    case "selectSeat":
+      return { ...state, selectedSeat: action.payload.selectedSeat };
+    case "setViewPosts":
+      return { ...state, viewPosts: action.payload.viewPosts };
+    case "isSelectRow":
+      return { ...state, isSelectRow: false };
+    case "togglePostClick":
+      return { ...state, isPostClick: action.payload.isPostClick, isShowMask: action.payload.isShowMask };
+    case "setSelectPhoto":
+      return { ...state, selectPhoto: action.payload.selectPhoto, localPhotoUrl: action.payload.localPhotoUrl };
+    case "setLoading": {
+      return { ...state, isLoading: action.payload.isLoading };
+    }
+    case "setPostMode": {
+      return { ...state, postEdit: action.payload.postEdit, isPostClick: action.payload.isPostClick, isShowMask: action.payload.isShowMask };
+    }
+    case "updatePostMode": {
+      return { ...state, postEdit: action.payload.postEdit };
+    }
+    case "setAllSectionPost": {
+      return { ...state, allPost: action.payload.allPost };
+    }
+    case "setAllRowPost": {
+      return { ...state, allRowPost: action.payload.allRowPost };
+    }
+    case "editPost": {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case "resetPost": {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case "cancelPost": {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    default:
+      return state;
+  }
+};
+export interface Seats {
+  sectionName: string;
+  row: number[];
+  height: string;
+  width: string;
+  top: string;
+  top768: string;
+  top575: string;
+  height575: string;
+  height768?: string;
+  left: string;
+  imgUrl: string;
+}
 function View() {
   const navigate = useNavigate();
   const location = useLocation();
   const { section, row, seat } = location.state || {};
   const { isOpen, setIsOpen, closeDialog } = useDialog();
   const authContext = useContext(AuthContext);
-  const componentContext = useContext(ComponentContext);
-  const { state, dispatch } = useContext(ViewContext);
+
+  const [state, dispatch] = useReducer(reducer, initial);
+  const [isViewLoad, setIsViewLoad] = useState<boolean>(false);
+  const [sectionData, setSectionData] = useState<Seats[]>([]);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const getSeat = async () => {
       const rows = await api.getRows(section);
+
       const sectionAry: number[] = Array.isArray(rows) ? rows : [];
+
       dispatch({ type: "setDefaultSeat", payload: { rowSeats: sectionAry, selectedSection: section, isSelectSection: true, isSelectRow: true, selectedRow: row - 1, selectedSeat: seat - 1 } });
     };
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       document.body.style.overflowY = "auto";
-      componentContext?.setIsViewLoad(true);
+      setIsViewLoad(true);
+      const allSection = (await api.getSections()) as Seats[];
+      console.log(allSection);
+
+      setSectionData(allSection);
     }, 4000);
     const timerLink = setTimeout(() => {
       if (location.state) {
@@ -155,10 +251,12 @@ function View() {
       <Dialog isOpen={isOpen} title="您尚未登入" onConfirm={handleConfirm} onCancel={closeDialog} confirmText="前往登入">
         是否前往登入執行更多功能?
       </Dialog>
-      {!componentContext?.isViewLoad && <Loading />}
-      <VenueHeader />
+      {!isViewLoad && <Loading />}
+
       <Main>
-        <Post />
+        <ViewContextProvider>
+          <Form state={state} dispatch={dispatch} sectionData={sectionData} />
+        </ViewContextProvider>
         <SectionHeader>
           <Title>區域選擇</Title>
           <PostViewBtn onClick={() => handlePostClick()}>
@@ -166,9 +264,9 @@ function View() {
             <PostVieBtnText>發佈視角</PostVieBtnText>
           </PostViewBtn>
         </SectionHeader>
-        <Sections />
-        <Rows />
-        <Seat />
+        <Sections state={state} dispatch={dispatch} sectionRef={sectionRef} sectionData={sectionData} />
+        <Rows state={state} dispatch={dispatch} sectionRef={sectionRef} />
+        <Seat state={state} dispatch={dispatch} />
       </Main>
     </Container>
   );

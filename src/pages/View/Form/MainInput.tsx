@@ -1,8 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import styled from "styled-components";
 import ViewSelect from "../../../components/ViewSelect";
 import { ViewContext } from "../../../utils/ViewContextProvider";
-import api from "../../../utils/api";
 
 const FormContainer = styled.div`
   display: grid;
@@ -59,27 +58,20 @@ const Content = styled.textarea`
 
 const seatOptions = ["VIPA", "VIPB", "VIPC", "2A", "2B", "2C", "2D", "2E", "2F", "2G", "3A", "3B", "3C", "3D", "3E", "3F", "3G"];
 
-type Seats = {
+interface Seats {
   sectionName: string;
   row: number[];
-};
+}
+interface Props {
+  sectionData: Seats[];
+}
+function MainInput({ sectionData }: Props) {
+  const { register, watch } = useContext(ViewContext);
 
-function MainInput() {
-  const { state, register, watch } = useContext(ViewContext);
-
-  const [allSeats, setAllSeats] = useState<Seats[]>([]);
   const sectionValue = watch("section");
   const rowValue = parseInt(watch("row"));
 
-  useEffect(() => {
-    const getAllSeats = async () => {
-      const allSection = (await api.getSections()) as Seats[];
-      setAllSeats(allSection);
-    };
-    getAllSeats();
-  }, [state.viewPosts]);
-
-  const filteredSeats = allSeats.filter((item) => item.sectionName === sectionValue);
+  const filteredSeats = sectionData.filter((item) => item.sectionName === sectionValue);
   const uniqueRows = filteredSeats.length > 0 && Array.isArray(filteredSeats[0].row) ? filteredSeats[0].row : [];
   const seats = uniqueRows[rowValue - 1];
   return (

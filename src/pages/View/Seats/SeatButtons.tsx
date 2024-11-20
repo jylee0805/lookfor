@@ -3,8 +3,7 @@ import dataSeat from "../../../assets/dataSeat.png";
 import defaultSeat from "../../../assets/defaultSeat.png";
 
 import { motion } from "framer-motion";
-import { useContext } from "react";
-import { ViewContext } from "../../../utils/ViewContextProvider";
+import { ViewAction, ViewState } from "../../../types";
 
 const Container = styled.div`
   width: 100%;
@@ -84,9 +83,11 @@ const SeatPoint = styled(motion.div)`
     top: -65%;
   }
 `;
-
-function SeatButtons() {
-  const { state, dispatch } = useContext(ViewContext);
+interface Props {
+  state: ViewState;
+  dispatch: React.Dispatch<ViewAction>;
+}
+function SeatButtons({ state, dispatch }: Props) {
   const handlerSeat = (value: number) => {
     dispatch({ type: "selectSeat", payload: { selectedSeat: value } });
   };

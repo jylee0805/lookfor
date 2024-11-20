@@ -1,17 +1,19 @@
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import GlobalStyle from "./GlobalStyle";
 import Header from "./components/Header";
 import Loading from "./components/Loading";
+import VenueHeader from "./components/VenueHeader";
 import { AuthContextProvider } from "./utils/AuthContextProvider";
 import { ComponentContextProvider } from "./utils/ComponentContextProvider";
 import { ConcertContextProvider } from "./utils/ConcertContextProvider";
-import { ViewContextProvider } from "./utils/ViewContextProvider";
 
 function App() {
   const [loaded, setLoaded] = useState(false);
+  const location = useLocation();
+  const showVenueHeader = location.pathname === "/transportation-public" || location.pathname === "/transportation-driving" || location.pathname === "/view";
   const onLoad = () => {
     setLoaded(true);
   };
@@ -26,14 +28,13 @@ function App() {
     <AuthContextProvider>
       <ConcertContextProvider>
         <ComponentContextProvider>
-          <ViewContextProvider>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <GlobalStyle />
-              {!loaded && <Loading />}
-              <Header />
-              <Outlet />
-            </LocalizationProvider>
-          </ViewContextProvider>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <GlobalStyle />
+            {!loaded && <Loading />}
+            <Header />
+            {showVenueHeader && <VenueHeader />}
+            <Outlet />
+          </LocalizationProvider>
         </ComponentContextProvider>
       </ConcertContextProvider>
     </AuthContextProvider>

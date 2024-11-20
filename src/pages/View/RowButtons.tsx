@@ -1,6 +1,5 @@
-import { useContext } from "react";
 import styled from "styled-components";
-import { ViewContext } from "../../utils/ViewContextProvider";
+import { ViewAction, ViewState } from "../../types";
 
 const Container = styled.div`
   display: grid;
@@ -52,9 +51,11 @@ const Button = styled.button<{ $col: boolean; $haveData: boolean; $isSelect: boo
     border-radius: 50%;
   }
 `;
-
-function RowButtons() {
-  const { state, dispatch } = useContext(ViewContext);
+interface Props {
+  state: ViewState;
+  dispatch: React.Dispatch<ViewAction>;
+}
+function RowButtons({ state, dispatch }: Props) {
   return (
     <Container>
       {Array.from({ length: state.rowSeats.length }).map((_, index) => (
