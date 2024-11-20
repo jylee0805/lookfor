@@ -88,6 +88,28 @@ const StyleLink = styled(Link)`
     color: transparent;
   }
 `;
+
+const Venues = styled.div`
+  position: absolute;
+  width: 240px;
+  background: #000000;
+`;
+const VenuesLink = styled(Link)`
+  padding: 15px 24px;
+  color: #ffffff;
+  display: block;
+  @media (max-width: 768px) {
+    padding: 10px 15px;
+  }
+  @media (max-width: 575px) {
+    display: block;
+    color: #fff;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 10px 30px;
+  }
+`;
+
 type Props = {
   state: State;
   dispatch: React.Dispatch<Action>;
@@ -104,9 +126,15 @@ function Menu({ state, dispatch, isLogin }: Props) {
         </NavCloseBtn>
       </NavCloseItem>
       <NavItem>
-        <StyleLink to="/view" onClick={() => dispatch({ type: "toggleIsMenuOpen", payload: { isMenuOpen: false } })}>
-          北流視角
-        </StyleLink>
+        場館視角
+        <Venues>
+          <VenuesLink to="/view?venue=tmc" onClick={() => dispatch({ type: "toggleIsMenuOpen", payload: { isMenuOpen: false } })}>
+            臺北流行音樂中心
+          </VenuesLink>
+          <VenuesLink to="/view?venue=lsc" onClick={() => dispatch({ type: "toggleIsMenuOpen", payload: { isMenuOpen: false } })}>
+            國立體育大學綜合體育館
+          </VenuesLink>
+        </Venues>
       </NavItem>
       <NavItem>
         <StyleLink to="/concertlist" onClick={() => dispatch({ type: "toggleIsMenuOpen", payload: { isMenuOpen: false } })}>

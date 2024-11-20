@@ -1,3 +1,4 @@
+import { memo } from "react";
 import styled from "styled-components";
 import { Seats } from "..";
 import { ViewAction, ViewState } from "../../../types";
@@ -38,7 +39,6 @@ function Sections({ state, dispatch, sectionRef, sectionData }: Props) {
   const handlerSection = async (section: string) => {
     const rows = await api.getRows(section);
     const sectionAry: number[] = Array.isArray(rows) ? rows : [];
-
     setTimeout(() => {
       if (sectionRef.current) {
         sectionRef.current.scrollIntoView({
@@ -66,4 +66,6 @@ function Sections({ state, dispatch, sectionRef, sectionData }: Props) {
   );
 }
 
-export default Sections;
+export default memo(Sections, (prevProps, nextProps) => {
+  return prevProps.state.selectedSection === nextProps.state.selectedSection && prevProps.sectionData === nextProps.sectionData;
+});
